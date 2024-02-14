@@ -1,0 +1,6 @@
+bench/
+docs/
+data/
+models/
+notebooks/
+venv/

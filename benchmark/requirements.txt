@@ -1,0 +1,2 @@
+#pip package names required by the package, and exact versions you know to work
+click==8.1.3

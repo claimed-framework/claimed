@@ -1,0 +1,85 @@
+dist: bionic
+os: linux
+
+services:
+  - docker
+
+language: python
+
+python:
+  - "3.7"
+  - "3.8"
+  - "3.9"
+  - "3.10"
+
+install:
+  # install the package
+  - pip install --upgrade pip wheel
+  - pip install --progress-bar off -r requirements.txt
+  - pip install --progress-bar off -r dev_requirements.txt
+  - pip install --progress-bar off .
+
+script:
+  # test import
+  - python -c "import benchmark"
+  
+  # ensure installed commands helps run successfully
+  # (add as required)
+  - salutation --help
+  
+  # run unit tests
+  - python -m pytest -sv --cov=benchmark --cov-fail-under=65
+
+  # static type checking
+  - python -m mypy benchmark
+
+  # style checking
+  - python -m black benchmark --check --diff --color
+  - python -m flake8 --per-file-ignores="__init__.py:F401" benchmark
+
+# the following stages only start if the "test" stage above all succeed
+jobs:
+  include:
+    - stage: Documentation
+      python: "3.7"
+      before_install: skip
+      install:
+        - pip install --progress-bar off -r requirements.txt
+        - pip install --progress-bar off -r dev_requirements.txt
+      before_script: skip
+      script:
+        # build documentation pages
+        - cd docs && make html && cd ..
+      deploy:
+        - provider: pages
+          cleanup: false
+          github_token: $GITHUB_TOKEN
+          # Set in the settings page of your repository, as a secure variable
+          # see https://docs.travis-ci.com/user/deployment/pages/#setting-the-github-token
+          local_dir: docs/_build/html
+          github_url: github.ibm.com
+          on:
+            branch: main
+    - stage: Docker
+      services: docker
+      before_install: skip
+      install: skip
+      before_script: skip
+      script:
+        # check docker build and test inside
+        - docker build -t benchmark:test .
+        - docker run --rm -t benchmark:test python -m pytest -sv
+      deploy:
+        - provider: script
+          cleanup: false
+          script: bash .travis/deploy.sh
+          on:
+            branch: main
+
+# documented on https://docs.travis-ci.com/user/notifications/#configuring-slack-notifications
+notifications:
+  slack:
+    rooms:
+      - ibm-research:can-be-set-later-in-travis-file
+    on_success: always
+    on_failure: always

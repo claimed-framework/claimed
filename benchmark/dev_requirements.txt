@@ -1,0 +1,17 @@
+# tests
+pytest==7.1.2
+pytest-cov==3.0.0
+# checks
+black==22.3.0
+flake8==4.0.1
+pep8-naming==0.13.0
+mypy==0.950
+pre-commit==2.18.1
+# docs
+# pinning sphinx to older version to resolve flake8 conflict under python3.7: flake8 4.0.1 depends on importlib-metadata<4.3; python_version < "3.8" and sphinx 4.4.0 depends on importlib-metadata>=4.4; python_version < "3.10"
+sphinx==4.3.2
+sphinx-autodoc-typehints==1.17.1
+better-apidoc==0.3.2
+six==1.16.0
+sphinx-rtd-theme==1.0.0
+myst-parser==0.17.2

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# LICENSED INTERNAL CODE. PROPERTY OF IBM.
+# IBM Research Licensed Internal Code
+# (C) Copyright IBM Corp. 2024
+# ALL RIGHTS RESERVED
+
+echo "We can also ship bash scripts with the python package if we have to."
+echo "What matters is the shebang."

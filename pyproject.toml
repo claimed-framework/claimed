@@ -18,11 +18,16 @@ readme = "README.md"
 repository = "https://github.ibm.com/GeoFM-Finetuning/benchmark"
 
 [tool.poetry.dependencies]
-python = ">= 3.7, < 3.11"
+python = ">= 3.10, < 3.11"
 click = "*"
 # optional dependencies that can be opted in by apps.
 pytest = { version = "*", optional = true }
 pytest-cov = { version = "*", optional = true }
+torch = "^2.2.0"
+torchvision = "^0.17.0"
+terratorch = {git = "git@github.ibm.com:GeoFM-Finetuning/terratorch.git"}
+more-itertools = "^10.2.0"
+mlflow = "^2.10.2"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]

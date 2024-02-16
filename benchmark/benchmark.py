@@ -1,5 +1,4 @@
 import random
-import socket
 from functools import partial
 from itertools import starmap
 
@@ -26,44 +25,47 @@ def generate_run_names(test_no, num_runs=5):
 # Execute tuning function, allowing for param overrides,
 # run_name disambiguation, and tagging support
 def execute_tuning(
-    test_no,
+    dataset,
     param1_choices=["a", "b", "c"],
     param2_choices=["d", "e", "f"],
     test_identifier="",
 ):
     ident = "default" if not test_identifier else test_identifier
     # Use a parent run to encapsulate the child runs
-    with mlflow.start_run(run_name="super_parent_run_test"):
-        with mlflow.start_run(
-            run_name=f"parent_run_test_{ident}_{test_no}", nested=True
-        ):
-            # Partial application of the log_run function
-            log_current_run = partial(
-                log_run,
-                test_no=test_no,
-                param1_choices=param1_choices,
-                param2_choices=param2_choices,
-                tag_ident=ident,
-            )
-            mlflow.set_tag("test_identifier", ident)
-            # Generate run names and apply log_current_run function to each run name
-            runs = starmap(
-                log_current_run,
-                ((run_name,) for run_name in generate_run_names(test_no)),
-            )
-            # Consume the iterator to execute the runs
-            consume(runs)
+    with mlflow.start_run(run_name=f"parent_run_{dataset}", nested=True):
+        # Partial application of the log_run function
+        log_current_run = partial(
+            log_run,
+            test_no=dataset,
+            param1_choices=param1_choices,
+            param2_choices=param2_choices,
+            tag_ident=ident,
+        )
+        mlflow.set_tag("test_identifier", ident)
+        # Generate run names and apply log_current_run function to each run name
+        runs = starmap(
+            log_current_run,
+            ((run_name,) for run_name in generate_run_names(dataset)),
+        )
+        # Consume the iterator to execute the runs
+        consume(runs)
 
 
 # Set the tracking uri and experiment
-mlflow.set_tracking_uri(f"http://{socket.gethostname()}.pok.ibm.com:8080")
+mlflow.set_tracking_uri(f"http://localhost:8080")
 mlflow.set_experiment("Nested Child Association")
 
 # Define custom parameters
+datasets = ["agb", "sen1floods11", "fire_scars"]
 param_1_values = ["x", "y", "z"]
 param_2_values = ["u", "v", "w"]
 
 # Execute hyperparameter tuning runs with custom parameter choices
-consume(
-    starmap(execute_tuning, ((x, param_1_values, param_2_values) for x in range(5)))
-)
+with mlflow.start_run(run_name="backbone_1"):
+    mlflow.set_tag("purpose", "backbone_benchmarking")
+    consume(
+        starmap(
+            execute_tuning,
+            ((dataset, param_1_values, param_2_values) for dataset in datasets),
+        )
+    )

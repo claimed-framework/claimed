@@ -1,0 +1,7 @@
+backbone:
+  backbone_name: prithvi_vit_100
+
+tasks:
+  - type: regression
+    datamodule: benchmark/resources/dataset_specifications/agb.yaml
+    decoder_name: FCNDecoder

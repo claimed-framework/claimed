@@ -28,6 +28,8 @@ torchvision = "^0.17.0"
 terratorch = {git = "git@github.ibm.com:GeoFM-Finetuning/terratorch.git"}
 more-itertools = "^10.2.0"
 mlflow = "^2.10.2"
+importlib-metadata = "4.13.0"
+optuna = "^3.5.0"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov"]

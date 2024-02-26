@@ -182,7 +182,7 @@ def ray_fit_model(
         callbacks.append(ModelCheckpoint(monitor="val/loss"))
 
     trainer = Trainer(
-        strategy=RayDDPStrategy(),
+        strategy=RayDDPStrategy(find_unused_parameters=True),
         callbacks=callbacks,
         plugins=[RayLightningEnvironment()],
         enable_checkpointing=save_models,

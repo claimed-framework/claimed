@@ -63,7 +63,7 @@ optimization_space:
   #   - FCNDecoder
   #   - UperNetDecoder
   lr:
-    min: 1e-6
+    min: 1e-5
     max: 1e-3
     type: real
     log: true
@@ -79,6 +79,6 @@ optimization_space:
     min: 0
     max: 0.8
     type: real
-  freeze_backbone:
-    - true
-    - false
+  # freeze_backbone:
+  #   - true
+  #   - false

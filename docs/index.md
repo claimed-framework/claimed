@@ -32,8 +32,10 @@ pip install -e .
 ## Usage
 
 This tool allows you to design a benchmark test for a backbone that exists in `TerraTorch` over:
-    - Several tasks
-    - Several hyperparameter configurations
+
+- Several tasks
+
+- Several hyperparameter configurations
 
 To do this it relies on a configuration file where the benchmark is defined. This consists of:
     

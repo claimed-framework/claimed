@@ -9,7 +9,7 @@ import ray
 from jsonargparse import CLI
 from tabulate import tabulate
 
-from benchmark.model_fitting import ray_tune_model
+from benchmark.model_fitting import ray_train_model, ray_tune_model
 from benchmark.types import (
     Backbone,
     Task,
@@ -27,7 +27,7 @@ def benchmark_backbone_on_task(
     n_trials: int = 1,
     save_models: bool = False,
     pruning_grace_period: int | None = 10,
-) -> tuple[float, str | list[str] | None, dict[str, Any] | None]:
+) -> dict:
     with mlflow.start_run(
         run_name=f"{backbone.backbone}_{task.name}", nested=True
     ) as run:
@@ -43,7 +43,6 @@ def benchmark_backbone_on_task(
             task,
             lightning_task_class,
             model_args,
-            f"{backbone.backbone}_{task.name}",
             optimization_space,
             storage_uri,
             experiment_name,
@@ -58,11 +57,11 @@ def benchmark_backbone_on_task(
 
         if results.get_best_result().metrics is None:
             raise Exception("Best result metrics were none")
-        return (
-            results.get_best_result().metrics[task.metric],
-            task.metric,
-            results.get_best_result().config,
-        )
+        return {
+            "best_result": results.get_best_result().metrics[task.metric],
+            "metric": task.metric,
+            "best_config": results.get_best_result().config,
+        }
 
 
 def benchmark_backbone(
@@ -101,20 +100,64 @@ def benchmark_backbone(
 
     table_columns = ["Task", "Metric", "Best Score", "Hyperparameters"]
     table_entries = []
+
     with mlflow.start_run(run_name=run_name) as run:
         mlflow.set_tag("purpose", "backbone_benchmarking")
+
+    if optimization_space is None:
+        ray_tasks = []
         for task in tasks:
-            best_value, metric_name, hparams = benchmark_backbone_on_task(
-                backbone,
-                task,
-                storage_uri,
-                experiment_name,
-                optimization_space=optimization_space,
-                n_trials=n_trials,
-                save_models=save_models,
-                pruning_grace_period=pruning_grace_period,
+            lightning_task_class = task.type.get_class_from_enum()
+            model_args = build_model_args(backbone, task)
+            ray_tasks.append(
+                ray_train_model.remote(
+                    backbone,
+                    task,
+                    lightning_task_class,
+                    model_args,
+                    run_name,
+                    run.info.run_id,
+                    storage_uri,
+                    experiment_name,
+                    save_models,
+                    pruning_grace_period=pruning_grace_period,
+                )
             )
-            table_entries.append([task.name, metric_name, best_value, hparams])
+        results = ray.get(ray_tasks)
+        table_entries = [
+            [
+                task.name,
+                task.metric,
+                result.metrics[task.metric],
+                None,
+            ]
+            for task, result in zip(tasks, results)
+        ]
+    else:
+        results = []
+        for task in tasks:
+            results.append(
+                benchmark_backbone_on_task(
+                    backbone,
+                    task,
+                    storage_uri,
+                    experiment_name,
+                    optimization_space=optimization_space,
+                    n_trials=n_trials,
+                    save_models=save_models,
+                    pruning_grace_period=pruning_grace_period,
+                )
+            )
+
+        table_entries = [
+            [
+                task.name,
+                result["metric"],
+                result["best_result"],
+                result["best_config"],
+            ]
+            for task, result in zip(tasks, results)
+        ]
 
         table = tabulate(table_entries, headers=table_columns)
         print(table)

@@ -9,6 +9,7 @@ from typing import Any
 import lightning.pytorch as pl
 import mlflow
 import optuna
+import ray
 import torch
 from lightning import Callback, Trainer
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint, RichProgressBar
@@ -245,12 +246,65 @@ class RayReportCallback(pl.callbacks.Callback):
         report(metrics=metrics)
 
 
-def ray_tune_model(
+@ray.remote
+def ray_train_model(
     backbone: Backbone,
     task: Task,
     lightning_task_class: valid_task_types,
     base_args: dict[str, Any],
     run_name: str,
+    parent_run_id: str,
+    storage_uri: str,
+    experiment_name: str,
+    save_models: bool,
+    pruning_grace_period: int | None = 10,
+) -> train.Result:
+    mlflow.set_tracking_uri(storage_uri)
+    mlflow.set_experiment(experiment_name)
+
+    with mlflow.start_run(run_name=run_name, nested=True):
+        # hack for nestedness
+        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+        trainable = tune.with_parameters(
+            ray_fit_model,
+            backbone=backbone,
+            base_args=base_args,
+            task=task,
+            lightning_task_class=lightning_task_class,
+            storage_uri=storage_uri,
+            experiment_name=experiment_name,
+            parent_run_id=parent_run_id,
+            save_models=save_models,
+            pruning_grace_period=pruning_grace_period,
+        )
+
+        scaling_config = ScalingConfig(
+            use_gpu=True,
+            num_workers=1,
+            resources_per_worker={"CPU": 4, "GPU": 1},
+            trainer_resources={"CPU": 1, "GPU": 0},
+        )
+
+        ray_dir = Path(storage_uri).parent / "ray"
+        ray_trainer = TorchTrainer(
+            trainable,
+            scaling_config=scaling_config,
+            run_config=RunConfig(
+                name=run_name,
+                storage_path=str(ray_dir.absolute()),
+                checkpoint_config=CheckpointConfig(
+                    num_to_keep=1, checkpoint_frequency=0
+                ),
+            ),
+        )
+    return ray_trainer.fit()
+
+
+def ray_tune_model(
+    backbone: Backbone,
+    task: Task,
+    lightning_task_class: valid_task_types,
+    base_args: dict[str, Any],
     hparam_space: optimization_space_type,
     storage_uri: str,
     experiment_name: str,
@@ -264,7 +318,6 @@ def ray_tune_model(
         base_args=base_args,
         task=task,
         lightning_task_class=lightning_task_class,
-        run_name=run_name,
         storage_uri=storage_uri,
         experiment_name=experiment_name,
         parent_run_id=mlflow.active_run().info.run_id,
@@ -361,7 +414,6 @@ def ray_fit_model(
     base_args: dict,
     task: Task,
     lightning_task_class: valid_task_types,
-    run_name: str,
     storage_uri: str,
     experiment_name: str,
     parent_run_id: str,

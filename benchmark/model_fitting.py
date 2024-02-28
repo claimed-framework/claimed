@@ -299,13 +299,13 @@ def ray_tune_model(
 
         # Early stopping
         # this causes memory to not be released and trials to fail
-        if pruning_grace_period is not None:
-            scheduler = ASHAScheduler(
-                max_t=task.max_epochs,
-                grace_period=min(task.max_epochs, pruning_grace_period),
-            )
-        else:
-            scheduler = FIFOScheduler()
+        # if pruning_grace_period is not None:
+        #     scheduler = ASHAScheduler(
+        #         max_t=task.max_epochs,
+        #         grace_period=min(task.max_epochs, pruning_grace_period),
+        #     )
+        # else:
+        scheduler = FIFOScheduler()
 
     scaling_config = ScalingConfig(
         use_gpu=True,
@@ -318,18 +318,6 @@ def ray_tune_model(
     ray_trainer = TorchTrainer(
         trainable,
         scaling_config=scaling_config,
-    )
-
-    reporter = tune.CLIReporter(
-        metric_columns={
-            task.metric: task.metric,
-            "val/loss": "Validation loss",
-            "train/loss": "Train loss",
-            "iter": "Epoch",
-        },
-        metric=task.metric,
-        mode="min",
-        sort_by_metric=True,
     )
 
     tuner = tune.Tuner(
@@ -346,7 +334,6 @@ def ray_tune_model(
             name=run_name,
             storage_path=str(ray_dir.absolute()),
             checkpoint_config=CheckpointConfig(num_to_keep=1, checkpoint_frequency=0),
-            progress_reporter=reporter,
         ),
         param_space={"train_loop_config": current_hparams},
     )
@@ -368,9 +355,9 @@ def ray_fit_model(
     save_models: bool = True,
     pruning_grace_period: int | None = 10,
 ) -> None:
-    # tune.utils.wait_for_gpu(
-    #     target_util=0.07, delay_s=10
-    # )  # sometimes process needs some time to release GPU
+    tune.utils.wait_for_gpu(
+        target_util=0.07, delay_s=10, retry=50
+    )  # sometimes process needs some time to release GPU
     lr = float(config.pop("lr", task.lr))
     batch_size = config.pop("batch_size", None)
     if batch_size is not None:

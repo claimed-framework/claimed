@@ -31,7 +31,7 @@ export RAY_ADDRESS="<address>"
 Then, launch your workers:
 
 ```sh
-jbsub -queue <ccc_queue> -cores <nodes x (min 6 cpu per gpu) + gpu> -mem <mem> ./start_ray_workers.sh -a <ray_head_ip>
+jbsub -queue <ccc_queue> -cores <nodes x (min 6 cpu per gpu) + gpu> -mem <mem> ./start_ray_workers.sh -a <ray_head_ip>:$RAY_PORT
 ```
 
 You may have to run `chmod +x start_ray_workers.sh`.

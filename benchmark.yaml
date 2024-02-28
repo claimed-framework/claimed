@@ -80,10 +80,10 @@ optimization_space:
     - 16
     - 32
     # - 64
-  decoder_channels:
-    #   - 32
-    - 64
-    - 128
+  # decoder_channels:
+  #   #   - 32
+  #   - 64
+  #   - 128
   head_dropout:
     min: 0.4
     max: 0.8

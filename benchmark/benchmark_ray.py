@@ -7,9 +7,10 @@ import mlflow
 import pandas as pd
 import ray
 from jsonargparse import CLI
+from ray.util.multiprocessing import Pool
 from tabulate import tabulate
 
-from benchmark.model_fitting import ray_train_model, ray_tune_model
+from benchmark.model_fitting import fit_model, ray_tune_model, valid_task_types
 from benchmark.types import (
     Backbone,
     Task,
@@ -64,6 +65,34 @@ def benchmark_backbone_on_task(
         }
 
 
+@ray.remote(num_cpus=6, num_gpus=1)
+def remote_fit(
+    backbone: Backbone,
+    model_args: dict,
+    task: Task,
+    lightning_task_class: valid_task_types,
+    run_name: str,
+    storage_uri: str,
+    experiment_name: str,
+    parent_run_id: str,
+    pruning: bool,
+    save_models: bool,
+) -> float:
+    mlflow.set_tracking_uri(storage_uri)
+    mlflow.set_experiment(experiment_name)
+    return fit_model(
+        backbone,
+        model_args,
+        task,
+        lightning_task_class,
+        run_name,
+        storage_uri,
+        parent_run_id,
+        pruning=pruning,
+        save_models=save_models,
+    )[0]
+
+
 def benchmark_backbone(
     backbone: Backbone,
     tasks: list[Task],
@@ -104,50 +133,53 @@ def benchmark_backbone(
     with mlflow.start_run(run_name=run_name) as run:
         mlflow.set_tag("purpose", "backbone_benchmarking")
 
-    if optimization_space is None:
-        ray_tasks = []
-        for task in tasks:
-            lightning_task_class = task.type.get_class_from_enum()
-            model_args = build_model_args(backbone, task)
-            ray_tasks.append(
-                ray_train_model.remote(
-                    backbone,
-                    task,
-                    lightning_task_class,
-                    model_args,
-                    run_name,
-                    run.info.run_id,
-                    storage_uri,
-                    experiment_name,
-                    save_models,
-                    pruning_grace_period=pruning_grace_period,
+        if optimization_space is None:
+            # no hparams, parallelize over tasks
+            ray_tasks = []
+            for task in tasks:
+                run_name = f"{backbone.backbone}_{task.name}"
+                lightning_task_class = task.type.get_class_from_enum()
+                model_args = build_model_args(backbone, task)
+                ray_tasks.append(
+                    remote_fit.remote(
+                        backbone,
+                        model_args,
+                        task,
+                        lightning_task_class,
+                        run_name,
+                        storage_uri,
+                        experiment_name,
+                        run.info.run_id,
+                        pruning_grace_period is not None,
+                        save_models,
+                    )
                 )
-            )
-        results = ray.get(ray_tasks)
-        table_entries = [
-            [
-                task.name,
-                task.metric,
-                result.metrics[task.metric],
-                None,
+            results = ray.get(ray_tasks)
+            table_entries = [
+                [
+                    task.name,
+                    task.metric,
+                    result,
+                    None,
+                ]
+                for task, result in zip(tasks, results)
             ]
-            for task, result in zip(tasks, results)
-        ]
-    else:
-        results = []
-        for task in tasks:
-            results.append(
-                benchmark_backbone_on_task(
-                    backbone,
-                    task,
-                    storage_uri,
-                    experiment_name,
-                    optimization_space=optimization_space,
-                    n_trials=n_trials,
-                    save_models=save_models,
-                    pruning_grace_period=pruning_grace_period,
+        else:
+            # hparams, parallelize within tasks, run one task at a time.
+            results = []
+            for task in tasks:
+                results.append(
+                    benchmark_backbone_on_task(
+                        backbone,
+                        task,
+                        storage_uri,
+                        experiment_name,
+                        optimization_space=optimization_space,
+                        n_trials=n_trials,
+                        save_models=save_models,
+                        pruning_grace_period=pruning_grace_period,
+                    )
                 )
-            )
 
         table_entries = [
             [

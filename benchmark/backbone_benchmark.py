@@ -49,7 +49,7 @@ def benchmark_backbone_on_task(
                     lightning_task_class,
                     f"{run.info.run_name}",
                     storage_uri,
-                    experiment_name,
+                    run.info.run_id,
                     save_models=save_models,
                     pruning=pruning,
                 ),
@@ -69,7 +69,7 @@ def benchmark_backbone_on_task(
             f"{backbone.backbone}_{task.name}",
             optimization_space,
             storage_uri,
-            experiment_name,
+            run.info.run_id,
             save_models,
             pruning,
         )

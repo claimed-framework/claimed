@@ -14,7 +14,7 @@ init_args:
         width: 224
     - class_path: ToTensorV2
   cls: torchgeo.datamodules.EuroSATDataModule
-  batch_size: 32
+  batch_size: 16
   num_workers: 4
 dict_kwargs:
   root: /dccstor/geofm-pre/EuroSat

@@ -1,6 +1,6 @@
 class_path: terratorch.datamodules.GenericNonGeoPixelwiseRegressionDataModule
 init_args:
-  batch_size: 32
+  batch_size: 16
   num_workers: 4
   train_transform:
     - class_path: albumentations.HorizontalFlip

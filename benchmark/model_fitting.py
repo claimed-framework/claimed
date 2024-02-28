@@ -67,12 +67,13 @@ def launch_training(
     run_name: str,
     metric: str,
     storage_uri: str,
-    experiment_name: str,
+    parent_run_id: str,
 ) -> float:
     with mlflow.start_run(run_name=run_name, nested=True) as run:
+        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
         # explicitly log batch_size. Since it is not a model param, it will not be logged
         mlflow.log_param("batch_size", datamodule.batch_size)
-        mlflow.pytorch.autolog(log_datasets=False)
+        mlflow.pytorch.autolog(log_datasets=False, log_models=False)
 
         # trainer.logger = MLFlowLogger(
         #     experiment_name=experiment_name,
@@ -101,12 +102,12 @@ def fit_model(
     lightning_task_class: valid_task_types,
     run_name: str,
     storage_uri: str,
-    experiment_name: str,
+    parent_run_id: str,
     trial: optuna.Trial | None = None,
     lr: float | None = None,
     batch_size: int | None = None,
     freeze_backbone: bool = False,
-    save_models: bool = True,
+    save_models: bool = False,
     pruning: bool = True,
 ) -> tuple[float, str]:
     if batch_size:
@@ -152,7 +153,7 @@ def fit_model(
         run_name,
         task.metric,
         storage_uri,
-        experiment_name,
+        parent_run_id,
     ), task.metric
 
 
@@ -164,7 +165,7 @@ def fit_model_with_hparams(
     run_name: str,
     hparam_space: optimization_space_type,
     storage_uri: str,
-    experiment_name: str,
+    parent_run_id: str,
     save_models: bool,
     pruning: bool,
     trial: optuna.Trial,
@@ -209,7 +210,7 @@ def fit_model_with_hparams(
         lightning_task_class,
         run_name,
         storage_uri,
-        experiment_name,
+        parent_run_id,
         trial,
         lr=lr,
         batch_size=batch_size,
@@ -244,60 +245,6 @@ class RayReportCallback(pl.callbacks.Callback):
         # Add a barrier to ensure all workers finished reporting here
         torch.distributed.barrier()
         report(metrics=metrics)
-
-
-@ray.remote
-def ray_train_model(
-    backbone: Backbone,
-    task: Task,
-    lightning_task_class: valid_task_types,
-    base_args: dict[str, Any],
-    run_name: str,
-    parent_run_id: str,
-    storage_uri: str,
-    experiment_name: str,
-    save_models: bool,
-    pruning_grace_period: int | None = 10,
-) -> train.Result:
-    mlflow.set_tracking_uri(storage_uri)
-    mlflow.set_experiment(experiment_name)
-
-    with mlflow.start_run(run_name=run_name, nested=True):
-        # hack for nestedness
-        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
-        trainable = tune.with_parameters(
-            ray_fit_model,
-            backbone=backbone,
-            base_args=base_args,
-            task=task,
-            lightning_task_class=lightning_task_class,
-            storage_uri=storage_uri,
-            experiment_name=experiment_name,
-            parent_run_id=parent_run_id,
-            save_models=save_models,
-            pruning_grace_period=pruning_grace_period,
-        )
-
-        scaling_config = ScalingConfig(
-            use_gpu=True,
-            num_workers=1,
-            resources_per_worker={"CPU": 4, "GPU": 1},
-            trainer_resources={"CPU": 1, "GPU": 0},
-        )
-
-        ray_dir = Path(storage_uri).parent / "ray"
-        ray_trainer = TorchTrainer(
-            trainable,
-            scaling_config=scaling_config,
-            run_config=RunConfig(
-                name=run_name,
-                storage_path=str(ray_dir.absolute()),
-                checkpoint_config=CheckpointConfig(
-                    num_to_keep=1, checkpoint_frequency=0
-                ),
-            ),
-        )
-    return ray_trainer.fit()
 
 
 def ray_tune_model(

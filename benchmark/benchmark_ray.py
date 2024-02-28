@@ -181,15 +181,15 @@ def benchmark_backbone(
                     )
                 )
 
-        table_entries = [
-            [
-                task.name,
-                result["metric"],
-                result["best_result"],
-                result["best_config"],
+            table_entries = [
+                [
+                    task.name,
+                    result["metric"],
+                    result["best_result"],
+                    result["best_config"],
+                ]
+                for task, result in zip(tasks, results)
             ]
-            for task, result in zip(tasks, results)
-        ]
 
         table = tabulate(table_entries, headers=table_columns)
         print(table)

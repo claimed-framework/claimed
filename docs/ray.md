@@ -15,7 +15,7 @@ If on CCC, start a head node with:
 ```sh
 export RAY_PORT=20022 # or any other port you like
 
-jbsub -queue x86_24h -cores 2 -mem 32g ray start --head --port $RAY_PORT --dashboard-port $((RAY_PORT + 1)) --include-dashboard True --dashboard-host 0.0.0.0 --object-store-memory 10000000000 --num-cpus 0 --num-gpus 0 --temp-dir /tmp
+jbsub -queue x86_24h -cores 2 -mem 32g ray start --head --port $RAY_PORT --dashboard-port $((RAY_PORT + 1)) --include-dashboard True --dashboard-host 0.0.0.0 --object-store-memory 10000000000 --num-cpus 2 --num-gpus 0 --temp-dir /tmp
 ```
 
 Find out the address of your ray head with `bpeek <ccc process number>` and store it in an environment variable with
@@ -28,11 +28,10 @@ export RAY_ADDRESS="<address>"
 
 ![ray_head](images/ray_head.png)
 
-
 Then, launch your workers:
 
 ```sh
-jbsub -queue <ccc_queue> -cores <nodes x (min 6 cpu per gpu + 1 cpu per node) + gpu> -mem <mem> ./start_ray_workers.sh -a <ray_head_ip>
+jbsub -queue <ccc_queue> -cores <nodes x (min 6 cpu per gpu) + gpu> -mem <mem> ./start_ray_workers.sh -a <ray_head_ip>
 ```
 
 You may have to run `chmod +x start_ray_workers.sh`.

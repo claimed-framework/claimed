@@ -53,7 +53,7 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 
 - `storage_uri`: Location to use for storage.
 
-- `optimization_space`: Hyperparameter space to search over.
+- `optimization_space`: Hyperparameter space to search over. Bayesian optimization tends to work well with a small number of hyperparameters.
 
 See `benchmark.yaml` in the git repo for an example.
 
@@ -63,6 +63,7 @@ To run a benchmark over a ray cluster (which must be created before running), us
 
 To check the experiment results, use `mlflow ui --host $(hostname -f) --port <port> --backend-store-uri <storage_uri>` and click the link.
 ![mlflow demo](images/mlflow.png)
+
 ## :::benchmark.backbone_benchmark.benchmark_backbone
 
 ## :::benchmark.types.Backbone

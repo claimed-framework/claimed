@@ -52,9 +52,9 @@ def benchmark_backbone_on_task(
             pruning_grace_period=pruning_grace_period,
         )
 
-        mlflow.log_table(
-            results.get_dataframe(), f"results_{task.name}.json", run.info.run_id
-        )
+        # mlflow.log_table(
+        #     results.get_dataframe(), f"results_{task.name}.json", run.info.run_id
+        # )
 
         if results.get_best_result().metrics is None:
             raise Exception("Best result metrics were none")

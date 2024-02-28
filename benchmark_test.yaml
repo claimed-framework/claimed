@@ -1,5 +1,6 @@
 benchmark_suffix: test_benchmark
 experiment_name: benchmark_test
+pruning_grace_period: 5
 backbone:
   backbone: prithvi_swin_B
 tasks:
@@ -34,7 +35,7 @@ tasks:
       - NIR_NARROW
       - SWIR_1
       - SWIR_2
-    max_epochs: 5
+    max_epochs: 10
     datamodule: benchmark/resources/dataset_specifications/sen1floods11.yaml
     decoder: FCNDecoder
     metric: val/loss
@@ -49,7 +50,7 @@ tasks:
       - SWIR_1
       - SWIR_2
     num_classes: 10
-    max_epochs: 5
+    max_epochs: 10
     datamodule: benchmark/resources/dataset_specifications/eurosat.yaml
     decoder: IdentityDecoder
     metric: val/loss

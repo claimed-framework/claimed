@@ -214,6 +214,7 @@ def fit_model_with_hparams(
         batch_size=batch_size,
         freeze_backbone=freeze_backbone,
         save_models=save_models,
+        pruning=pruning,
     )[0]  # return only the metric value for optuna
 
 
@@ -298,18 +299,19 @@ def ray_tune_model(
 
         # Early stopping
         # this causes memory to not be released and trials to fail
-        # if pruning_grace_period is not None:
-        #     scheduler = ASHAScheduler(
-        #         max_t=task.max_epochs,
-        #         grace_period=min(task.max_epochs, pruning_grace_period),
-        #     )
-        # else:
-        scheduler = FIFOScheduler()
+        if pruning_grace_period is not None:
+            scheduler = ASHAScheduler(
+                max_t=task.max_epochs,
+                grace_period=min(task.max_epochs, pruning_grace_period),
+            )
+        else:
+            scheduler = FIFOScheduler()
 
     scaling_config = ScalingConfig(
         use_gpu=True,
         num_workers=1,
-        resources_per_worker={"CPU": 6, "GPU": 1},
+        resources_per_worker={"CPU": 4, "GPU": 1},
+        trainer_resources={"CPU": 1, "GPU": 0},
     )
 
     ray_dir = Path(storage_uri).parent / "ray"
@@ -336,7 +338,7 @@ def ray_tune_model(
             metric=task.metric,
             mode="min",  # let user choose this
             num_samples=num_trials,
-            # search_alg=ConcurrencyLimiter(OptunaSearch(), max_concurrent=8),
+            search_alg=OptunaSearch(),
             scheduler=scheduler,
             reuse_actors=False,
         ),

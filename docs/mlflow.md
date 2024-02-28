@@ -15,3 +15,5 @@ You can compare the performance of runs by selecting them and using MLFlow's com
 For each dataset, click on the parent run to see a report table of the results.
 
 For each benchmark run, click on the parent run to see a report of the results.
+
+![mlflow demo](images/mlflow.png)

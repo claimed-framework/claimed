@@ -21,9 +21,13 @@ jbsub -queue x86_24h -cores 2 -mem 32g ray start --head --port $RAY_PORT --dashb
 Find out the address of your ray head with `bpeek <ccc process number>` and store it in an environment variable with
 This will also tell you the url where you can check the ray cluster.
 
+
 ```sh
 export RAY_ADDRESS="<address>"
 ```
+
+![ray_head](images/ray_head.png)
+
 
 Then, launch your workers:
 
@@ -35,6 +39,8 @@ You may have to run `chmod +x start_ray_workers.sh`.
 You can provide multiple nodes in the command above. Each GPU will be used to launch a task. For each GPU, make sure there are at least 7 CPUs cores.
 
 At any time you may add more workers to the cluster which will be assigned trials to run.
+
+![ray_cluster](images/ray_cluster.png)
 
 ## Run the script
 

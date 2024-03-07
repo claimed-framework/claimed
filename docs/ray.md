@@ -49,6 +49,9 @@ At any time you may add more workers to the cluster which will be assigned trial
 
 ## Run the script
 
+One additional requirement is the key `ray_storage_path` must be included for jobs launched with ray.
+This key is ignored if ray is not being used. When ray is used, it determines where ray stores its files, including saved models.
+
 You can now run `ray job submit --no-wait --working-dir . -- "ray_benchmark --config <your benchmark>"`.
 
 You can then use ray job to interact with your job. See [the ray quickstart guide](https://docs.ray.io/en/latest/cluster/running-applications/job-submission/quickstart.html) for more examples.

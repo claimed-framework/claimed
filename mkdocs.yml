@@ -19,6 +19,7 @@ repo_url: https://github.ibm.com/GeoFM-Finetuning/benchmark
 nav:
   - index.md
   - mlflow.md
+  - new_backbone.md
   - ray.md
 
 markdown_extensions:

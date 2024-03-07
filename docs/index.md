@@ -41,17 +41,17 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 
 - `experiment_name`: MLFLow experiment to run the benchmark on. This is the highest level grouping of runs in MLFLow.
 
-- `benchmark_suffix`: Suffix that will be added to the name of the benchmark.
+- `benchmark_suffix`: Suffix that will be added to the name of the benchmark. If the benchmark name is not unique, saved models and artifacts will get mixed up.
 
 - `backbone`: Specification of the backbone to use.
 
 - `tasks`: List of tasks to perform. Tasks specify parameters for the decoder, datamodule to be used and training parameters.
-    - an important parameter here is `early_prune`, which defaults to `false`. This will stop runs that do not seem promising.
-    When this is true, you should use a larger number of trials. For ray parallelization, save_models may need to be enabled as well to get accurate results..
+
+  - an important parameter here is `early_prune`, which defaults to `false`. This will stop runs that do not seem promising. When this is true, you should use a larger number of trials. For ray parallelization, save_models may need to be enabled as well to get accurate results..
 
 - `n_trials`: Number of trials to be carried out per task, in the case of hyperparameter tuning.
 
-- `save_models`: Whether to save models. Defaults to False. (Setting this to true can take up a lot of space).
+- `save_models`: Whether to save models. Defaults to False. (Setting this to true can take up a lot of space). Models will be logged as artifacts for each run in MLFlow.
 
 - `storage_uri`: Location to use for storage.
 

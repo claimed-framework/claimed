@@ -473,7 +473,7 @@ def ray_fit_model(
         # hack for nestedness
         mlflow.set_tag("mlflow.parentRunId", parent_run_id)
         if trial_local_dir:
-            mlflow.set_tag(key="ray_runs_storage", value=trial_local_dir)
+            mlflow.log_artifacts(trial_local_dir)
         trainer.logger = MLFlowLogger(
             experiment_name=experiment_name,
             run_id=run.info.run_id,

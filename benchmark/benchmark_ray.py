@@ -138,8 +138,7 @@ def benchmark_backbone(
     table_columns = ["Task", "Metric", "Best Score", "Hyperparameters"]
     table_entries = []
 
-    # with mlflow.start_run(run_name=run_name) as run:
-    with mlflow.start_run(run_id="c7880135f6e144588edda641c0f2fc72") as run:
+    with mlflow.start_run(run_name=run_name) as run:
         mlflow.set_tag("purpose", "backbone_benchmarking")
 
         if optimization_space is None:

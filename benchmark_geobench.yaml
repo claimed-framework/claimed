@@ -1,0 +1,383 @@
+benchmark_suffix: geobench_max
+experiment_name: geobench
+backbone:
+  backbone: prithvi_swin_B
+tasks:
+  # - name: chesapeake
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_BROAD
+  #   num_classes: 7
+  #   max_epochs: 60
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  # - name: cashew
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED3
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 7
+  #   max_epochs: 60
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MBeninSmallHolderCashewsNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  - name: neontree
+    type: segmentation
+    loss: ce
+    bands:
+      - RED
+      - GREEN
+      - BLUE
+    num_classes: 2
+    max_epochs: 60
+    direction: max
+    datamodule:
+      class_path: terratorch.datamodules.MNeonTreeNonGeoDataModule
+      init_args:
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+    decoder: UperNetDecoder
+    decoder_args:
+      channels: 128
+    metric: val/Multiclass Jaccard Index
+  # - name: nz_cattle
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 60
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  # - name: pv4ger_seg
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 60
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MPv4gerSegNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  # - name: sa_crop_type
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 10
+  #   max_epochs: 60
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.m_SA_crop_type.MSACropTypeNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #class
+  # - name: big_earth_net
+  #   type: multilabel_classification
+  #   loss: bce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 43
+  #   max_epochs: 60
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MBigEarthNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  # - name: brick_kiln
+  #   type: classification
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 2
+  #   max_epochs: 60
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MBrickKilnNonGeoDataModule
+  #     init_args:
+  #       batch_size: 16
+  #       num_workers: 4
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  - name: eurosat
+    type: classification
+    loss: ce
+    bands:
+      - RED
+      - GREEN
+      - BLUE
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+    num_classes: 10
+    max_epochs: 60
+    direction: max
+    decoder: IdentityDecoder
+    head_args:
+      linear_after_pool: True
+    datamodule:
+      class_path: terratorch.datamodules.MEuroSATNonGeoDataModule
+      init_args:
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+          - "NIR_NARROW"
+          - "SWIR_1"
+          - "SWIR_2"
+    optimization_except:
+      - decoder_channels
+      - head_dropout
+    metric: val/Overall Accuracy
+  - name: forestnet
+    type: classification
+    loss: ce
+    bands:
+      - RED
+      - GREEN
+      - BLUE
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+    num_classes: 17
+    max_epochs: 60
+    direction: max
+    decoder: IdentityDecoder
+    head_args:
+      linear_after_pool: True
+    datamodule:
+      class_path: terratorch.datamodules.MForestNetNonGeoDataModule
+      init_args:
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+          - "NIR"
+          - "SWIR_1"
+          - "SWIR_2"
+    optimization_except:
+      - decoder_channels
+      - head_dropout
+    metric: val/Overall Accuracy
+  - name: pv4ger
+    type: classification
+    loss: ce
+    bands:
+      - RED
+      - GREEN
+      - BLUE
+    num_classes: 2
+    max_epochs: 60
+    direction: max
+    decoder: IdentityDecoder
+    head_args:
+      linear_after_pool: True
+    datamodule:
+      class_path: terratorch.datamodules.MPv4gerNonGeoDataModule
+      init_args:
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+    optimization_except:
+      - decoder_channels
+      - head_dropout
+    metric: val/Overall Accuracy
+  - name: so2sat
+    type: classification
+    loss: ce
+    bands:
+      - RED
+      - GREEN
+      - BLUE
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+    num_classes: 17
+    max_epochs: 60
+    direction: max
+    decoder: IdentityDecoder
+    head_args:
+      linear_after_pool: True
+    datamodule:
+      class_path: terratorch.datamodules.MSo2SatNonGeoDataModule
+      init_args:
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+          - "NIR_NARROW"
+          - "SWIR_1"
+          - "SWIR_2"
+    optimization_except:
+      - decoder_channels
+      - head_dropout
+    metric: val/Overall Accuracy
+
+n_trials: 16
+save_models: False
+storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark
+ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage
+optimization_space:
+  # decoder:
+  #   - FCNDecoder
+  #   - UperNetDecoder
+  lr:
+    min: 6e-5
+    max: 1e-3
+    type: real
+    log: true
+  batch_size:
+    - 8
+    - 16
+    - 32
+    - 64
+  decoder_channels:
+    - 32
+    - 64
+    - 128
+  # head_dropout:
+  #   min: 0.2
+  #   max: 0.8
+  #   type: real

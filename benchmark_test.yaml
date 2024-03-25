@@ -38,7 +38,7 @@ tasks:
     datamodule: benchmark/resources/dataset_specifications/sen1floods11.yaml
     decoder: FCNDecoder
     metric: val/loss
-    early_prune: true
+    early_prune: false
   - name: eurosat
     type: classification
     loss: ce
@@ -59,8 +59,8 @@ tasks:
   #   - decoder_channels
   #   - head_dropout
   # - decoder
-n_trials: 10
-save_models: true
+n_trials: 2
+save_models: false
 storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark/
 ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage
 optimization_space:

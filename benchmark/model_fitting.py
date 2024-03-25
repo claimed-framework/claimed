@@ -145,11 +145,11 @@ def fit_model(
         backbone.model_factory,
         loss=task.loss,
         lr=lr,
-        optimizer=torch.optim.AdamW,
+        optimizer="AdamW",
         optimizer_hparams={"weight_decay": 0.05},
         freeze_backbone=freeze_backbone,
         ignore_index=task.ignore_index,
-        scheduler=ReduceLROnPlateau,
+        scheduler="ReduceLROnPlateau",
     )
     callbacks: list[Callback] = [
         RichProgressBar(),
@@ -435,11 +435,11 @@ def ray_fit_model(
         backbone.model_factory,
         loss=task.loss,
         lr=lr,
-        optimizer=torch.optim.AdamW,
+        optimizer="AdamW",
         optimizer_hparams={"weight_decay": 0.05},
         freeze_backbone=freeze_backbone,
         ignore_index=task.ignore_index,
-        scheduler=ReduceLROnPlateau,
+        scheduler="ReduceLROnPlateau",
         # scheduler_hparams={"patience": 5},
     )
     callbacks: list[Callback] = [

@@ -79,7 +79,7 @@ def benchmark_backbone_on_task(
             storage_uri,
             run.info.run_id,
             save_models,
-            precision=precision,
+            precision,
         )
         study.optimize(
             objective,

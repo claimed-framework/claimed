@@ -19,7 +19,6 @@ from lightning.pytorch.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
-    RichProgressBar,
 )
 from lightning.pytorch.loggers.mlflow import MLFlowLogger
 
@@ -172,7 +171,6 @@ def fit_model(
         scheduler="ReduceLROnPlateau",
     )
     callbacks: list[Callback] = [
-        RichProgressBar(),
         LearningRateMonitor(logging_interval="epoch"),
     ]
 

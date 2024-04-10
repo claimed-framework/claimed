@@ -1,117 +1,60 @@
-benchmark_suffix: geobench_fixed_resize_16
-experiment_name: geobench
+benchmark_suffix: geobench_prithvi_cashew
+experiment_name: geobench_rerun_seg
+precision: 16-mixed
 backbone:
   backbone: prithvi_swin_B
 tasks:
-  - name: eurosat
-    type: classification
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 10
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    head_args:
-      linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MEuroSATNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR_NARROW"
-          - "SWIR_1"
-          - "SWIR_2"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
-  - name: chesapeake
-    type: segmentation
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-    num_classes: 7
-    max_epochs: 300
-    direction: max
-    datamodule:
-      class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR"
-    decoder: UperNetDecoder
-    decoder_args:
-      channels: 128
-    metric: val/Multiclass Jaccard Index
-    early_stop_patience: 50
+  # - name: chesapeake
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #   num_classes: 7
+  #   max_epochs: 300
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #   early_stop_patience: 50
   - name: cashew
     type: segmentation
     loss: ce
@@ -167,325 +110,325 @@ tasks:
       channels: 128
     metric: val/Multiclass Jaccard Index
     early_stop_patience: 50
-  - name: neontree
-    type: segmentation
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-    num_classes: 2
-    max_epochs: 200
-    direction: max
-    datamodule:
-      class_path: terratorch.datamodules.MNeonTreeNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-    decoder: UperNetDecoder
-    decoder_args:
-      channels: 128
-    metric: val/Multiclass Jaccard Index
-    early_stop_patience: 50
-  - name: nz_cattle
-    type: segmentation
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-    num_classes: 2
-    max_epochs: 300
-    direction: max
-    datamodule:
-      class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-    decoder: UperNetDecoder
-    decoder_args:
-      channels: 128
-    metric: val/Multiclass Jaccard Index
-    early_stop_patience: 50
-  - name: pv4ger_seg
-    type: segmentation
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-    num_classes: 2
-    max_epochs: 300
-    direction: max
-    datamodule:
-      class_path: terratorch.datamodules.MPv4gerSegNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-    decoder: UperNetDecoder
-    decoder_args:
-      channels: 128
-    metric: val/Multiclass Jaccard Index
-    early_stop_patience: 50
-  - name: sa_crop_type
-    type: segmentation
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 10
-    max_epochs: 300
-    direction: max
-    datamodule:
-      class_path: terratorch.datamodules.m_SA_crop_type.MSACropTypeNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR_NARROW"
-          - "SWIR_1"
-          - "SWIR_2"
-    decoder: UperNetDecoder
-    decoder_args:
-      channels: 128
-    metric: val/Multiclass Jaccard Index
-    early_stop_patience: 50
-  # # class
-  - name: big_earth_net
-    type: multilabel_classification
-    loss: balanced_bce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 43
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    # head_args:
-    #   linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MBigEarthNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR_NARROW"
-          - "SWIR_1"
-          - "SWIR_2"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
-  - name: brick_kiln
-    type: classification
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 2
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    head_args:
-      linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MBrickKilnNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR_NARROW"
-          - "SWIR_1"
-          - "SWIR_2"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
+  # - name: neontree
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 200
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MNeonTreeNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #   early_stop_patience: 50
+  # - name: nz_cattle
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 300
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #   early_stop_patience: 50
+  # - name: pv4ger_seg
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 300
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MPv4gerSegNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #   early_stop_patience: 50
+  # - name: sa_crop_type
+  #   type: segmentation
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 10
+  #   max_epochs: 300
+  #   direction: max
+  #   datamodule:
+  #     class_path: terratorch.datamodules.m_SA_crop_type.MSACropTypeNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/segmentation_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   decoder: UperNetDecoder
+  #   decoder_args:
+  #     channels: 128
+  #   metric: val/Multiclass Jaccard Index
+  #   early_stop_patience: 50
+  # class
+  # - name: big_earth_net
+  #   type: multilabel_classification
+  #   loss: balanced_bce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 43
+  #   max_epochs: 300
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MBigEarthNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Multilabel F1 Score
+  #   early_stop_patience: 50
+  # - name: brick_kiln
+  #   type: classification
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 2
+  #   max_epochs: 300
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MBrickKilnNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  #   early_stop_patience: 50
   # - name: eurosat
   #   type: classification
   #   loss: ce
@@ -544,197 +487,197 @@ tasks:
   #     - head_dropout
   #   metric: val/Overall Accuracy
   #   early_stop_patience: 50
-  - name: forestnet
-    type: classification
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 17
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    head_args:
-      linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MForestNetNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR"
-          - "SWIR_1"
-          - "SWIR_2"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
-  - name: pv4ger
-    type: classification
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-    num_classes: 2
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    head_args:
-      linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MPv4gerNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
-  - name: so2sat
-    type: classification
-    loss: ce
-    bands:
-      - RED
-      - GREEN
-      - BLUE
-      - NIR_NARROW
-      - SWIR_1
-      - SWIR_2
-    num_classes: 17
-    max_epochs: 300
-    direction: max
-    decoder: IdentityDecoder
-    head_args:
-      linear_after_pool: True
-    datamodule:
-      class_path: terratorch.datamodules.MSo2SatNonGeoDataModule
-      init_args:
-        train_transform:
-          - class_path: albumentations.HorizontalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.VerticalFlip
-            init_args:
-              p: 0.5
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        val_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        test_transform:
-          - class_path: albumentations.Resize
-            init_args:
-              height: 224
-              width: 224
-          - class_path: ToTensorV2
-        batch_size: 16
-        num_workers: 6
-        data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
-        bands:
-          - "RED"
-          - "GREEN"
-          - "BLUE"
-          - "NIR_NARROW"
-          - "SWIR_1"
-          - "SWIR_2"
-    optimization_except:
-      - decoder_channels
-      - head_dropout
-    metric: val/Overall Accuracy
-    early_stop_patience: 50
+  # - name: forestnet
+  #   type: classification
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 17
+  #   max_epochs: 300
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MForestNetNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  #   early_stop_patience: 50
+  # - name: pv4ger
+  #   type: classification
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #   num_classes: 2
+  #   max_epochs: 300
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MPv4gerNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  #   early_stop_patience: 50
+  # - name: so2sat
+  #   type: classification
+  #   loss: ce
+  #   bands:
+  #     - RED
+  #     - GREEN
+  #     - BLUE
+  #     - NIR_NARROW
+  #     - SWIR_1
+  #     - SWIR_2
+  #   num_classes: 17
+  #   max_epochs: 300
+  #   direction: max
+  #   decoder: IdentityDecoder
+  #   head_args:
+  #     linear_after_pool: True
+  #   datamodule:
+  #     class_path: terratorch.datamodules.MSo2SatNonGeoDataModule
+  #     init_args:
+  #       train_transform:
+  #         - class_path: albumentations.HorizontalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.VerticalFlip
+  #           init_args:
+  #             p: 0.5
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       val_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       test_transform:
+  #         - class_path: albumentations.Resize
+  #           init_args:
+  #             height: 224
+  #             width: 224
+  #         - class_path: ToTensorV2
+  #       batch_size: 16
+  #       num_workers: 6
+  #       data_root: "/dccstor/geofm-finetuning/geobench/classification_v1.0"
+  #       bands:
+  #         - "RED"
+  #         - "GREEN"
+  #         - "BLUE"
+  #         - "NIR_NARROW"
+  #         - "SWIR_1"
+  #         - "SWIR_2"
+  #   optimization_except:
+  #     - decoder_channels
+  #     - head_dropout
+  #   metric: val/Overall Accuracy
+  #   early_stop_patience: 50
 
 n_trials: 16
 save_models: False
 storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark
 ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage
-optimization_space:
-  # decoder:
-  #   - FCNDecoder
-  #   - UperNetDecoder
-  lr:
-    min: 6e-5
-    max: 1e-3
-    type: real
-    log: true
-  batch_size:
-    - 8
-    - 32
-    - 64
-  decoder_channels:
-    - 32
-    - 64
-    - 128
-  # head_dropout:
-  #   min: 0.2
-  #   max: 0.8
-  #   type: real
+# optimization_space:
+# decoder:
+#   - UperNetDecoder
+#   - UperNetDecoder
+lr:
+  min: 6e-5
+  max: 6e-5
+  type: real
+  log: true
+# batch_size:
+#   - 8
+#   - 32
+#   - 64
+# decoder_channels:
+#   - 32
+#   - 64
+#   - 128
+# head_dropout:
+#   min: 0.2
+#   max: 0.8
+#   type: real

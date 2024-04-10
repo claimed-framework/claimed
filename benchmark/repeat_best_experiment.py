@@ -15,7 +15,7 @@ from jsonargparse import CLI
 from lightning import Callback, Trainer
 from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from lightning.pytorch import seed_everything
-from lightning.pytorch.callbacks import EarlyStopping, RichProgressBar
+from lightning.pytorch.callbacks import EarlyStopping
 from tabulate import tabulate
 
 from benchmark.model_fitting import (
@@ -35,6 +35,7 @@ def remote_fit(
     precision: _PRECISION_INPUT = "16-mixed",
 ) -> float | None:
     torch.set_float32_matmul_precision("high")
+    seed_everything(seed, workers=True)
     lr = float(model_args.pop("lr", task.lr))
     batch_size = model_args.pop("batch_size", None)
     if batch_size is not None:
@@ -57,9 +58,7 @@ def remote_fit(
         ignore_index=task.ignore_index,
         scheduler="ReduceLROnPlateau",
     )
-    callbacks: list[Callback] = [
-        RichProgressBar(),
-    ]
+    callbacks: list[Callback] = []
 
     if task.early_stop_patience is not None:
         callbacks.append(
@@ -67,6 +66,7 @@ def remote_fit(
                 task.metric, mode=task.direction, patience=task.early_stop_patience
             )
         )
+        # callbacks.append(EarlyStopping("val/loss", patience=task.early_stop_patience))
 
     trainer = Trainer(
         callbacks=callbacks,
@@ -78,7 +78,6 @@ def remote_fit(
         log_every_n_steps=10,
         precision=precision,
     )
-    seed_everything(seed, workers=True)
     try:
         trainer.fit(lightning_task, datamodule=task.datamodule)
     except Exception as e:
@@ -123,7 +122,7 @@ def rerun_best_from_backbone(
     table_entries = []
 
     ray_tasks = []
-    seeds = [randint(1, 5000) for i in range(10)]
+    seeds = [42] + [randint(1, 5000) for i in range(9)]
     for task in tasks:
         matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore
         if len(matching_runs) == 0:
@@ -153,7 +152,12 @@ def rerun_best_from_backbone(
         for seed in seeds:
             ray_tasks.append(
                 remote_fit.remote(
-                    backbone, model_args, task, lightning_task_class, seed, precision
+                    backbone,
+                    model_args,
+                    task,
+                    lightning_task_class,
+                    seed,
+                    precision=precision,
                 )
             )
     results = ray.get(ray_tasks)

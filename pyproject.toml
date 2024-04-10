@@ -62,6 +62,7 @@ myst-parser = "*"
 ruff = "^0.2.2"
 mkdocs-material = "^9.5.11"
 mkdocstrings = {extras = ["python"], version = "^0.24.1"}
+debugpy = "^1.8.1"
 
 [tool.poetry.scripts]
 benchmark = "benchmark.backbone_benchmark:main"

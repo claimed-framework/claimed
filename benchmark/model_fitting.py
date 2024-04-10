@@ -19,6 +19,7 @@ from lightning.pytorch.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
+    RichProgressBar,
 )
 from lightning.pytorch.loggers.mlflow import MLFlowLogger
 
@@ -48,6 +49,7 @@ from ray.tune.schedulers import FIFOScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
 from ray.tune.search.optuna import OptunaSearch
+from terratorch.tasks import IBMPixelwiseRegressionTask, IBMSemanticSegmentationTask
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
@@ -113,7 +115,6 @@ def launch_training(
             save_dir=storage_uri,
             log_model=True,
         )
-        pl.seed_everything(SEED, workers=True)
         trainer.fit(task, datamodule=datamodule)
         client = mlflow.tracking.MlflowClient(
             tracking_uri=storage_uri,
@@ -151,6 +152,7 @@ def fit_model(
     save_models: bool = False,
     precision: _PRECISION_INPUT = "16-mixed",
 ) -> tuple[float, str]:
+    pl.seed_everything(SEED, workers=True)
     torch.set_float32_matmul_precision("high")
     if batch_size:
         task.datamodule.batch_size = (
@@ -159,9 +161,9 @@ def fit_model(
     if lr is None:
         lr = task.lr
 
-    lightning_task = lightning_task_class(
-        model_args,
-        task.model_factory,
+    params: dict[str, Any] = dict(
+        model_args=model_args,
+        model_factory=task.model_factory,
         loss=task.loss,
         lr=lr,
         optimizer="AdamW",
@@ -170,8 +172,16 @@ def fit_model(
         ignore_index=task.ignore_index,
         scheduler="ReduceLROnPlateau",
     )
+    if lightning_task_class in [
+        IBMSemanticSegmentationTask,
+        IBMPixelwiseRegressionTask,
+    ]:
+        params["plot_on_val"] = False
+    lightning_task = lightning_task_class(**params)
+
     callbacks: list[Callback] = [
         LearningRateMonitor(logging_interval="epoch"),
+        RichProgressBar(),
     ]
 
     if task.early_stop_patience is not None:
@@ -186,6 +196,7 @@ def fit_model(
 
     if save_models:
         callbacks.append(ModelCheckpoint(monitor=task.metric, mode=task.direction))
+
     trainer = Trainer(
         callbacks=callbacks,
         max_epochs=task.max_epochs,
@@ -447,6 +458,7 @@ def ray_fit_model(
 ) -> None:
     print(config)
     torch.set_float32_matmul_precision("high")
+    pl.seed_everything(SEED, workers=True)
     tune.utils.wait_for_gpu(
         target_util=0.07, delay_s=10, retry=50
     )  # sometimes process needs some time to release GPU
@@ -523,7 +535,6 @@ def ray_fit_model(
 
         # explicitly log batch_size. Since it is not a model param, it will not be logged
         mlflow.log_param("batch_size", task.datamodule.batch_size)
-        pl.seed_everything(SEED, workers=True)
         trainer.fit(lightning_task, datamodule=task.datamodule)
         print("Trial Storage: ", trial_storage.trial_fs_path)
         if trial_storage is not None:

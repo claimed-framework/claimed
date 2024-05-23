@@ -9,13 +9,13 @@ from jsonargparse import CLI
 from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from tabulate import tabulate
 
-from benchmark.model_fitting import fit_model, ray_tune_model, valid_task_types
-from benchmark.types import (
+from benchmark.benchmark_types import (
     Backbone,
     Task,
     build_model_args,
     optimization_space_type,
 )
+from benchmark.model_fitting import fit_model, ray_tune_model, valid_task_types
 
 
 def benchmark_backbone_on_task(

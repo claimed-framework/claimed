@@ -18,11 +18,16 @@ from lightning.pytorch import seed_everything
 from lightning.pytorch.callbacks import EarlyStopping
 from tabulate import tabulate
 
+from benchmark.benchmark_types import (
+    Backbone,
+    Task,
+    build_model_args,
+    optimization_space_type,
+)
 from benchmark.model_fitting import (
     inject_hparams,
     valid_task_types,
 )
-from benchmark.types import Backbone, Task, build_model_args, optimization_space_type
 
 
 @ray.remote(num_cpus=8, num_gpus=1)

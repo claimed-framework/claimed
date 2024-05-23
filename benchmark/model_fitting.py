@@ -54,7 +54,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
 
-from benchmark.types import (
+from benchmark.benchmark_types import (
     Backbone,
     ParameterBounds,
     ParameterTypeEnum,

@@ -61,8 +61,6 @@ See more details in the documentation, and [here](benchmark.yaml) for an example
 
 To run a benchmark, use `benchmark --config <benchmark_file>`.
 
-To run a benchmark over a ray cluster (which must be created before running), use `ray_benchmark <address_of_head_without_port> --config <benchmark_file>`.
-
 To check the experiment results, use `mlflow ui --host $(hostname -f) --port <port> --backend-store-uri <storage_uri>` and click the link.
 ![mlflow demo](docs/images/mlflow.png)
 

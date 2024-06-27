@@ -9,15 +9,15 @@ from typing import Any
 import torch
 from terratorch.datasets import HLSBands
 from terratorch.tasks import (
-    IBMClassificationTask,
-    IBMMultiLabelClassificationTask,
-    IBMPixelwiseRegressionTask,
-    IBMSemanticSegmentationTask,
+    ClassificationTask,
+    MultiLabelClassificationTask,
+    PixelwiseRegressionTask,
+    SemanticSegmentationTask,
 )
 from torchgeo.datamodules import BaseDataModule
 
 valid_task_types = type[
-    IBMSemanticSegmentationTask | IBMClassificationTask | IBMPixelwiseRegressionTask
+    SemanticSegmentationTask | ClassificationTask | PixelwiseRegressionTask
 ]
 
 
@@ -36,13 +36,13 @@ class TaskTypeEnum(enum.Enum):
     ) -> valid_task_types:
         match self:
             case TaskTypeEnum.segmentation:
-                return IBMSemanticSegmentationTask
+                return SemanticSegmentationTask
             case TaskTypeEnum.regression:
-                return IBMPixelwiseRegressionTask
+                return PixelwiseRegressionTask
             case TaskTypeEnum.classification:
-                return IBMClassificationTask
+                return ClassificationTask
             case TaskTypeEnum.multilabel_classification:
-                return IBMMultiLabelClassificationTask
+                return MultiLabelClassificationTask
             case _:
                 raise TypeError("Task type does not exist")
 

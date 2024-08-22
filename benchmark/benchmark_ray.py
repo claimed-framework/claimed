@@ -2,6 +2,8 @@
 This module contains the high level functions for benchmarking on a single node.
 """
 
+import importlib
+
 import mlflow
 import pandas as pd
 import ray
@@ -28,6 +30,7 @@ def benchmark_backbone_on_task(
     n_trials: int = 1,
     save_models: bool = False,
     precision: _PRECISION_INPUT = "16-mixed",
+    backbone_import: str|None = None
 ) -> dict:
     with mlflow.start_run(
         run_name=f"{mlflow.active_run().info.run_name}_{task.name}",
@@ -52,6 +55,7 @@ def benchmark_backbone_on_task(
             save_models,
             n_trials,
             precision,
+            backbone_import=backbone_import
         )
 
         mlflow.log_table(
@@ -85,9 +89,12 @@ def remote_fit(
     parent_run_id: str,
     save_models: bool,
     precision: _PRECISION_INPUT,
+    backbone_import: str | None
 ) -> float:
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
+    if backbone_import:
+        importlib.import_module(backbone_import)
     lr = float(model_args.pop("lr", task.lr))
     batch_size = model_args.pop("batch_size", None)
     if batch_size is not None:
@@ -115,6 +122,7 @@ def benchmark_backbone(
     tasks: list[Task],
     storage_uri: str,
     experiment_name: str,
+    backbone_import: str | None = None,
     benchmark_suffix: str | None = None,
     n_trials: int = 1,
     ray_storage_path: str | None = None,
@@ -130,7 +138,8 @@ def benchmark_backbone(
         experiment_name (str): Name of the MLFlow experiment to be used.
         tasks (list[Task]): List of Tasks to benchmark over.
         storage_uri (str): Path to storage location.
-        ray_storage_path (str): Path to storage of ray outputs, including saved models, when using ray tune. Required if optimization_space is specified
+        ray_storage_path (str | None): Path to storage of ray outputs, including saved models, when using ray tune. Required if optimization_space is specified
+        backbone_import (str | None): Path to module that will be imported to register a potential new backbone. Defaults to None.
         benchmark_suffix (str | None, optional): Suffix to be added to benchmark run name. Defaults to None.
         n_trials (int, optional): Number of hyperparameter optimization trials to run. Defaults to 1.
         optimization_space (optimization_space_type | None, optional): Parameters to optimize over. Should be a dictionary
@@ -141,6 +150,8 @@ def benchmark_backbone(
         precision (str): precision to use for training. Defaults to 16-mixed.
     """
     ray.init()
+    if backbone_import:
+        importlib.import_module(backbone_import)
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
     # mlflow.pytorch.autolog(log_datasets=False)
@@ -177,6 +188,7 @@ def benchmark_backbone(
                         run.info.run_id,
                         save_models,
                         precision,
+                        backbone_import
                     )
                 )
             results = ray.get(ray_tasks)
@@ -208,6 +220,7 @@ def benchmark_backbone(
                         n_trials=n_trials,
                         save_models=save_models,
                         precision=precision,
+                        backbone_import=backbone_import
                     )
                 )
 

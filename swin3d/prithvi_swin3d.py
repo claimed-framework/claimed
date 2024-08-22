@@ -101,14 +101,23 @@ def convert_weights_swin2mmseg(ckpt):
 
 
 # If you need to adapt the checkpoint file, do it here
-# def checkpoint_filter_fn(
-#     state_dict: dict[str, torch.Tensor],
-#     model: torch.nn.Module,
-#     pretrained_bands,
-#     model_bands,
-# ):
-#
-#     return state_dict
+def checkpoint_filter_fn(
+    state_dict: dict[str, torch.Tensor],
+    model: torch.nn.Module,
+    pretrained_bands,
+    model_bands,
+):
+    new_state_dict = {}
+    for key, val in state_dict.items():
+        if "decoder" in key:
+            continue
+        if "encoder." in key:
+            if "mask_token" in key:
+                continue
+            new_state_dict[key.removeprefix("encoder.")] = val
+
+    new_state_dict = prithvi_select_patch_embed_weights(new_state_dict, model, pretrained_bands, model_bands)
+    return new_state_dict
 
 
 def _create_swin_3D(
@@ -129,16 +138,16 @@ def _create_swin_3D(
     kwargs["in_chans"] = len(model_bands)
 
     # If you need to adapt the checkpoint file
-    # def checkpoint_filter_wrapper_fn(state_dict, model):
-    #     return checkpoint_filter_fn(state_dict, model, pretrained_bands, model_bands)
+    def checkpoint_filter_wrapper_fn(state_dict, model):
+        return checkpoint_filter_fn(state_dict, model, pretrained_bands, model_bands)
 
     model: torch.nn.Module = build_model_with_cfg(
         SwinTransformer3D,
         variant,
         pretrained,
         # if you need to adapt the checkpoint file
-        # pretrained_filter_fn=checkpoint_filter_wrapper_fn,
-        pretrained_strict=False,
+        pretrained_filter_fn=checkpoint_filter_wrapper_fn,
+        pretrained_strict=True,
         feature_cfg={
             "flatten_sequential": True,
             "out_indices": out_indices,

@@ -603,7 +603,7 @@ class SwinTransformer3D(nn.Module):
         attn_drop_rate=0.0,
         drop_path_rate=0.2,
         norm_layer=nn.LayerNorm,
-        patch_norm=False,
+        patch_norm=True,
     ):
         super().__init__()
 
@@ -654,7 +654,7 @@ class SwinTransformer3D(nn.Module):
                 scale *= 2
             self.feature_info += [
                 dict(
-                    num_chs=int(embed_dim * 2**i_layer),
+                    num_chs=int(embed_dim * 2**i_layer) * (2 if i_layer < self.num_layers - 1 else 1),
                     reduction=reduction[i_layer],
                     module=f"layers.{i_layer}",
                 )

@@ -2,6 +2,7 @@
 This module contains all the logic for fitting models
 """
 import copy
+import importlib
 import os
 import types
 from fnmatch import fnmatchcase
@@ -324,6 +325,7 @@ def ray_tune_model(
     save_models: bool,
     num_trials: int,
     precision: _PRECISION_INPUT = "16-mixed",
+    backbone_import: str|None = None
 ) -> tune.ResultGrid:
     trainable = tune.with_parameters(
         ray_fit_model,
@@ -336,6 +338,7 @@ def ray_tune_model(
         parent_run_id=mlflow.active_run().info.run_id,
         save_models=save_models,
         precision=precision,
+        backbone_import=backbone_import
     )
 
     current_hparams: dict[str, Any] = {}
@@ -459,7 +462,10 @@ def ray_fit_model(
     parent_run_id: str,
     save_models: bool = True,
     precision: _PRECISION_INPUT = "16-mixed",
+    backbone_import: str|None = None
 ) -> None:
+    if backbone_import:
+        importlib.import_module(backbone_import)
     print(config)
     pl.seed_everything(SEED, workers=True)
     tune.utils.wait_for_gpu(

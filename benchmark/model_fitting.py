@@ -176,8 +176,9 @@ def fit_model(
 
     if task.reduce_lr_on_plateau:
         params["scheduler"] = "ReduceLROnPlateau"
+        params["scheduler_hparams"] = {"metric": "val/loss"}
         if isinstance(task.reduce_lr_on_plateau, int):
-            params["scheduler_hparams"] = {"patience": task.reduce_lr_on_plateau}
+            params["scheduler_hparams"]["patience"] = task.reduce_lr_on_plateau
             
     if lightning_task_class in [
         SemanticSegmentationTask,
@@ -195,12 +196,12 @@ def fit_model(
     if task.early_stop_patience is not None:
         callbacks.append(
             EarlyStopping(
-                task.metric, mode=task.direction, patience=task.early_stop_patience
+                "val/loss", patience=task.early_stop_patience
             )
         )
 
     if task.early_prune and trial is not None:
-        callbacks.append(PyTorchLightningPruningCallback(trial, monitor=task.metric))
+        callbacks.append(PyTorchLightningPruningCallback(trial, monitor="val/loss"))
 
     if save_models:
         callbacks.append(ModelCheckpoint(monitor=task.metric, mode=task.direction))
@@ -504,8 +505,9 @@ def ray_fit_model(
 
     if task.reduce_lr_on_plateau:
         params["scheduler"] = "ReduceLROnPlateau"
+        params["scheduler_hparams"] = {"metric": "val/loss"}
         if isinstance(task.reduce_lr_on_plateau, int):
-            params["scheduler_hparams"] = {"patience": task.reduce_lr_on_plateau}
+            params["scheduler_hparams"]["patience"] = task.reduce_lr_on_plateau
     if lightning_task_class in [
         SemanticSegmentationTask,
         PixelwiseRegressionTask,
@@ -522,7 +524,7 @@ def ray_fit_model(
     if task.early_stop_patience is not None:
         callbacks.append(
             EarlyStopping(
-                task.metric, mode=task.direction, patience=task.early_stop_patience
+                "val/loss", patience=task.early_stop_patience
             )
         )
 

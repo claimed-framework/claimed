@@ -435,7 +435,6 @@ def ray_tune_model(
         run_config=RunConfig(
             name=mlflow.active_run().info.run_name,
             storage_path=storage_path,
-            local_dir=storage_path,
             callbacks=[
                 tune.logger.CSVLoggerCallback(),
                 tune.logger.JsonLoggerCallback(),

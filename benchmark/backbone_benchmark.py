@@ -34,13 +34,14 @@ def benchmark_backbone_on_task(
     optimization_space: optimization_space_type | None = None,
     n_trials: int = 1,
     save_models: bool = False,
-    precision: _PRECISION_INPUT = "16-mixed",
 ) -> tuple[float, str | list[str] | None, dict[str, Any]]:
     with mlflow.start_run(
         run_name=task.name,
         nested=True,
     ) as run:
         training_spec = combine_with_defaults(task, defaults)
+        if "max_epochs" not in training_spec.trainer_args:
+            raise Exception("Must specify max_epochs for the trainer")
         task = training_spec.task
         lightning_task_class = training_spec.task.type.get_class_from_enum()
 
@@ -50,7 +51,7 @@ def benchmark_backbone_on_task(
                 *fit_model(
                     training_spec,
                     lightning_task_class,
-                    f"{run.info.run_name}",
+                    run.info.run_name,
                     experiment_name,
                     storage_uri,
                     run.info.run_id,

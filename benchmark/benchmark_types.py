@@ -118,6 +118,7 @@ class Task:
     direction: str
     metric: str = "val/loss"
     early_prune: bool = False
+    early_stop_patience: int | None = None
     optimization_except: set[str] = field(default_factory=set)
 
 @dataclass

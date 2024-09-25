@@ -8,24 +8,20 @@ import dataclasses
 import importlib
 import os
 import types
+import uuid
 import warnings
 from abc import abstractmethod
-from fnmatch import fnmatchcase
 from functools import wraps
-from pathlib import Path
 from typing import Any, Callable
 
 import lightning.pytorch as pl
 import mlflow
 import optuna
-import torch
 from lightning import Callback, Trainer
-from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from lightning.pytorch.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
-    RichProgressBar,
 )
 from lightning.pytorch.loggers.mlflow import MLFlowLogger
 
@@ -33,7 +29,6 @@ from lightning.pytorch.loggers.mlflow import MLFlowLogger
 from optuna.integration import PyTorchLightningPruningCallback
 from ray import tune
 from ray.air import CheckpointConfig, RunConfig
-from ray.train import Checkpoint
 from ray.train._internal.storage import StorageContext
 from ray.tune.experiment import Trial
 
@@ -50,20 +45,17 @@ from ray.tune.experiment import Trial
 # )
 # from ray.train.torch import TorchTrainer
 from ray.tune.integration.pytorch_lightning import TuneReportCheckpointCallback
-from ray.tune.logger import LoggerCallback
 from ray.tune.schedulers import FIFOScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search.bohb import TuneBOHB
 from ray.tune.search.optuna import OptunaSearch
 from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
 
 from benchmark.benchmark_types import (
     ParameterBounds,
     ParameterTypeEnum,
-    Task,
     TrainingSpec,
     optimization_space_type,
     recursive_merge,
@@ -127,140 +119,37 @@ class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
         super().__init__(*args, **kwargs)
 
 
-def inject_hparams(model_setup: dict[str, Any], model_hparams: dict[str, Any]):
-    model_setup_with_injected_hparams = copy.deepcopy(model_setup)
-    # assume maximum nesting value is 2
-    for k, v in model_hparams.items():
-        if k in model_setup_with_injected_hparams and isinstance(
-            model_setup_with_injected_hparams[k], dict
-        ):
-            # overwrite / merge keys
-            model_setup_with_injected_hparams[k] |= v
-        else:
-            # either add key or overwrite existing key
-            model_setup_with_injected_hparams[k] = v
-    return model_setup_with_injected_hparams
+def inject_hparams(training_spec: TrainingSpec, config: dict):
+    # treat batch size specially
+    batch_size: int = int(config.pop("batch_size", None))  # type: ignore
+    datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
+    if batch_size:
+        datamodule_with_generated_hparams.batch_size = batch_size
 
+    terratorch_task_with_generated_hparams = copy.deepcopy(
+        training_spec.task.terratorch_task
+    )
+    recursive_merge(terratorch_task_with_generated_hparams, config)
 
-###########################################
-########### SINGLE NODE - OPTUNA ##########
-###########################################
-def launch_training(
-    trainer: Trainer,
-    task: BaseTask,
-    datamodule: BaseDataModule,
-    run_name: str,
-    experiment_name: str,
-    metric: str,
-    storage_uri: str,
-    parent_run_id: str,
-    direction: str,
-) -> float:
-    with mlflow.start_run(run_name=run_name, nested=True) as run:
-        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
-        # explicitly log batch_size. Since it is not a model param, it will not be logged
-        mlflow.log_param("batch_size", datamodule.batch_size)
+    task_with_generated_hparams = dataclasses.replace(
+        training_spec.task,
+        terratorch_task=terratorch_task_with_generated_hparams,
+        datamodule=datamodule_with_generated_hparams,
+    )
+    training_spec_with_generated_hparams = dataclasses.replace(
+        training_spec, task=task_with_generated_hparams
+    )
+    return training_spec_with_generated_hparams
 
-        trainer.logger = MLFlowLogger(
-            experiment_name=experiment_name,
-            run_id=run.info.run_id,
-            save_dir=storage_uri,
-            log_model=True,
-        )
-        trainer.fit(task, datamodule=datamodule)
-        client = mlflow.tracking.MlflowClient(
-            tracking_uri=storage_uri,
-        )
-
-        metric_history = client.get_metric_history(run.info.run_id, metric)
-        if len(metric_history) == 0:
-            raise Exception(
-                f"No values for metric {metric}. Choose a valid metric for this task"
-            )
-        # return metric_history[-1].value  # or best idk
-        metric_values = [m.value for m in metric_history]
-        if direction == "max":
-            return max(metric_values)  # or best idk
-        elif direction == "min":
-            return min(metric_values)
-        else:
-            raise Exception(f"Direction must be `max` or `min` but got {direction}")
-        # trainer.test(task, datamodule=datamodule)
-
-
-def fit_model(
-    training_spec: TrainingSpec,
-    lightning_task_class: valid_task_types,
-    run_name: str,
-    experiment_name: str,
-    storage_uri: str,
-    parent_run_id: str,
-    trial: optuna.Trial | None = None,
-    save_models: bool = False,
-) -> tuple[float, str]:
-    pl.seed_everything(SEED, workers=True)
-    training_spec_copy = copy.deepcopy(training_spec)
-    task = training_spec_copy.task
-
-    if lightning_task_class in [
-        SemanticSegmentationTask,
-        PixelwiseRegressionTask,
-    ]:
-        task.terratorch_task["plot_on_val"] = False
-    lightning_task = lightning_task_class(**task.terratorch_task)
-
-    if len(training_spec.trainer_args.get("callbacks", [])) > 0:
-        warnings.warn(
-            "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
-        )
+def get_default_callbacks(early_stop_patience: int | None) -> list[Callback]:
     default_callbacks: list[Callback] = [
         LearningRateMonitor(logging_interval="epoch"),
-        # RichProgressBar(),
     ]
-
-    if task.early_prune and trial is not None:
+    if early_stop_patience is not None:
         default_callbacks.append(
-            PyTorchLightningPruningCallback(trial, monitor="val/loss")
+            EarlyStopping("val/loss", patience=early_stop_patience)
         )
-
-    if task.early_stop_patience is not None:
-        default_callbacks.append(
-            EarlyStopping("val/loss", patience=task.early_stop_patience)
-        )
-
-    if save_models:
-        default_callbacks.append(
-            ModelCheckpoint(monitor=task.metric, mode=task.direction)
-        )
-    else:
-        training_spec_copy.trainer_args["enable_checkpointing"] = False
-        # remove model saving callbacks
-        if "callbacks" in training_spec_copy.trainer_args:
-            training_spec_copy.trainer_args["callbacks"] = [  # type: ignore
-                c
-                for c in training_spec_copy.trainer_args["callbacks"]  # type: ignore
-                if not isinstance(c, ModelCheckpoint)
-            ]  # type: ignore
-
-    # get callbacks (set to empty list if none defined) and extend with default ones
-    training_spec_copy.trainer_args.setdefault("callbacks", []).extend(
-        default_callbacks
-    )  # type: ignore
-
-    trainer = Trainer(**training_spec_copy.trainer_args)
-
-    return launch_training(
-        trainer,
-        lightning_task,
-        task.datamodule,
-        run_name,
-        experiment_name,
-        task.metric,
-        storage_uri,
-        parent_run_id,
-        task.direction,
-    ), task.metric
-
+    return default_callbacks
 
 def generate_parameters(
     parameter_picker: ParameterPicker,
@@ -339,6 +228,115 @@ def _generate_parameters(
                 raise Exception(
                     "Leaves of optimization space must be lists or ParameterBounds"
                 )
+            
+###########################################
+########### SINGLE NODE - OPTUNA ##########
+###########################################
+def launch_training(
+    trainer: Trainer,
+    task: BaseTask,
+    datamodule: BaseDataModule,
+    run_name: str,
+    experiment_name: str,
+    metric: str,
+    storage_uri: str,
+    parent_run_id: str,
+    direction: str,
+) -> float:
+    with mlflow.start_run(run_name=run_name, nested=True) as run:
+        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+        # explicitly log batch_size. Since it is not a model param, it will not be logged
+        mlflow.log_param("batch_size", datamodule.batch_size)
+
+        trainer.logger = MLFlowLogger(
+            experiment_name=experiment_name,
+            run_id=run.info.run_id,
+            save_dir=storage_uri,
+            log_model=True,
+        )
+        trainer.fit(task, datamodule=datamodule)
+        client = mlflow.tracking.MlflowClient(
+            tracking_uri=storage_uri,
+        )
+
+        metric_history = client.get_metric_history(run.info.run_id, metric)
+        if len(metric_history) == 0:
+            raise Exception(
+                f"No values for metric {metric}. Choose a valid metric for this task"
+            )
+        metric_values = [m.value for m in metric_history]
+        if direction == "max":
+            return max(metric_values)
+        elif direction == "min":
+            return min(metric_values)
+        else:
+            raise Exception(f"Direction must be `max` or `min` but got {direction}")
+
+
+def fit_model(
+    training_spec: TrainingSpec,
+    lightning_task_class: valid_task_types,
+    run_name: str,
+    experiment_name: str,
+    storage_uri: str,
+    parent_run_id: str,
+    trial: optuna.Trial | None = None,
+    save_models: bool = False,
+) -> tuple[float, str]:
+    pl.seed_everything(SEED, workers=True)
+    training_spec_copy = copy.deepcopy(training_spec)
+    task = training_spec_copy.task
+
+    if lightning_task_class in [
+        SemanticSegmentationTask,
+        PixelwiseRegressionTask,
+    ]:
+        task.terratorch_task["plot_on_val"] = False
+    lightning_task = lightning_task_class(**task.terratorch_task)
+
+    if len(training_spec.trainer_args.get("callbacks", [])) > 0:
+        warnings.warn(
+            "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
+        )
+    default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience)
+
+    if task.early_prune and trial is not None:
+        default_callbacks.append(
+            PyTorchLightningPruningCallback(trial, monitor="val/loss")
+        )
+
+    if save_models:
+        default_callbacks.append(
+            ModelCheckpoint(monitor=task.metric, mode=task.direction)
+        )
+    else:
+        training_spec_copy.trainer_args["enable_checkpointing"] = False
+        # remove model saving callbacks
+        if "callbacks" in training_spec_copy.trainer_args:
+            training_spec_copy.trainer_args["callbacks"] = [  # type: ignore
+                c
+                for c in training_spec_copy.trainer_args["callbacks"]  # type: ignore
+                if not isinstance(c, ModelCheckpoint)
+            ]  # type: ignore
+
+    # get callbacks (set to empty list if none defined) and extend with default ones
+    training_spec_copy.trainer_args.setdefault("callbacks", []).extend(
+        default_callbacks
+    )  # type: ignore
+
+    trainer = Trainer(**training_spec_copy.trainer_args)
+
+    return launch_training(
+        trainer,
+        lightning_task,
+        task.datamodule,
+        run_name,
+        experiment_name,
+        task.metric,
+        storage_uri,
+        parent_run_id,
+        task.direction,
+    ), task.metric
 
 
 def fit_model_with_hparams(
@@ -367,25 +365,7 @@ def fit_model_with_hparams(
         ignore_keys=task.optimization_except,
     )
 
-    # treat batch size specially
-    batch_size: int = int(current_hparams.pop("batch_size", None))  # type: ignore
-    datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
-    if batch_size:
-        datamodule_with_generated_hparams.batch_size = batch_size
-
-    terratorch_task_with_generated_hparams = copy.deepcopy(
-        training_spec.task.terratorch_task
-    )
-    recursive_merge(terratorch_task_with_generated_hparams, current_hparams)
-
-    task_with_generated_hparams = dataclasses.replace(
-        task,
-        terratorch_task=terratorch_task_with_generated_hparams,
-        datamodule=datamodule_with_generated_hparams,
-    )
-    training_spec_with_generated_hparams = dataclasses.replace(
-        training_spec, task=task_with_generated_hparams
-    )
+    training_spec_with_generated_hparams = inject_hparams(training_spec, current_hparams)
     run_name = f"{run_name}_{trial.number}"
     return fit_model(
         training_spec_with_generated_hparams,
@@ -517,6 +497,10 @@ def ray_tune_model(
     results = tuner.fit()
     return results
 
+def _generate_random_name(task_name: str):
+    # needed since the random names from mlflow are affected by the seed
+    # so they are always the same
+    return f"{task_name}_{uuid.uuid4().hex[:8]}"
 
 def ray_fit_model(
     config: dict,
@@ -536,28 +520,9 @@ def ray_fit_model(
         target_util=0.07, delay_s=10, retry=50
     )  # sometimes process needs some time to release GPU
 
-    trial_storage: StorageContext = config.pop("trial_storage", None)
-    task = training_spec.task
-    # treat batch size specially
-    batch_size: int = int(config.pop("batch_size", None))  # type: ignore
-    datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
-    if batch_size:
-        datamodule_with_generated_hparams.batch_size = batch_size
+    trial_storage: StorageContext = config.pop("trial_storage", None)    
 
-    terratorch_task_with_generated_hparams = copy.deepcopy(
-        training_spec.task.terratorch_task
-    )
-    recursive_merge(terratorch_task_with_generated_hparams, config)
-
-    task_with_generated_hparams = dataclasses.replace(
-        task,
-        terratorch_task=terratorch_task_with_generated_hparams,
-        datamodule=datamodule_with_generated_hparams,
-    )
-    training_spec_with_generated_hparams = dataclasses.replace(
-        training_spec, task=task_with_generated_hparams
-    )
-
+    training_spec_with_generated_hparams = inject_hparams(training_spec, config)
     task = training_spec_with_generated_hparams.task
 
     if lightning_task_class in [
@@ -572,15 +537,8 @@ def ray_fit_model(
             "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
         )
 
-    default_callbacks: list[Callback] = [
-        # RayReportCallback(), for ddp if required in the future
-        _TuneReportCallback(metrics=[task.metric], save_checkpoints=save_models),
-        LearningRateMonitor(logging_interval="epoch"),
-    ]
-    if task.early_stop_patience is not None:
-        default_callbacks.append(
-            EarlyStopping("val/loss", patience=task.early_stop_patience)
-        )
+    default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience)
+    default_callbacks.append(_TuneReportCallback(metrics=[task.metric], save_checkpoints=save_models))
 
     # get callbacks (set to empty list if none defined) and extend with default ones
     training_spec_with_generated_hparams.trainer_args.setdefault(
@@ -594,12 +552,13 @@ def ray_fit_model(
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
 
-    with mlflow.start_run(nested=True) as run:
+    with mlflow.start_run(run_name=_generate_random_name(training_spec.task.name), nested=True, parent_run_id=parent_run_id) as run:
         # hack for nestedness
-        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+        # mlflow.set_tag("mlflow.parentRunId", parent_run_id)
         trainer.logger = MLFlowLogger(
             experiment_name=experiment_name,
             run_id=run.info.run_id,
+            run_name=run.info.run_name,
             save_dir=storage_uri,
             log_model=False,
         )

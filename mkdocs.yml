@@ -25,6 +25,7 @@ nav:
   - ray.md
   - plotting.md
   - repeating_experiments.md
+  - mlflow_corrupted.md
 
 markdown_extensions:
   - pymdownx.highlight:

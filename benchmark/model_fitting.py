@@ -178,6 +178,9 @@ def _generate_parameters(
     ignore_keys: set[str],
     dictionary_position: list[str],
 ):
+    # instead of the recursion approach, we could consider using flatdict to flatten everything
+    # then generating the parameters
+    # then using flatdict again to make it nested
     for parameter, space in hparam_space.items():
         if parameter in ignore_keys:
             continue
@@ -490,7 +493,7 @@ def ray_tune_model(
             )
             if save_models
             else None,
-            stop={"training_iteration": training_spec.trainer_args["max_epochs"]},
+            # stop={"training_iteration": training_spec.trainer_args["max_epochs"]},
         ),
         param_space=current_hparams,
     )
@@ -552,9 +555,7 @@ def ray_fit_model(
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
 
-    with mlflow.start_run(run_name=_generate_random_name(training_spec.task.name), nested=True, parent_run_id=parent_run_id) as run:
-        # hack for nestedness
-        # mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+    with mlflow.start_run(run_name=_generate_random_name(training_spec.task.name), parent_run_id=parent_run_id) as run:
         trainer.logger = MLFlowLogger(
             experiment_name=experiment_name,
             run_id=run.info.run_id,

@@ -127,6 +127,7 @@ class TrainingSpec:
     trainer_args: dict[str, Any] = field(default_factory=dict)
 
 def recursive_merge(first_dict: dict[str, Any], second_dict: dict[str, Any]):
+    # consider using deepmerge instead of this
     for key, val in second_dict.items():
         if key not in first_dict:
             first_dict[key] = val

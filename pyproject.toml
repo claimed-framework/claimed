@@ -49,7 +49,6 @@ configspace = "^0.7.1"
 geobench = {python = ">=3.10", version= "^1.0.0"}
 optuna-integration = "^3.6.0"
 torchmetrics = ">=0.10,<1.3.2"
-flatdict = "^4.0.1"
 numpy = "1.26.4"
 albucore = "0.0.16"
 

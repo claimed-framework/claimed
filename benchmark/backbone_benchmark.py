@@ -10,7 +10,6 @@ import optuna
 import pandas as pd
 import torch
 from jsonargparse import CLI
-from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from optuna.pruners import HyperbandPruner
 from tabulate import tabulate
 
@@ -25,6 +24,17 @@ from benchmark.model_fitting import fit_model, fit_model_with_hparams
 
 direction_type_to_optuna = {"min": "minimize", "max": "maximize"}
 
+def unflatten(dictionary):
+    resultDict = {}
+    for key, value in dictionary.items():
+        parts = key.split(".")
+        d = resultDict
+        for part in parts[:-1]:
+            if part not in d:
+                d[part] = {}
+            d = d[part]
+        d[parts[-1]] = value
+    return resultDict
 
 def benchmark_backbone_on_task(
     defaults: Defaults,
@@ -84,9 +94,10 @@ def benchmark_backbone_on_task(
             # callbacks=[champion_callback],
             catch=[torch.cuda.OutOfMemoryError],  # add a few more here?
         )
-        mlflow.log_params(study.best_trial.params)
+        best_params = unflatten(study.best_trial.params)
+        mlflow.log_params(best_params) # unflatten
         mlflow.log_metric(f"best_{task.metric}", study.best_value)
-        return study.best_value, task.metric, study.best_trial.params
+        return study.best_value, task.metric, best_params
 
 
 # Custom function to parse the optimization space argument
@@ -128,18 +139,15 @@ def benchmark_backbone(
         defaults (Defaults): Defaults that are set for all tasks
         tasks (list[Task]): List of Tasks to benchmark over. Will be combined with defaults to get the final parameters of the task.
         experiment_name (str): Name of the MLFlow experiment to be used.
-        storage_uri (str): Path to storage location.
+        storage_uri (str): Path to MLFLow storage location.
         ray_storage_path (str | None): Ignored. Exists for compatibility with ray configs.
         backbone_import (str | None): Path to module that will be imported to register a potential new backbone. Defaults to None.
         run_name (str | None, optional): Name of highest level mlflow run. Defaults to None.
         n_trials (int, optional): Number of hyperparameter optimization trials to run. Defaults to 1.
-        optimization_space (optimization_space_type | None, optional): Parameters to optimize over. Should be a dictionary
-            of strings (parameter name) to list (discrete set of possibilities) or ParameterBounds, defining a range to optimize over.
-            Arguments belonging passed to the backbone, decoder or head should be given in the form `backbone_{argument}`, `decoder_{argument}` or `head_{argument}` Defaults to None.
+        optimization_space (dict | None): Parameters to optimize over. Should be a dictionary (may be nested)
+            of strings (parameter name) to list (discrete set of possibilities) or ParameterBounds, defining a range to optimize over. The structure should be the same as would be passed under tasks.terratorch_task. Defaults to None.
         save_models (bool, optional): Whether to save the model. Defaults to False.
         run_id (str | None): id of existing mlflow run to use as top-level run. Useful to add more experiments to a previous benchmark run. Defaults to None.
-        precision (str): precision to use for training. Defaults to 16-mixed.
-
     """
     if backbone_import:
         importlib.import_module(backbone_import)

@@ -113,17 +113,16 @@ def benchmark_backbone(
     """Highest level function to benchmark a backbone using a ray cluster
 
     Args:
-        backbone (Backbone): Backbone to be used for the benchmark
+       defaults (Defaults): Defaults that are set for all tasks
+        tasks (list[Task]): List of Tasks to benchmark over. Will be combined with defaults to get the final parameters of the task.
         experiment_name (str): Name of the MLFlow experiment to be used.
-        tasks (list[Task]): List of Tasks to benchmark over.
-        storage_uri (str): Path to storage location.
+        storage_uri (str): Path to MLFlow storage location.
         ray_storage_path (str | None): Path to storage of ray outputs, including saved models, when using ray tune. Required if optimization_space is specified
         backbone_import (str | None): Path to module that will be imported to register a potential new backbone. Defaults to None.
         run_name (str | None, optional): Name of highest level mlflow run. Defaults to None.
         n_trials (int, optional): Number of hyperparameter optimization trials to run. Defaults to 1.
-        optimization_space (optimization_space_type | None, optional): Parameters to optimize over. Should be a dictionary
-            of strings (parameter name) to list (discrete set of possibilities) or ParameterBounds, defining a range to optimize over.
-            Arguments belonging passed to the backbone, decoder or head should be given in the form `backbone_{argument}`, `decoder_{argument}` or `head_{argument}` Defaults to None.
+        optimization_space (dict | None): Parameters to optimize over. Should be a dictionary (may be nested)
+            of strings (parameter name) to list (discrete set of possibilities) or ParameterBounds, defining a range to optimize over. The structure should be the same as would be passed under tasks.terratorch_task. Defaults to None.
         save_models (bool, optional): Whether to save the model. Defaults to False.
         run_id (str | None): id of existing mlflow run to use as top-level run. Useful to add more experiments to a previous benchmark run. Defaults to None.
     """

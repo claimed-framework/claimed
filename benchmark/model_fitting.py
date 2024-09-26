@@ -45,8 +45,9 @@ from ray.tune.experiment import Trial
 # )
 # from ray.train.torch import TorchTrainer
 from ray.tune.integration.pytorch_lightning import TuneReportCheckpointCallback
-from ray.tune.schedulers import FIFOScheduler
+from ray.tune.schedulers import FIFOScheduler, TrialScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
+from ray.tune.search import Searcher
 from ray.tune.search.bohb import TuneBOHB
 from ray.tune.search.optuna import OptunaSearch
 from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
@@ -121,7 +122,8 @@ class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
 
 def inject_hparams(training_spec: TrainingSpec, config: dict):
     # treat batch size specially
-    batch_size: int = int(config.pop("batch_size", None))  # type: ignore
+    config_without_batch_size = copy.deepcopy(config)
+    batch_size: int | None = config_without_batch_size.pop("batch_size", None)  # type: ignore
     datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
     if batch_size:
         datamodule_with_generated_hparams.batch_size = batch_size
@@ -129,7 +131,7 @@ def inject_hparams(training_spec: TrainingSpec, config: dict):
     terratorch_task_with_generated_hparams = copy.deepcopy(
         training_spec.task.terratorch_task
     )
-    recursive_merge(terratorch_task_with_generated_hparams, config)
+    recursive_merge(terratorch_task_with_generated_hparams, config_without_batch_size)
 
     task_with_generated_hparams = dataclasses.replace(
         training_spec.task,
@@ -178,9 +180,6 @@ def _generate_parameters(
     ignore_keys: set[str],
     dictionary_position: list[str],
 ):
-    # instead of the recursion approach, we could consider using flatdict to flatten everything
-    # then generating the parameters
-    # then using flatdict again to make it nested
     for parameter, space in hparam_space.items():
         if parameter in ignore_keys:
             continue
@@ -421,8 +420,8 @@ def ray_tune_model(
     # Early stopping
     # It is unclear if this is working properly when checkpoints are disabled
     if task.early_prune:
-        search_alg = TuneBOHB()
-        scheduler = HyperBandForBOHB(
+        search_alg: Searcher = TuneBOHB()
+        scheduler: TrialScheduler = HyperBandForBOHB(
             time_attr="training_iteration",
             max_t=training_spec.trainer_args["max_epochs"],
             reduction_factor=2,

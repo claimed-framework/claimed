@@ -4,12 +4,12 @@ This module contains functions to re-run a best backbone with different seeds
 
 import copy
 import importlib
+import os
 import warnings
 from ast import literal_eval
 from random import randint
 from typing import Any
 
-import flatdict
 import mlflow
 import mlflow.entities
 import pandas as pd
@@ -77,7 +77,7 @@ def remote_fit(
             if not isinstance(c, ModelCheckpoint)
         ]  # type: ignore
 
-    trainer = Trainer(**training_spec_with_generated_hparams.trainer_args)
+    trainer = Trainer(**training_spec_with_generated_hparams.trainer_args, enable_progress_bar=False)
     try:
         trainer.fit(lightning_task, datamodule=task.datamodule)
         metrics = trainer.test(
@@ -99,6 +99,7 @@ def rerun_best_from_backbone(
     experiment_name: str,
     storage_uri: str,
     *args,
+    run_repetitions: int = 10,
     backbone_import: str | None = None,
     run_name: str | None = None,
     n_trials: int = 1,
@@ -122,6 +123,8 @@ def rerun_best_from_backbone(
         ray_storage_path (str | None, optional): _description_. Defaults to None.
 
     """
+    if not os.path.isabs(output_path):
+        raise Exception(f"output_path must be absolute. Consider using $(pwd)/{output_path}.")
     ray.init()
     if backbone_import:
         importlib.import_module(backbone_import)
@@ -132,14 +135,12 @@ def rerun_best_from_backbone(
         filter_string=f"tags.mlflow.parentRunId='{parent_run_id}'", output_format="list"
     )  # type: ignore
     print(f"Found runs: {[run.info.run_name for run in runs]}")
-    print(
-        f"Will match with task names: {['_'.join(run.info.run_name.split('_')[1:]) for run in runs]}"
-    )
-    table_columns = ["Task", "Metric", "Score"]
+
+    table_columns = ["Task", "Metric", "Score", "MLFlow run id"]
     table_entries = []
 
     ray_tasks = []
-    seeds = [42] + [randint(1, 5000) for i in range(9)]
+    seeds = [randint(1, 5000) for i in range(run_repetitions)]
     for task in tasks:
         matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore
         if len(matching_runs) == 0:
@@ -153,7 +154,6 @@ def rerun_best_from_backbone(
         best_params = matching_runs[0].data.params
         # eval them
         best_params = {k: literal_eval(v) for k, v in best_params.items()}
-        best_params = flatdict.FlatDict(best_params).as_dict()
         training_spec = combine_with_defaults(task, defaults)
         lightning_task_class = training_spec.task.type.get_class_from_enum()
         for seed in seeds:
@@ -172,6 +172,7 @@ def rerun_best_from_backbone(
             task.name,
             task.metric.split("/")[-1],
             result,
+            matching_runs[0].info.run_id
         ]
         for task, result in zip(
             [task for task in tasks for _ in seeds], results
@@ -181,7 +182,7 @@ def rerun_best_from_backbone(
     table = tabulate(table_entries, headers=table_columns)
     print(table)
     df = pd.DataFrame(data=table_entries, columns=table_columns)
-    df.to_csv(output_path)
+    df.to_csv(output_path, index=False)
     ray.shutdown()
 
 

@@ -99,6 +99,7 @@ def rerun_best_from_backbone(
     experiment_name: str,
     storage_uri: str,
     *args,
+    tmp_dir: str | None = None,
     run_repetitions: int = 10,
     backbone_import: str | None = None,
     run_name: str | None = None,
@@ -114,12 +115,16 @@ def rerun_best_from_backbone(
     Args:
         parent_run_id (str): mlflow id of parent run
         output_path (str): path to store the results of the run
+        tmp_dir (str): Path to temporary directory to be used for ray
         run_repetitions (int): How many runs (each with a different seed) to run per task.
 
     """
     if not os.path.isabs(output_path):
         raise Exception(f"output_path must be absolute. Consider using $(pwd)/{output_path}.")
-    ray.init()
+    if tmp_dir is None:
+        raise Exception("tmp_dir must be specified for runs with ray.")
+    os.environ["RAY_TMPDIR"] = tmp_dir
+    ray.init(_temp_dir=tmp_dir)
     if backbone_import:
         importlib.import_module(backbone_import)
     mlflow.set_tracking_uri(storage_uri)

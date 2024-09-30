@@ -3,6 +3,7 @@ This module contains the high level functions for benchmarking on a single node.
 """
 
 import importlib
+import os
 
 import mlflow
 import pandas as pd
@@ -102,6 +103,7 @@ def benchmark_backbone(
     tasks: list[Task],
     experiment_name: str,
     storage_uri: str,
+    tmp_dir: str | None = None,
     backbone_import: str | None = None,
     run_name: str | None = None,
     n_trials: int = 1,
@@ -114,6 +116,7 @@ def benchmark_backbone(
     """Highest level function to benchmark a backbone using a ray cluster
 
     Args:
+        tmp_dir (str): Path to temporary directory to be used for ray
         defaults (Defaults): Defaults that are set for all tasks
         tasks (list[Task]): List of Tasks to benchmark over. Will be combined with defaults to get the final parameters of the task.
         experiment_name (str): Name of the MLFlow experiment to be used.
@@ -128,7 +131,10 @@ def benchmark_backbone(
         run_id (str | None): id of existing mlflow run to use as top-level run. Useful to add more experiments to a previous benchmark run. Defaults to None.
         description (str): Optional description for mlflow parent run.
     """
-    ray.init()
+    if tmp_dir is None:
+        raise Exception("tmp_dir must be specified for runs with ray.")
+    os.environ["RAY_TMPDIR"] = tmp_dir
+    ray.init(_temp_dir=tmp_dir)
     if backbone_import:
         importlib.import_module(backbone_import)
     mlflow.set_tracking_uri(storage_uri)

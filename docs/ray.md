@@ -24,8 +24,8 @@ If on CCC, start a head node with:
 
 ```sh
 export RAY_PORT=20022 # or any other port you like
-
-jbsub -queue x86_24h -cores 2 -mem 32g ray start --head --port $RAY_PORT --dashboard-port $((RAY_PORT + 1)) --include-dashboard True --dashboard-host 0.0.0.0 --object-store-memory 10000000000 --num-cpus 2 --num-gpus 0 --temp-dir /tmp
+export RAY_TMPDIR=/tmp/<your_tmp_dir> # replace this with a unique directory name for you. If another user specifies the same, you may get permission denied errors.
+jbsub -queue x86_24h -cores 2 -mem 32g ray start --head --port $RAY_PORT --dashboard-port $((RAY_PORT + 1)) --include-dashboard True --dashboard-host 0.0.0.0 --object-store-memory 10000000000 --num-cpus 2 --num-gpus 0 --temp-dir $TMP_DIR
 ```
 
 Find out the address of your ray head with `bpeek <ccc process number>` and store it in an environment variable with
@@ -57,7 +57,7 @@ At any time you may add more workers to the cluster which will be assigned trial
 One additional requirement is the key `ray_storage_path` must be included for jobs launched with ray.
 This key is ignored if ray is not being used. When ray is used, it determines where ray stores its files, including saved models.
 
-You can now run `ray job submit --no-wait --working-dir . -- ray_benchmark --config <your benchmark>`.
+You can now run `ray job submit --no-wait --working-dir . -- ray_benchmark --tmp_dir $RAY_TMPDIR --config <your benchmark>`.
 
 You can then use ray job to interact with your job. See [the ray quickstart guide](https://docs.ray.io/en/latest/cluster/running-applications/job-submission/quickstart.html) for more examples.
 

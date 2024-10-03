@@ -3,7 +3,7 @@ run_name: test_models_saved_multiple_epochs_no_ray
 defaults:
   trainer_args:
     precision: bf16-mixed # for these new models pretrained with bf16-mixed we should probably finetune with bf16-mixed
-    max_epochs: 20
+    max_epochs: 300
   terratorch_task:
     model_args:
       pretrained: True
@@ -761,8 +761,8 @@ tasks:
     metric: val/Overall_Accuracy
     early_stop_patience: 50
 
-n_trials: 2
-save_models: True
+n_trials: 16
+save_models: False
 storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark
 ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage
 optimization_space:

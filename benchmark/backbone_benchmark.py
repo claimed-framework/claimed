@@ -45,7 +45,8 @@ def benchmark_backbone_on_task(
     optimization_space: optimization_space_type | None = None,
     n_trials: int = 1,
     save_models: bool = False,
-    sampler: BaseSampler | None = None
+    sampler: BaseSampler | None = None,
+    test_models: bool = False,
 ) -> tuple[float, str | list[str] | None, dict[str, Any]]:
     with mlflow.start_run(
         run_name=task.name,
@@ -68,6 +69,7 @@ def benchmark_backbone_on_task(
                     storage_uri,
                     run.info.run_id,
                     save_models=save_models,
+                    test_models=test_models,
                 ),
                 {},
             )
@@ -90,6 +92,7 @@ def benchmark_backbone_on_task(
             storage_uri,
             run.info.run_id,
             save_models,
+            test_models,
         )
         study.optimize(
             objective,
@@ -137,6 +140,7 @@ def benchmark_backbone(
     run_id: str | None = None,
     description: str = "No description provided",
     bayesian_search: bool = True,
+    test_models: bool = False,
 ):
     """Highest level function to benchmark a backbone using a single node
 
@@ -179,7 +183,8 @@ def benchmark_backbone(
                 optimization_space=optimization_space,
                 n_trials=n_trials,
                 save_models=save_models,
-                sampler=sampler
+                sampler=sampler,
+                test_models=test_models,
             )
             table_entries.append([task.name, metric_name, best_value, hparams])
 

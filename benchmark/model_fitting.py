@@ -262,6 +262,7 @@ def launch_training(
             log_model=True,
         )
         trainer.fit(task, datamodule=datamodule)
+        trainer.test(ckpt_path="best")
         client = mlflow.tracking.MlflowClient(
             tracking_uri=storage_uri,
         )

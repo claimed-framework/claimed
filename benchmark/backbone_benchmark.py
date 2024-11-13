@@ -149,7 +149,7 @@ def benchmark_backbone(
         #find status of existing runs, and delete incomplete runs except the one with the most completed runs
         existing_experiments = check_existing_experiments(storage_uri, experiment_name, run_name)
 
-        if not existing_experiments["no_existing_runs"] and (run_id is None):
+        if (not existing_experiments["no_existing_runs"]) and (run_id is None):
             if existing_experiments["incomplete_run_to_finish"] is not None:
                 print("Continuing previous experiment parent run")
                 run_id = existing_experiments["incomplete_run_to_finish"]

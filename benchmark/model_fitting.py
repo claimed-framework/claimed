@@ -1,26 +1,28 @@
 """
 This module contains all the logic for fitting models
 """
+
+import abc
 import copy
+import dataclasses
 import importlib
 import os
 import types
-from fnmatch import fnmatchcase
+import uuid
+import warnings
+from abc import abstractmethod
 from functools import wraps
-from pathlib import Path
 from typing import Any, Callable
 
 import lightning.pytorch as pl
 import mlflow
 import optuna
-import torch
 from lightning import Callback, Trainer
-from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from lightning.pytorch.callbacks import (
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
-    RichProgressBar,
+    Timer,
 )
 from lightning.pytorch.loggers.mlflow import MLFlowLogger
 
@@ -28,7 +30,6 @@ from lightning.pytorch.loggers.mlflow import MLFlowLogger
 from optuna.integration import PyTorchLightningPruningCallback
 from ray import tune
 from ray.air import CheckpointConfig, RunConfig
-from ray.train import Checkpoint
 from ray.train._internal.storage import StorageContext
 from ray.tune.experiment import Trial
 
@@ -45,30 +46,74 @@ from ray.tune.experiment import Trial
 # )
 # from ray.train.torch import TorchTrainer
 from ray.tune.integration.pytorch_lightning import TuneReportCheckpointCallback
-from ray.tune.logger import LoggerCallback
-from ray.tune.schedulers import FIFOScheduler
+from ray.tune.schedulers import FIFOScheduler, TrialScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
+from ray.tune.search import SearchAlgorithm, Searcher
 from ray.tune.search.bohb import TuneBOHB
 from ray.tune.search.optuna import OptunaSearch
 from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
 
-from benchmark.benchmark_types import (
-    Backbone,
+from benchmark_types import (
     ParameterBounds,
     ParameterTypeEnum,
-    Task,
+    TrainingSpec,
     optimization_space_type,
+    recursive_merge,
     valid_task_types,
 )
 
-os.environ[
-    "TUNE_DISABLE_AUTO_CALLBACK_LOGGERS"
-] = "1"  # disable tune loggers, will add csv and json manually. If this is not here, it will log to tensorboard automatically
+os.environ["TUNE_DISABLE_AUTO_CALLBACK_LOGGERS"] = (
+    "1"  # disable tune loggers, will add csv and json manually. If this is not here, it will log to tensorboard automatically
+)
 
 SEED = 42
+
+
+class ParameterPicker(abc.ABC):
+    @abstractmethod
+    def pick_categorical(self, variable, choices):
+        pass
+
+    @abstractmethod
+    def pick_int(self, variable, low, high):
+        pass
+
+    @abstractmethod
+    def pick_float(self, variable, low, high, log=False):
+        pass
+
+
+class OptunaParameterPicker(ParameterPicker):
+    def __init__(self, trial: optuna.Trial):
+        super().__init__()
+        self.trial = trial
+
+    def pick_categorical(self, variable, choices):
+        return self.trial.suggest_categorical(variable, choices)
+
+    def pick_int(self, variable, low, high):
+        return self.trial.suggest_int(variable, low, high)
+
+    def pick_float(self, variable, low, high, log=False):
+        return self.trial.suggest_float(variable, low, high, log=log)
+
+
+class RayTuneParameterPicker(ParameterPicker):
+    def __init__(self):
+        super().__init__()
+
+    def pick_categorical(self, variable, choices):
+        return tune.choice(choices)
+
+    def pick_int(self, variable, low, high):
+        return tune.quniform(low, high, 1)
+
+    def pick_float(self, variable, low, high, log=False):
+        if log:
+            return tune.loguniform(low, high)
+        return tune.uniform(low, high)
 
 
 class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
@@ -76,21 +121,121 @@ class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
         super().__init__(*args, **kwargs)
 
 
-def inject_hparams(model_setup: dict[str, Any], model_hparams: dict[str, Any]):
-    model_setup_with_injected_hparams = copy.deepcopy(model_setup)
-    # assume maximum nesting value is 2
-    for k, v in model_hparams.items():
-        if k in model_setup_with_injected_hparams and isinstance(
-            model_setup_with_injected_hparams[k], dict
-        ):
-            # overwrite / merge keys
-            model_setup_with_injected_hparams[k] |= v
+def inject_hparams(training_spec: TrainingSpec, config: dict):
+    # treat batch size specially
+    config_without_batch_size = copy.deepcopy(config)
+    batch_size: int | None = config_without_batch_size.pop("batch_size", None)  # type: ignore
+    datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
+    if batch_size:
+        datamodule_with_generated_hparams.batch_size = batch_size
+
+    terratorch_task_with_generated_hparams = copy.deepcopy(
+        training_spec.task.terratorch_task
+    )
+    recursive_merge(terratorch_task_with_generated_hparams, config_without_batch_size)
+
+    task_with_generated_hparams = dataclasses.replace(
+        training_spec.task,
+        terratorch_task=terratorch_task_with_generated_hparams,
+        datamodule=datamodule_with_generated_hparams,
+    )
+    training_spec_with_generated_hparams = dataclasses.replace(
+        training_spec, task=task_with_generated_hparams
+    )
+    return training_spec_with_generated_hparams
+
+def get_default_callbacks(early_stop_patience: int | None, max_run_duration: str | None) -> list[Callback]:
+    default_callbacks: list[Callback] = [
+        LearningRateMonitor(logging_interval="epoch"),
+    ]
+    if early_stop_patience is not None:
+        default_callbacks.append(
+            EarlyStopping("val/loss", patience=early_stop_patience)
+        )
+    if max_run_duration is not None:
+        default_callbacks.append(
+            Timer(duration=max_run_duration)
+        )
+    return default_callbacks
+
+def generate_parameters(
+    parameter_picker: ParameterPicker,
+    current_hparams: dict,
+    hparam_space: dict,
+    ignore_keys: set[str] | None = None,
+    dictionary_position: list[str] | None = None,
+):
+    if ignore_keys is None:
+        ignore_keys = set()
+    if dictionary_position is None:
+        dictionary_position = []
+    _generate_parameters(
+        parameter_picker,
+        current_hparams,
+        hparam_space,
+        ignore_keys,
+        dictionary_position,
+    )
+
+
+def _generate_parameters(
+    parameter_picker: ParameterPicker,
+    current_hparams: dict,
+    hparam_space: dict,
+    ignore_keys: set[str],
+    dictionary_position: list[str],
+):
+    for parameter, space in hparam_space.items():
+        if parameter in ignore_keys:
+            continue
+        # if its a dictionary, continue to recurse
+        if isinstance(space, dict):
+            if parameter not in current_hparams:
+                current_hparams[parameter] = {}
+            dictionary_position.append(parameter)
+            _generate_parameters(
+                parameter_picker,
+                current_hparams[parameter],
+                hparam_space[parameter],
+                ignore_keys,
+                dictionary_position,
+            )
+            dictionary_position.pop()
+        # if not, get a value from the parameter_picker and insert it with the name prepended by the dictionary position
+        # this is important so that the full path of the parameter is used
+        # this will avoid confusion between parameters with the same name but from different components
         else:
-            # either add key or overwrite existing key
-            model_setup_with_injected_hparams[k] = v
-    return model_setup_with_injected_hparams
-
-
+            full_parameter_name = ".".join(dictionary_position + [parameter])
+            if isinstance(space, list):
+                suggestion = parameter_picker.pick_categorical(
+                    full_parameter_name, space
+                )
+                if suggestion is None:
+                    raise Exception(
+                        f"Optuna suggested None for parameter {full_parameter_name}"
+                    )
+                current_hparams[parameter] = suggestion
+            elif isinstance(space, ParameterBounds):
+                match space.type:
+                    case ParameterTypeEnum.integer:
+                        current_hparams[parameter] = parameter_picker.pick_int(
+                            full_parameter_name,
+                            int(space.min),
+                            int(space.max),
+                        )
+                    case ParameterTypeEnum.real:
+                        current_hparams[parameter] = parameter_picker.pick_float(
+                            full_parameter_name, space.min, space.max, log=space.log
+                        )
+                    case _:
+                        raise Exception(
+                            f"Type {space.type} not recognized. Suggest one of {[e.value for e in ParameterTypeEnum]}"
+                        )
+            else:
+                raise Exception(
+                    "Leaves of optimization space must be lists or ParameterBounds"
+                )
+            
 ###########################################
 ########### SINGLE NODE - OPTUNA ##########
 ###########################################
@@ -126,92 +271,68 @@ def launch_training(
             raise Exception(
                 f"No values for metric {metric}. Choose a valid metric for this task"
             )
-        # return metric_history[-1].value  # or best idk
         metric_values = [m.value for m in metric_history]
         if direction == "max":
-            return max(metric_values)  # or best idk
+            return max(metric_values)
         elif direction == "min":
             return min(metric_values)
         else:
             raise Exception(f"Direction must be `max` or `min` but got {direction}")
-        # trainer.test(task, datamodule=datamodule)
 
 
 def fit_model(
-    backbone: Backbone,
-    model_args: dict,
-    task: Task,
+    training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
     run_name: str,
     experiment_name: str,
     storage_uri: str,
     parent_run_id: str,
     trial: optuna.Trial | None = None,
-    lr: float | None = None,
-    batch_size: int | None = None,
-    weight_decay: float = 0.05,
-    freeze_backbone: bool = False,
     save_models: bool = False,
-    precision: _PRECISION_INPUT = "32",
 ) -> tuple[float, str]:
     pl.seed_everything(SEED, workers=True)
-    if batch_size:
-        task.datamodule.batch_size = (
-            batch_size
-        )
-    if lr is None:
-        lr = task.lr
-    
-    params: dict[str, Any] = dict(
-        model_args=model_args,
-        model_factory=task.model_factory,
-        loss=task.loss,
-        lr=lr,
-        optimizer="AdamW",
-        # optimizer_hparams={"weight_decay": weight_decay, "layer_decay": True, "num_layers": 24},
-        optimizer_hparams={"weight_decay": weight_decay},
-        freeze_backbone=freeze_backbone,
-        ignore_index=task.ignore_index,
-    )
+    training_spec_copy = copy.deepcopy(training_spec)
+    task = training_spec_copy.task
 
-    if task.reduce_lr_on_plateau:
-        params["scheduler"] = "ReduceLROnPlateau"
-        if isinstance(task.reduce_lr_on_plateau, int):
-            params["scheduler_hparams"] = {"patience": task.reduce_lr_on_plateau}
-            
+    #print(f"\ntask: {task}")
+
     if lightning_task_class in [
         SemanticSegmentationTask,
         PixelwiseRegressionTask,
     ]:
-        params["plot_on_val"] = False
-        params["class_weights"] = task.class_weights
-    lightning_task = lightning_task_class(**params)
+        task.terratorch_task["plot_on_val"] = False
+    #print("\n initializing lightning_task")
+    lightning_task = lightning_task_class(**task.terratorch_task)
 
-    callbacks: list[Callback] = [
-        LearningRateMonitor(logging_interval="epoch"),
-        RichProgressBar(),
-    ]
+    #print(f"\nlightning_task: {lightning_task}")
+    #print(f"\nlightning_task model: {lightning_task.model}")
 
-    if task.early_stop_patience is not None:
-        callbacks.append(
-            EarlyStopping(
-                "val/loss", patience=task.early_stop_patience
-            )
+    if len(training_spec.trainer_args.get("callbacks", [])) > 0:
+        warnings.warn(
+            "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
         )
+    default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience, task.max_run_duration)
 
     if task.early_prune and trial is not None:
-        callbacks.append(PyTorchLightningPruningCallback(trial, monitor="val/loss"))
+        default_callbacks.append(
+            PyTorchLightningPruningCallback(trial, monitor="val/loss")
+        )
 
     if save_models:
-        callbacks.append(ModelCheckpoint(monitor=task.metric, mode=task.direction))
+        default_callbacks.append(
+            ModelCheckpoint(monitor=task.metric, mode=task.direction)
+        )
+    if "enable_checkpointing" in training_spec_copy.trainer_args:
+        warnings.warn(f"enable_checkpointing found. Will be overwritten to the value of save_models {save_models}")
+    training_spec_copy.trainer_args["enable_checkpointing"] = save_models
+    training_spec_copy.trainer_args["enable_progress_bar"] = training_spec_copy.trainer_args.get("enable_progress_bar", True)
+    # get callbacks (set to empty list if none defined) and extend with default ones
+    training_spec_copy.trainer_args.setdefault("callbacks", []).extend(
+        default_callbacks
+    )  # type: ignore
 
-    trainer = Trainer(
-        callbacks=callbacks,
-        max_epochs=task.max_epochs,
-        enable_checkpointing=save_models,
-        log_every_n_steps=10,
-        precision=precision,
-    )
+    trainer = Trainer(**training_spec_copy.trainer_args)
+
     return launch_training(
         trainer,
         lightning_task,
@@ -226,69 +347,42 @@ def fit_model(
 
 
 def fit_model_with_hparams(
-    backbone: Backbone,
-    task: Task,
+    training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
-    base_args: dict[str, Any],
     run_name: str,
     experiment_name: str,
     hparam_space: optimization_space_type,
     storage_uri: str,
     parent_run_id: str,
     save_models: bool,
-    precision,
     trial: optuna.Trial,
 ) -> float:
+    """
+    Generate parameters using the optuna trial from the given parameters.
+    Then inject these into the given task.
+    It is important to make sure to not overwrite the task passed in the arguments, or these updates may affect
+    subsequent trials.
+    """
     current_hparams: dict[str, int | float | str | bool] = {}
+    task = training_spec.task
+    generate_parameters(
+        OptunaParameterPicker(trial),
+        current_hparams,
+        hparam_space,
+        ignore_keys=task.optimization_except,
+    )
 
-    for parameter, space in hparam_space.items():
-        if parameter in task.optimization_except:
-            continue
-        if isinstance(space, list):
-            suggestion = trial.suggest_categorical(parameter, space)
-            if suggestion is None:
-                raise Exception(f"Optuna suggested None for parameter {parameter}")
-            current_hparams[parameter] = suggestion
-        elif isinstance(space, ParameterBounds):
-            match space.type:
-                case ParameterTypeEnum.integer:
-                    current_hparams[parameter] = trial.suggest_int(
-                        parameter,
-                        int(space.min),
-                        int(space.max),
-                    )
-                case ParameterTypeEnum.real:
-                    current_hparams[parameter] = trial.suggest_float(
-                        parameter, space.min, space.max, log=space.log
-                    )
-                case _:
-                    raise Exception(
-                        f"Type {space.type} not recognized. Suggest one of {[e.value for e in ParameterTypeEnum]}"
-                    )
-    lr = float(current_hparams.pop("lr", task.lr))
-    batch_size = current_hparams.pop("batch_size", None)
-    weight_decay = float(current_hparams.pop("weight_decay", 0.05))
-    if batch_size is not None:
-        batch_size = int(batch_size)
-    freeze_backbone = bool(current_hparams.pop("freeze_backbone", False))
-    model_args = inject_hparams(base_args, current_hparams)
+    training_spec_with_generated_hparams = inject_hparams(training_spec, current_hparams)
     run_name = f"{run_name}_{trial.number}"
     return fit_model(
-        backbone,
-        model_args,
-        task,
+        training_spec_with_generated_hparams,
         lightning_task_class,
         run_name,
         experiment_name,
         storage_uri,
         parent_run_id,
         trial,
-        lr=lr,
-        batch_size=batch_size,
-        weight_decay=weight_decay,
-        freeze_backbone=freeze_backbone,
         save_models=save_models,
-        precision=precision,
     )[0]  # return only the metric value for optuna
 
 
@@ -296,99 +390,59 @@ def fit_model_with_hparams(
 ########### MULTI NODE - RAY ##############
 ###########################################
 
-# class RayReportCallback(pl.callbacks.Callback):
-#     """Like Ray's Report Callback but with no checkpointing"""
-
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.trial_name = train.get_context().get_trial_name()
-#         self.local_rank = train.get_context().get_local_rank()
-
-#     def on_train_epoch_end(self, trainer, pl_module) -> None:
-#         # Creates a checkpoint dir with fixed name
-#         metrics = trainer.callback_metrics
-#         metrics = {k: v.item() for k, v in metrics.items()}
-
-#         # (Optional) Add customized metrics
-#         metrics["epoch"] = trainer.current_epoch
-#         metrics["step"] = trainer.global_step
-
-#         # Add a barrier to ensure all workers finished reporting here
-#         torch.distributed.barrier()
-#         report(metrics=metrics)
-
 
 def ray_tune_model(
-    backbone: Backbone,
-    task: Task,
+    training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
-    base_args: dict[str, Any],
     hparam_space: optimization_space_type,
     storage_uri: str,
     ray_storage_path: str,
     experiment_name: str,
     save_models: bool,
     num_trials: int,
-    precision: _PRECISION_INPUT = "16-mixed",
-    backbone_import: str|None = None
+    backbone_import: str | None = None,
+    searcher: Searcher | SearchAlgorithm | None = None,
 ) -> tune.ResultGrid:
+    
+    if not searcher:
+        raise ValueError("searcher must be specified")
     trainable = tune.with_parameters(
         ray_fit_model,
-        backbone=backbone,
-        base_args=base_args,
-        task=task,
+        training_spec=training_spec,
         lightning_task_class=lightning_task_class,
         storage_uri=storage_uri,
         experiment_name=experiment_name,
         parent_run_id=mlflow.active_run().info.run_id,
         save_models=save_models,
-        precision=precision,
-        backbone_import=backbone_import
+        backbone_import=backbone_import,
     )
 
-    current_hparams: dict[str, Any] = {}
+    current_hparams: dict[str, int | float | str | bool] = {}
+    task = training_spec.task
+    generate_parameters(
+        RayTuneParameterPicker(),
+        current_hparams,
+        hparam_space,
+        ignore_keys=task.optimization_except,
+    )
 
-    for parameter, space in hparam_space.items():
-        if parameter in task.optimization_except:
-            continue
-        if isinstance(space, list):
-            suggestion = tune.choice(space)
-            if suggestion is None:
-                raise Exception(f"Optuna suggested None for parameter {parameter}")
-            current_hparams[parameter] = suggestion
-        elif isinstance(space, ParameterBounds):
-            match space.type:
-                case ParameterTypeEnum.integer:
-                    current_hparams[parameter] = tune.quniform(space.min, space.max, 1)
-                case ParameterTypeEnum.real:
-                    if space.log:
-                        current_hparams[parameter] = tune.loguniform(
-                            space.min, space.max
-                        )
-                    else:
-                        current_hparams[parameter] = tune.uniform(space.min, space.max)
-                case _:
-                    raise Exception(
-                        f"Type {space.type} not recognized. Suggest one of {[e.value for e in ParameterTypeEnum]}"
-                    )
-
-        # Early stopping
-        # It is unclear if this is working properly when checkpoints are disabled
-        if task.early_prune:
-            search_alg = TuneBOHB()
-            scheduler = HyperBandForBOHB(
-                time_attr="training_iteration",
-                max_t=task.max_epochs,
-                reduction_factor=2,
-                stop_last_trials=False,
+    # Early stopping
+    # It is unclear if this is working properly when checkpoints are disabled
+    if task.early_prune:
+        search_alg: Searcher | SearchAlgorithm = TuneBOHB()
+        scheduler: TrialScheduler = HyperBandForBOHB(
+            time_attr="training_iteration",
+            max_t=training_spec.trainer_args["max_epochs"],
+            reduction_factor=2,
+            stop_last_trials=False,
+        )
+        if not save_models:
+            raise RuntimeWarning(
+                "It is unclear if using `early_prune=True` with `save_models=False` produces correct results."
             )
-            if not save_models:
-                raise RuntimeWarning(
-                    "It is unclear if using `early_prune=True` with `save_models=False` produces correct results."
-                )
-        else:
-            scheduler = FIFOScheduler()
-            search_alg = OptunaSearch()
+    else:
+        scheduler = FIFOScheduler()
+        search_alg = searcher
 
     # monkey patch scheduler to add trial storage dir
     def decorate_to_add_trial_info(fn: Callable):
@@ -447,26 +501,27 @@ def ray_tune_model(
             )
             if save_models
             else None,
-            stop={"training_iteration": task.max_epochs},
+            # stop={"training_iteration": training_spec.trainer_args["max_epochs"]},
         ),
         param_space=current_hparams,
     )
     results = tuner.fit()
     return results
 
+def _generate_random_name(task_name: str):
+    # needed since the random names from mlflow are affected by the seed
+    # so they are always the same
+    return f"{task_name}_{uuid.uuid4().hex[:8]}"
 
 def ray_fit_model(
     config: dict,
-    backbone: Backbone,
-    base_args: dict,
-    task: Task,
+    training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
     storage_uri: str,
     experiment_name: str,
     parent_run_id: str,
     save_models: bool = True,
-    precision: _PRECISION_INPUT = "16-mixed",
-    backbone_import: str|None = None
+    backbone_import: str | None = None,
 ) -> None:
     if backbone_import:
         importlib.import_module(backbone_import)
@@ -476,86 +531,53 @@ def ray_fit_model(
         target_util=0.07, delay_s=10, retry=50
     )  # sometimes process needs some time to release GPU
 
-    trial_storage: StorageContext = config.pop("trial_storage", None)
-    model_args = copy.deepcopy(config)
-    lr = float(model_args.pop("lr", task.lr))
-    batch_size = model_args.pop("batch_size", None)
-    weight_decay = model_args.pop("weight_decay", 0.05)
-    if batch_size is not None:
-        batch_size = int(batch_size)
-    freeze_backbone = bool(model_args.pop("freeze_backbone", False))
-    model_args = inject_hparams(base_args, model_args)
-    if batch_size:
-        task.datamodule.batch_size = (
-            batch_size
-        )
+    trial_storage: StorageContext = config.pop("trial_storage", None)    
 
-    params: dict[str, Any] = dict(
-        model_args=model_args,
-        model_factory=task.model_factory,
-        loss=task.loss,
-        lr=lr,
-        optimizer="AdamW",
-        optimizer_hparams={"weight_decay": weight_decay},
-        freeze_backbone=freeze_backbone,
-        ignore_index=task.ignore_index,
-    )
+    training_spec_with_generated_hparams = inject_hparams(training_spec, config)
+    task = training_spec_with_generated_hparams.task
 
-    if task.reduce_lr_on_plateau:
-        params["scheduler"] = "ReduceLROnPlateau"
-        if isinstance(task.reduce_lr_on_plateau, int):
-            params["scheduler_hparams"]= {"patience": task.reduce_lr_on_plateau}
     if lightning_task_class in [
         SemanticSegmentationTask,
         PixelwiseRegressionTask,
     ]:
-        params["plot_on_val"] = False
-        params["class_weights"] = task.class_weights
-    
-    lightning_task = lightning_task_class(**params)
-    callbacks: list[Callback] = [
-        # RayReportCallback(), for ddp if required in the future
-        _TuneReportCallback(metrics=[task.metric], save_checkpoints=save_models),
-        LearningRateMonitor(logging_interval="epoch"),
-    ]
-    if task.early_stop_patience is not None:
-        callbacks.append(
-            EarlyStopping(
-                "val/loss", patience=task.early_stop_patience
-            )
+        task.terratorch_task["plot_on_val"] = False
+    lightning_task = lightning_task_class(**task.terratorch_task)
+
+    if len(training_spec.trainer_args.get("callbacks", [])) > 0:
+        warnings.warn(
+            "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
         )
 
-    # if save_models:
-    #     callbacks.append(ModelCheckpoint(monitor=task.metric))
+    default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience, task.max_run_duration)
+    default_callbacks.append(_TuneReportCallback(metrics=[task.metric], save_checkpoints=save_models))
 
-    trainer = Trainer(
-        # commented out is for ddp if required in the future
-        # strategy=RayDeepSpeedStrategy(),
-        callbacks=callbacks,
-        # plugins=[RayLightningEnvironment()],
-        # accelerator="auto",
-        # devices="auto",
-        devices=1,
-        enable_progress_bar=False,
-        max_epochs=task.max_epochs,
-        enable_checkpointing=False,
-        log_every_n_steps=10,
-        precision=precision,
-    )
+    if "enable_checkpointing" in training_spec_with_generated_hparams.trainer_args:
+        warnings.warn("enable_checkpointing found. Will be overwritten to False as ray will be responsible for saving models.")
+    training_spec_with_generated_hparams.trainer_args["enable_checkpointing"] = False
+    if "enable_progress_bar" in training_spec_with_generated_hparams.trainer_args:
+        warnings.warn("enable_progress_bar found. Will be overwritten to False")
+    training_spec_with_generated_hparams.trainer_args["enable_progress_bar"] = False
+    
+    # get callbacks (set to empty list if none defined) and extend with default ones
+    training_spec_with_generated_hparams.trainer_args.setdefault(
+        "callbacks", []
+    ).extend(default_callbacks)
+
+    trainer = Trainer(**training_spec_with_generated_hparams.trainer_args)
+
 
     # trainer = prepare_trainer(trainer)
 
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
 
-    with mlflow.start_run(nested=True) as run:
-        # hack for nestedness
-        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+    with mlflow.start_run(run_name=_generate_random_name(training_spec.task.name), parent_run_id=parent_run_id) as run:
         trainer.logger = MLFlowLogger(
             experiment_name=experiment_name,
             run_id=run.info.run_id,
+            run_name=run.info.run_name,
             save_dir=storage_uri,
-            log_model=False,
+            log_model=save_models,
         )
 
         # explicitly log batch_size. Since it is not a model param, it will not be logged

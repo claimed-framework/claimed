@@ -2,6 +2,10 @@
 This module contains functions to re-run a best backbone with different seeds
 """
 
+import copy
+import importlib
+import os
+import glob
 import warnings
 from ast import literal_eval
 from random import randint
@@ -10,22 +14,27 @@ from typing import Any
 import mlflow
 import mlflow.entities
 import pandas as pd
+import numpy as np
 import ray
 import torch
 from jsonargparse import CLI
 from lightning import Callback, Trainer
-from lightning.fabric.plugins.precision.precision import _PRECISION_INPUT
 from lightning.pytorch import seed_everything
-from lightning.pytorch.callbacks import EarlyStopping
+from lightning.pytorch.callbacks import ModelCheckpoint
 from tabulate import tabulate
+from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
+
+from lightning.pytorch.loggers.mlflow import MLFlowLogger
+import time
 
 from benchmark.benchmark_types import (
-    Backbone,
+    Defaults,
     Task,
-    build_model_args,
-    optimization_space_type,
+    TrainingSpec,
+    combine_with_defaults,
 )
 from benchmark.model_fitting import (
+    get_default_callbacks,
     inject_hparams,
     valid_task_types,
 )
@@ -33,164 +42,357 @@ from benchmark.model_fitting import (
 
 @ray.remote(num_cpus=8, num_gpus=1)
 def remote_fit(
-    backbone: Backbone,
-    model_args: dict,
-    task: Task,
+    training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
+    best_params: dict,
     seed: int,
-    precision: _PRECISION_INPUT = "32",
+    backbone_import: str | None = None
 ) -> float | None:
     seed_everything(seed, workers=True)
+    if backbone_import:
+        importlib.import_module(backbone_import)
 
-    lr = float(model_args.pop("lr", task.lr))
-    batch_size = model_args.pop("batch_size", None)
-    if batch_size is not None:
-        batch_size = int(batch_size)
-    freeze_backbone = bool(model_args.pop("freeze_backbone", False))
+    with mlflow.start_run(
+    run_name= f"{task.name}_{seed}",
+    nested=True,
+    ) as run:
+        
+        training_spec_copy = copy.deepcopy(training_spec)
+        training_spec_with_generated_hparams = inject_hparams(training_spec_copy, best_params)
+        task = training_spec_with_generated_hparams.task
 
-    if batch_size:
-        task.datamodule.batch_size = batch_size
-    if lr is None:
-        lr = task.lr
-    weight_decay = model_args.pop("weight_decay", 0.05)
+        if lightning_task_class in [
+            SemanticSegmentationTask,
+            PixelwiseRegressionTask,
+        ]:
+            task.terratorch_task["plot_on_val"] = False
+        lightning_task = lightning_task_class(**task.terratorch_task)
 
-    params: dict[str, Any] = dict(
-        model_args=model_args,
-        model_factory=task.model_factory,
-        loss=task.loss,
-        lr=lr,
-        optimizer="AdamW",
-        optimizer_hparams={"weight_decay": weight_decay},
-        freeze_backbone=freeze_backbone,
-        ignore_index=task.ignore_index,
-    )
-
-    if task.reduce_lr_on_plateau:
-        params["scheduler"] = "ReduceLROnPlateau"
-        if isinstance(task.reduce_lr_on_plateau, int):
-            params["scheduler_hparams"] = {"patience": task.reduce_lr_on_plateau}
-    
-    lightning_task = lightning_task_class(**params)
-    
-    callbacks: list[Callback] = []
-
-    if task.early_stop_patience is not None:
-        callbacks.append(
-            EarlyStopping(
-                "val/loss", mode=task.direction, patience=task.early_stop_patience
+        if len(training_spec.trainer_args.get("callbacks", [])) > 0:
+            warnings.warn(
+                "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
             )
-        )
-        # callbacks.append(EarlyStopping("val/loss", patience=task.early_stop_patience))
 
-    trainer = Trainer(
-        callbacks=callbacks,
-        logger=False,
-        max_epochs=task.max_epochs,
-        # max_epochs=1,
-        enable_checkpointing=False,
-        enable_progress_bar=False,
-        log_every_n_steps=10,
-        precision=precision,
-    )
-    try:
-        trainer.fit(lightning_task, datamodule=task.datamodule)
-        metrics = trainer.test(
-            lightning_task, datamodule=task.datamodule, verbose=False
+        default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience, task.max_run_duration)
+        # get callbacks (set to empty list if none defined) and extend with default ones
+        training_spec_with_generated_hparams.trainer_args.setdefault("callbacks", []).extend(
+            default_callbacks
+        )  # type: ignore
+        if "enable_checkpointing" in training_spec_with_generated_hparams.trainer_args:
+            warnings.warn("enable_checkpointing found. Will be overwritten to False as ray will be responsible for saving models.")
+        training_spec_with_generated_hparams.trainer_args["enable_checkpointing"] = False
+        if "enable_progress_bar" in training_spec_with_generated_hparams.trainer_args:
+            warnings.warn("enable_progress_bar found. Will be overwritten to False")
+        training_spec_with_generated_hparams.trainer_args["enable_progress_bar"] = False
+        trainer = Trainer(**training_spec_with_generated_hparams.trainer_args)
+        try:
+            trainer.fit(lightning_task, datamodule=task.datamodule)
+            metrics = trainer.test(
+                lightning_task, datamodule=task.datamodule, verbose=False
+            )
+            metrics = metrics[0]
+        except Exception as e:
+            raise Exception(str(e))
+    #        warnings.warn(str(e))
+    #        return None
+        test_metric = "test/" + task.metric.split("/")[1]
+        mlflow.log_metric(f"test_{test_metric}", metrics[test_metric])
+        return metrics[test_metric]
+
+
+
+def non_remote_fit(
+    experiment_name: str,
+    parent_run_id: str,
+    storage_uri: str,
+    task: Task,
+    training_spec: TrainingSpec,
+    lightning_task_class: valid_task_types,
+    best_params: dict,
+    seed: int,
+    backbone_import: str | None = None
+) -> float | None:
+    seed_everything(seed, workers=True)
+    if backbone_import:
+        importlib.import_module(backbone_import)
+
+
+    print(f"task in non_remote_fit: {task}")
+
+    with mlflow.start_run(
+    run_name= f"{task.name}_{seed}",
+    nested=True,
+    ) as run:
+        mlflow.set_tag("mlflow.parentRunId", parent_run_id)
+        #mlflow.log_param("seed", seed)
+        #print(f"task.name {task.name}")
+        #mlflow.log_param("task", task.name)
+
+        training_spec_copy = copy.deepcopy(training_spec)
+        training_spec_with_generated_hparams = inject_hparams(training_spec_copy, best_params)
+        task = training_spec_with_generated_hparams.task
+
+        if lightning_task_class in [
+            SemanticSegmentationTask,
+            PixelwiseRegressionTask,
+        ]:
+            task.terratorch_task["plot_on_val"] = False
+        lightning_task = lightning_task_class(**task.terratorch_task)
+
+        if len(training_spec.trainer_args.get("callbacks", [])) > 0:
+            warnings.warn(
+                "Callbacks passed to trainer. Make sure these are stateless, as they will not be reinitialized for each task!"
+            )
+
+        default_callbacks: list[Callback] = get_default_callbacks(task.early_stop_patience, task.max_run_duration)
+        # get callbacks (set to empty list if none defined) and extend with default ones
+        training_spec_with_generated_hparams.trainer_args.setdefault("callbacks", []).extend(
+            default_callbacks
+        )  # type: ignore
+        if "enable_checkpointing" in training_spec_with_generated_hparams.trainer_args:
+            warnings.warn("enable_checkpointing found. Will be overwritten to False as ray will be responsible for saving models.")
+        training_spec_with_generated_hparams.trainer_args["enable_checkpointing"] = False
+        if "enable_progress_bar" in training_spec_with_generated_hparams.trainer_args:
+            warnings.warn("enable_progress_bar found. Will be overwritten to False")
+        training_spec_with_generated_hparams.trainer_args["enable_progress_bar"] = False
+        trainer = Trainer(**training_spec_with_generated_hparams.trainer_args)
+
+        trainer.logger = MLFlowLogger(
+            experiment_name=experiment_name,
+            run_id=run.info.run_id,
+            save_dir=storage_uri,
+            log_model=True,
         )
-        metrics = metrics[0]
-    except Exception as e:
-        warnings.warn(str(e))
-        return None
-    test_metric = "test/" + task.metric.split("/")[1]
-    return metrics[test_metric]
+        try:
+            trainer.fit(lightning_task, datamodule=task.datamodule)
+            metrics = trainer.test(
+                lightning_task, datamodule=task.datamodule, verbose=False
+            )
+            metrics = metrics[0]
+        except Exception as e:
+            raise Exception(str(e))
+    #        warnings.warn(str(e))
+    #        return None
+        test_metric = "test/" + task.metric.split("/")[1]
+        mlflow.log_metric(f"test_{test_metric}", metrics[test_metric])
+        #mlflow.end_run()
+        return metrics[test_metric]
+
+
 
 
 def rerun_best_from_backbone(
     parent_run_id: str,
     output_path: str,
-    backbone: Backbone,
+    defaults: Defaults,
     tasks: list[Task],
-    storage_uri: str,
     experiment_name: str,
+    storage_uri: str,
     *args,
-    benchmark_suffix: str | None = None,
+    tmp_dir: str | None = None,
+    run_repetitions: int = 10,
+    backbone_import: str | None = None,
+    run_name: str | None = None,
     n_trials: int = 1,
     ray_storage_path: str | None = None,
-    optimization_space: optimization_space_type | None = None,
     save_models: bool = False,
-    precision: _PRECISION_INPUT = "32",
+    run_id: str | None = None,
+    optimization_space: dict | None = None,
+    description: str | None = None,
+    use_ray = False,
+    previously_completed_task_run_names: list,
     **kwargs,
 ):
-    ray.init()
+    """Repeat best experiments from a benchmark run. Only works with a ray cluster.
+
+    Args:
+        parent_run_id (str): mlflow id of parent run
+        output_path (str): path to store the results of the run
+        tmp_dir (str): Path to temporary directory to be used for ray
+        run_repetitions (int): How many runs (each with a different seed) to run per task.
+
+    """
+    if not os.path.isabs(output_path):
+        raise Exception(f"output_path must be absolute. Consider using $(pwd)/{output_path}.")
+    if tmp_dir is None:
+        raise Exception("tmp_dir must be specified for runs with ray.")
+    os.environ["RAY_TMPDIR"] = tmp_dir
+    if use_ray:
+        ray.init(_temp_dir=tmp_dir)
+    if backbone_import:
+        importlib.import_module(backbone_import)
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
 
     runs: list[mlflow.entities.Run] = mlflow.search_runs(
         filter_string=f"tags.mlflow.parentRunId='{parent_run_id}'", output_format="list"
     )  # type: ignore
-    print(f"Found runs: {[run.info.run_name for run in runs]}")
-    print(
-        f"Will match with task names: {['_'.join(run.info.run_name.split('_')[1:]) for run in runs]}"
-    )
-    table_columns = ["Task", "Metric", "Score"]
+    print(f"\nFound runs: {[run.info.run_name for run in runs]}")
+
+    task_names = [task.name for task in tasks]
+    print(f"Will only run the following: {task_names}")
+
+    table_columns = ["Task", "Metric", "Score", "mlflow_run_name", "mlflow_run_id", "mlflow_run_status"]
     table_entries = []
-
     ray_tasks = []
-    seeds = [42] + [randint(1, 5000) for i in range(9)]
-    for task in tasks:
-        matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore
-        if len(matching_runs) == 0:
-            msg = f"No runs found for task {task.name}. Skipping."
-            warnings.warn(msg)
-            continue
-        if len(matching_runs) > 1:
-            msg = f"More than 1 run found for task {task.name}"
-            raise Exception(msg)
+    does_not_need_to_be_run = []
+    tasks_with_new_results = []
 
-        best_params = matching_runs[0].data.params
-        # eval them
-        best_params = {k: literal_eval(v) for k, v in best_params.items()}
-        lightning_task_class = task.type.get_class_from_enum()
-        # print(f"Task {task.name}")
-        # print("Best params:")
-        # print(best_params)
-        # print("============")
-        model_args = build_model_args(backbone, task)
-        # print("Built model args:")
-        # print(model_args)
-        # print("============")
-        model_args = inject_hparams(model_args, best_params)
-        # print("Final model args")
-        # print(model_args)
-        # print("-------------")
-        for seed in seeds:
-            ray_tasks.append(
-                remote_fit.remote(
-                    backbone,
-                    model_args,
-                    task,
-                    lightning_task_class,
-                    seed,
-                    precision=precision,
-                )
-            )
-    results = ray.get(ray_tasks)
-    table_entries = [
-        [
-            task.name,
-            task.metric.split("/")[-1],
-            result,
+    repeated_storage_uri = f"{storage_uri}_repeated_exp"
+    if not os.path.exists(repeated_storage_uri):
+        os.makedirs(repeated_storage_uri)
+
+    repeated_experiment_name = f"{experiment_name}_repeated_exp"
+    mlflow.set_tracking_uri(repeated_storage_uri)
+    mlflow.set_experiment(repeated_experiment_name)
+
+    backbone_name = defaults.terratorch_task["model_args"]["backbone"]
+    with mlflow.start_run(run_name=backbone_name, run_id=None) as run:
+        mlflow.set_tag("purpose", "backbone_benchmarking")
+
+        for task in tasks:
+            print(f"\n\ntask: {task.name}")
+            matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore
+            if len(matching_runs) == 0:
+                msg = f"No runs found for task {task.name}. Skipping."
+                warnings.warn(msg)
+                continue
+            if len(matching_runs) > 1:
+                msg = f"More than 1 run found for task {task.name}"
+                raise Exception(msg)
+
+            #check if there are already results for this task and exp in the folder
+            past_output_path = f"{output_path.split(experiment_name)[0]}{experiment_name}_*"
+            past_output_path = glob.glob(past_output_path)
+            if len(sorted(past_output_path)) > 0:
+                output_path = sorted(past_output_path)[0]
+            print(f"output path: {output_path}")
+            if os.path.exists(output_path):
+                print("there are previous results from repeated experiments")
+                existing_output = pd.read_csv(output_path)
+                existing_output = existing_output[table_columns]
+                existing_task_output = existing_output.loc[existing_output["Task"]==task.name].copy()
+                rows, cols = existing_task_output.shape
+                print(f"rows: {rows} \t cols: {cols}")
+                if rows > run_repetitions:
+                    print("task has valid results, will not re-run")
+                    continue
+                past_seeds = [int(item.split("_")[-1]) for item in existing_task_output["mlflow_run_name"].tolist()]
+            else:
+                past_seeds = []
+            print(f"past_seeds for task: {past_seeds}")
+
+            best_params = matching_runs[0].data.params
+            # eval them
+            best_params = {k: literal_eval(v) for k, v in best_params.items()}
+            training_spec = combine_with_defaults(task, defaults)
+            lightning_task_class = training_spec.task.type.get_class_from_enum()
+
+            if use_ray: #does not work with past seeds (i.e. continuing in the middle of a task)
+                successful_seeds = [randint(1, 5000) for i in range(run_repetitions)]
+                for seed in successful_seeds:
+                    ray_tasks.append(
+                        remote_fit.remote(
+                            training_spec,
+                            lightning_task_class,
+                            best_params,
+                            seed,
+                            backbone_import=backbone_import
+                        )
+                    )
+            else:
+                experiment_info = mlflow.get_experiment_by_name(repeated_experiment_name)                
+                seeds = [randint(1, 5000) for i in range(run_repetitions*3)]
+                seeds = [seed for seed in seeds if seed not in past_seeds]
+                
+                for seed in seeds:
+                    if len(past_seeds) >= run_repetitions:
+                        break
+
+                    seed_run_name = f"{task.name}_{seed}"
+                    print(f"now trying: {seed_run_name}")
+                    seed_run_data = mlflow.search_runs(
+                                experiment_ids=[experiment_info.experiment_id],
+                                filter_string=f'tags."mlflow.runName" LIKE "{seed_run_name}"', output_format="list"
+                            )  # type: ignore
+                    if len(seed_run_data)>0:
+                        for item in seed_run_data:
+                            print(f"deleting existing run: {item}")
+                            mlflow.delete_run(item.info.run_id)
+
+                    score = non_remote_fit(
+                            experiment_name = repeated_experiment_name,
+                            parent_run_id = run.info.run_id,
+                            storage_uri = repeated_storage_uri,
+                            task = task,
+                            training_spec = training_spec,
+                            lightning_task_class =lightning_task_class,
+                            best_params = best_params,
+                            seed = seed,
+                            backbone_import=backbone_import
+                        )
+                    #check if run with name finished successfully
+                    print(f"score: {score}")
+                    time.sleep(3600*2)
+                    seed_run_data = mlflow.search_runs(
+                                experiment_ids=[experiment_info.experiment_id],
+                                filter_string=f'tags."mlflow.runName" LIKE "{seed_run_name}"', output_format="list"
+                            )  # type: ignore
+
+                    print(f"run for task {task.name} seed {seed} is :{seed_run_data}")
+                    if len(seed_run_data)>0:
+                        if seed_run_data[0].info.status != "FINISHED":
+                            client.delete_run(seed_run_data[0].info.run_id)
+                            continue
+                        past_seeds.append(seed)
+                        new_data = pd.DataFrame({
+                                    "Task": [task.name], 
+                                    "Metric": [task.metric.split("/")[-1]], 
+                                    "Score": [score],
+                                    "mlflow_run_name": [seed_run_name],
+                                    "mlflow_run_id": [seed_run_data[0].info.run_id],
+                                    "mlflow_run_status": [seed_run_data[0].info.status]
+                                    })
+                        print(f"completed seeds so far for this task: {len(past_seeds)}")
+                        if os.path.exists(output_path):
+                            print("there are previous results from repeated experiments")
+                            existing_output = pd.read_csv(output_path)
+                            existing_output = existing_output[table_columns]
+                            existing_output.reset_index(inplace=True)
+                            existing_task_output = existing_output.loc[existing_output["Task"]==task.name].copy()
+                            rows, cols = existing_task_output.shape
+                            print(f"rows: {rows} \t cols: {cols}")
+                            if rows == 0:
+                                print("no past results for this task")
+                            existing_output = pd.concat([existing_output,new_data], axis=0)
+                            existing_output.reset_index(inplace=True)
+                            existing_output.to_csv(output_path, index=False)
+                        else:
+                            new_data.to_csv(output_path, index=False)
+    #mlflow.end_run()
+                
+
+    if use_ray:
+        results = ray.get(ray_tasks)
+        table_entries = [
+            [
+                task.name,
+                task.metric.split("/")[-1],
+                result,
+                matching_runs[0].info.run_id
+            ]
+            for task, result in zip(
+                [task for task in tasks_with_new_results for _ in successful_seeds], results
+            )  # expand tasks
         ]
-        for task, result in zip(
-            [task for task in tasks for _ in seeds], results
-        )  # expand tasks
-    ]
 
-    table = tabulate(table_entries, headers=table_columns)
-    print(table)
-    df = pd.DataFrame(data=table_entries, columns=table_columns)
-    df.to_csv(output_path)
-    ray.shutdown()
+        table = tabulate(table_entries, headers=table_columns)
+        print(table)
+        df = pd.DataFrame(data=table_entries, columns=table_columns)
+        df.to_csv(output_path, index=False)
+
+    if use_ray:
+        ray.shutdown()
 
 
 def main():

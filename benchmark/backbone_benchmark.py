@@ -396,6 +396,7 @@ def benchmark_backbone(
     path_to_final_results = f"{REPEATED_EXP_FOLDER}/{experiment_name}_repeated_exp_mlflow.csv"
     
     rerun_best_from_backbone(
+        logger = logger,
         parent_run_id = finished_run_id,
         output_path = path_to_final_results, 
         defaults = defaults,

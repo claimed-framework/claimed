@@ -53,9 +53,6 @@ This function may be a method of your backbone or it may be passed to the `Prith
 
 Once these steps are complete, you may instantiate your model in the config file and pass it to the `PrithviModelFactory`
 
-### Example
-
-You can see an example of this for the Swin3D model in the `swin3d` directory. Specifically files `swin3d_backbone.py` for adapting the class and `swin3d.py` for adding `feature_info`. The file `benchmark_new_backbone.yaml` demonstrates how to instantiate the model within a config file.
 
 ## 2. Register the model with timm
 

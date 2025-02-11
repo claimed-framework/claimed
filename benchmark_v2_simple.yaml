@@ -78,7 +78,7 @@ tasks:
           - "GREEN"
           - "BLUE"
           - "NIR"
-n_trials: 16
+n_trials: 2
 save_models: False
 storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark
 ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage

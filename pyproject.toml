@@ -56,7 +56,6 @@ dependencies = [
 # fix this pytorch-lightning issue https://nvd.nist.gov/vuln/detail/CVE-2024-5452
 "pytorch-lightning>=2.3.3",
 "more-itertools~=10.2.0", 
-"mlflow~=2.10.2",
 "importlib-metadata~=4.13.0",
 "numpy~=1.26.0",
 "optuna~=3.5.0",
@@ -66,7 +65,6 @@ dependencies = [
 "gputil~=1.4.0",
 "asyncio~=3.4.3",
 "opencv-python-headless~=4.9.0.80",
-"h5py~=3.10.0", 
 "hpbandster~=0.7.4",
 "configspace~=0.7.1",
 "optuna-integration~=3.6.0",

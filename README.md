@@ -1,17 +1,15 @@
-# Benchmarking
+# Terratorch-iterate
 
-A tool for benchmarking and hpo using [TerraTorch](https://github.ibm.com/GeoFM-Finetuning/terratorch).
+A tool for benchmarking and hyper-parameter optimization using [TerraTorch](https://github.ibm.com/GeoFM-Finetuning/terratorch).
 
 Leverages MLFlow for experiment logging, optuna for hyperparameter optimization and ray for parallelization.
 
 ## Environment
 
 Using a virtual environment for all commands in this guide is strongly recommended.
-Package development was carried out with [Poetry](https://python-poetry.org/)
 
 ## Installation
 
-Install `torch >= 2.0` before installing this package
 
 ### Package installation
 
@@ -24,8 +22,6 @@ pip install "git+ssh://git@github.ibm.com/GeoFM-Finetuning/benchmark.git@main"
 
 ```sh
 pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
-pip install -r dev_requirements.txt
 pip install -e .
 ```
 
@@ -72,5 +68,4 @@ Check out instructions in the [docs](https://pages.github.ibm.com/GeoFM-Finetuni
 
 ## Credits
 
-Work by Carlos Gomes (carlos.gomes@ibm.com).
 This project was created using https://github.ibm.com/innersource/python-blueprint.

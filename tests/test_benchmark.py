@@ -7,10 +7,12 @@ from albumentations import HorizontalFlip, VerticalFlip, Resize
 from albumentations.pytorch.transforms import ToTensorV2
 import uuid
 import os
-
+from pathlib import Path
 
 @pytest.fixture(scope="module")
 def defaults() -> Defaults:
+    file = "/dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt"
+    assert Path(file).exists(), f"Error! {file=} does not exist" 
     trainer_args = {
         "precision": "bf16-mixed",
         "max_epochs": 10,
@@ -21,7 +23,7 @@ def defaults() -> Defaults:
             "backbone": "prithvi_vit_100",
             "backbone_out_indices": [2, 5, 8, 11],
             "backbone_pretrained_cfg_overlay": {
-                "file": "/dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt"
+                "file": file
             },
         },
         "model_factory": "PrithviModelFactory",
@@ -32,6 +34,8 @@ def defaults() -> Defaults:
 
 @pytest.fixture(scope="module")
 def mchesapeakelandcovernongeodatamodule() -> MChesapeakeLandcoverNonGeoDataModule:
+    data_root = "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+    assert Path(data_root).exists(), f"Error! Directory {data_root} does not exist"
     train_transform = [Resize(height=224, width=224), ToTensorV2()]
     test_transform = [
         HorizontalFlip(p=0.5),
@@ -45,7 +49,7 @@ def mchesapeakelandcovernongeodatamodule() -> MChesapeakeLandcoverNonGeoDataModu
         partition="0.10x_train",
         train_transform=train_transform,
         test_transform=test_transform,
-        data_root="/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0",
+        data_root=data_root,
         bands=["RED", "GREEN", "BLUE", "NIR"],
     )
 
@@ -104,6 +108,7 @@ def find_file(directory: str, filename: str):
 
 def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
     storage_uri = "/dccstor/geofm-finetuning/terratorch-iterate-test"
+    assert Path(storage_uri), f"Error! directory {storage_uri} does not exist"
     ray_storage_path = "/dccstor/geofm-finetuning/carlosgomes/ray_storage"
     optimization_space = {
         "batch_size": [8, 32, 64],

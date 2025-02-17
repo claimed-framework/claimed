@@ -34,8 +34,9 @@ Prerequisite:
    - `SEGMENTATION_V1` variable describes the path to segmetation_v1.0 dataset, which must be available locally (please see this example on how to load this dataset https://github.com/ServiceNow/geo-bench/blob/main/geobench/example_load_datasets.py)
    -  `BACKBONE_PRETRAINED_FILE` full path to the pretrained file
    -  `OUTPUT_DIR` directory that contains the results (e.g., mlflow run outputs)
--  a python env has been created (see "Package installation" section in [README](README.md)) and activated
+-  a python env has been created (see "Package installation" section in [README](README.md)) 
 
 Steps:
 1. Go to benchmark dir
-2. Run the script: `./run_tests.sh`
+2. Activate the python env in which you installed terratorch-iterate
+3. Run: `python3 run_tests.py`

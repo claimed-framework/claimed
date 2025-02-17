@@ -17,9 +17,9 @@ def main():
         out_file.unlink(missing_ok=True)
         assert not out_file.exists()
 
-    jbsub = f"jbsub -e {err_file} -o {out_file} -m 20G  -c 1+1 -r v100 pytest --cov-report html --cov=benchmark tests/test_benchmark.py"
+    jbsub = f"jbsub -e {err_file} -o {out_file} -m 20G -c 1+1 -r v100 pytest --cov-report html --cov=benchmark tests/test_benchmark.py"
     print(f"Submitting: {jbsub}")
-    subprocess.run(jbsub.split(""))
+    subprocess.run(jbsub.split())
 
 
 if __name__ == "__main__":

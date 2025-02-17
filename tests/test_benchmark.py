@@ -19,7 +19,10 @@ SEGMENTATION_V1 = os.getenv(
     "SEGMENTATION_V1", "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
 )
 
-OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/dccstor/geofm-finetuning/terratorch-iterate-test")
+OUTPUT_DIR = os.getenv(
+    "OUTPUT_DIR", "/dccstor/geofm-finetuning/terratorch-iterate-test"
+)
+
 
 @pytest.fixture(scope="module")
 def defaults() -> Defaults:
@@ -109,7 +112,7 @@ def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
     experiment_name = f"test_chesapeake_segmentation_{run_id}"
     run_name = f"run_name_geobench_{run_id}"
 
-    mlflow_run_id = benchmark_backbone(
+    mlflow_experiment_id = benchmark_backbone(
         experiment_name=experiment_name,
         run_name=run_name,
         run_id=None,
@@ -122,15 +125,24 @@ def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
         optimization_space=optimization_space,
     )
     # get the most recent modified directory
-    dir_path = Path(storage_uri) / mlflow_run_id
+    dir_path = Path(storage_uri) / mlflow_experiment_id
     assert dir_path.exists(), f"Error! directory does not exist: {dir_path}"
     # find mlflow.runName files within the result dir
-    mlflow_run_name = "mlflow.runName"
-    mlflow_path = find_file(directory=dir_path.resolve(), filename=mlflow_run_name)
+    meta_yaml = "meta.yaml"
+
+    meta_yaml_path = dir_path / meta_yaml
+    assert meta_yaml_path.exists(), f"Error! {meta_yaml_path=} does not exist"
     # open file and check that the experiment name is the same
-    with open(mlflow_path, mode="r") as f:
-        line = f.read()
+    with open(meta_yaml_path, mode="r") as f:
+        lines = f.readlines()
+        experiment_name_found = False
+        experiment_id_found = False
+        for line in lines:
+            if experiment_name in line:
+                experiment_name_found = True
+            if experiment_id_found in line:
+                experiment_id_found = True
         assert (
-            run_name in line
-        ), f"Error! {run_name=} is not part of {line=} from file={mlflow_path}"
+            experiment_name_found and experiment_id_found
+        ), f"Error! {experiment_id_found=} {experiment_name_found=}"
     # TODO delete the directories that were created by this test case

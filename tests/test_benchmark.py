@@ -9,10 +9,22 @@ import uuid
 import os
 from pathlib import Path
 
+
+BACKBONE_PRETRAINED_FILE = os.getenv(
+    "BACKBONE_PRETRAINED_FILE",
+    "/dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt",
+)
+
+SEGMENTATION_V1 = os.getenv(
+    "SEGMENTATION_V1", "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+)
+
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/dccstor/geofm-finetuning/terratorch-iterate-test")
+
 @pytest.fixture(scope="module")
 def defaults() -> Defaults:
-    file = "/dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt"
-    assert Path(file).exists(), f"Error! {file=} does not exist" 
+    file = BACKBONE_PRETRAINED_FILE
+    assert Path(file).exists(), f"Error! {file=} does not exist"
     trainer_args = {
         "precision": "bf16-mixed",
         "max_epochs": 10,
@@ -22,9 +34,7 @@ def defaults() -> Defaults:
             "pretrained": True,
             "backbone": "prithvi_vit_100",
             "backbone_out_indices": [2, 5, 8, 11],
-            "backbone_pretrained_cfg_overlay": {
-                "file": file
-            },
+            "backbone_pretrained_cfg_overlay": {"file": file},
         },
         "model_factory": "PrithviModelFactory",
         "optimizer": "AdamW",
@@ -34,7 +44,7 @@ def defaults() -> Defaults:
 
 @pytest.fixture(scope="module")
 def mchesapeakelandcovernongeodatamodule() -> MChesapeakeLandcoverNonGeoDataModule:
-    data_root = "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+    data_root = SEGMENTATION_V1
     assert Path(data_root).exists(), f"Error! Directory {data_root} does not exist"
     train_transform = [Resize(height=224, width=224), ToTensorV2()]
     test_transform = [
@@ -107,9 +117,9 @@ def find_file(directory: str, filename: str):
 
 
 def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
-    storage_uri = "/dccstor/geofm-finetuning/terratorch-iterate-test"
+    storage_uri = OUTPUT_DIR
     assert Path(storage_uri), f"Error! directory {storage_uri} does not exist"
-    ray_storage_path = "/dccstor/geofm-finetuning/carlosgomes/ray_storage"
+    ray_storage_path = None
     optimization_space = {
         "batch_size": [8, 32, 64],
         "lr": {"max": 1e-3, "min": 1e-6, "type": "real", "log": True},

@@ -29,8 +29,11 @@ It's encouraged that you look under the [Issues]([https://github.ibm.com/GeoFM-F
 
 ### Running tests
 
-Pre-requisite:
--  `geobench/segmentation_v1.0` dataset is available locally (please see this example on how to load this dataset https://github.com/ServiceNow/geo-bench/blob/main/geobench/example_load_datasets.py)
+Prerequisite:
+-  set environment variables:
+   - `SEGMENTATION_V1` variable describes the path to segmetation_v1.0 dataset, which must be available locally (please see this example on how to load this dataset https://github.com/ServiceNow/geo-bench/blob/main/geobench/example_load_datasets.py)
+   -  `BACKBONE_PRETRAINED_FILE` full path to the pretrained file
+   -  `OUTPUT_DIR` directory that contains the results (e.g., mlflow run outputs)
 -  a python env has been created (see "Package installation" section in [README](README.md)) and activated
 
 Steps:

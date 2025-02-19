@@ -14,8 +14,8 @@ from ray.tune.search.basic_variant import BasicVariantGenerator
 from ray.tune.search.optuna import OptunaSearch
 from tabulate import tabulate
 
-from backbone_benchmark import parse_optimization_space
-from benchmark_types import (
+from benchmark.backbone_benchmark import parse_optimization_space
+from benchmark.benchmark_types import (
     Defaults,
     Task,
     TrainingSpec,

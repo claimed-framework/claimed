@@ -53,9 +53,6 @@ This function may be a method of your backbone or it may be passed to the `Prith
 
 Once these steps are complete, you may instantiate your model in the config file and pass it to the `PrithviModelFactory`
 
-### Example
-
-You can see an example of this for the Swin3D model in the `swin3d` directory. Specifically files `swin3d_backbone.py` for adapting the class and `swin3d.py` for adding `feature_info`. The file `benchmark_new_backbone.yaml` demonstrates how to instantiate the model within a config file.
 
 ## 2. Register the model with timm
 
@@ -64,10 +61,6 @@ Alternatively, you may register the backbone with timm. This involves some more 
 You can see examples of this in the `vit_encoder_decoder.py` or `swin_encoder_decoder.py` and `prithvi_vit.py` or `swin_vit.py` classes in TerraTorch or any other model implemented in `timm`. The file `benchmark_new_backbone_timm.yaml` demonstrates how to use it in a config file.
 
 Once this is done, you just need to point the benchmarking tool to the module that registers your new backbones with the key `backbone_registration`. You can now use your backbone as any of the backbones in TerraTorch.
-
-### Example
-
-You can see an example of this for the Swin3D model in the `swin3d` directory. Specifically files `prithvi_swin3d.py` for registering with timm and `swin3d.py` for adding `feature_info`.
 
 ## 3. Using a different model factory
 

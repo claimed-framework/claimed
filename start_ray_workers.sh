@@ -2,10 +2,13 @@
 #from https://github.ibm.com/mssv/llm-eval-with-raytune/blob/main/ccc/ray_start_workers.sh
 obj_store_mem="10000000000" #10G
 
-while getopts ":a:" option;do
+while getopts ":a:e:" option;do
     case "${option}" in
     a) a=${OPTARG}
         head_address=$a
+    ;;
+    e) e=${OPTARG}
+        conda_env=$e
     ;;
     *) echo "Did not supply the correct arguments"
     ;;
@@ -19,6 +22,17 @@ then
 fi
 
 source ~/.bashrc
+
+if [ -z "$conda_env" ]
+then
+    echo "Not activating any conda env"        
+fi
+
+conda activate $conda_env
+if [ $? -ne 0 ]; then
+    echo "failed to activate conda environment, exiting..."
+    exit 1
+fi
 
 trap cleanup EXIT
 function cleanup()

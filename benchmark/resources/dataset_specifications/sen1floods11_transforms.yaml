@@ -42,18 +42,26 @@ init_args:
   label_grep: "*_LabelHand.tif"
   no_label_replace: -1
   no_data_replace: 0
-means:
-  - 0.1412956
-  - 0.13795798
-  - 0.12353792
-  - 0.30902815
-  - 0.2044958
-  - 0.11912015
-stds:
-  - 0.07406382
-  - 0.07370365
-  - 0.08692279
-  - 0.11798815
-  - 0.09772074
-  - 0.07659938
-num_classes: 2
+  train_transform:
+    - class_path: albumentations.HorizontalFlip
+      init_args:
+        p: 0.5
+    - class_path: albumentations.VerticalFlip
+      init_args:
+        p: 0.5
+    - class_path: ToTensorV2
+  means:
+    - 0.1412956
+    - 0.13795798
+    - 0.12353792
+    - 0.30902815
+    - 0.2044958
+    - 0.11912015
+  stds:
+    - 0.07406382
+    - 0.07370365
+    - 0.08692279
+    - 0.11798815
+    - 0.09772074
+    - 0.07659938
+  num_classes: 2

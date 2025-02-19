@@ -1,0 +1,104 @@
+experiment_name: geobench_v2_test
+run_name: test_models_saved_multiple_epochs_no_ray
+defaults:
+  trainer_args:
+    precision: bf16-mixed # for these new models pretrained with bf16-mixed we should probably finetune with bf16-mixed
+    max_epochs: 10
+  terratorch_task:
+    model_args:
+      pretrained: True
+      backbone: prithvi_vit_100
+      backbone_out_indices:
+        - 2
+        - 5
+        - 8
+        - 11
+      backbone_pretrained_cfg_overlay:
+        file: /dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt
+    model_factory: PrithviModelFactory
+    optimizer: AdamW
+    
+tasks:
+  - name: chesapeake
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 10
+    terratorch_task:
+      loss: ce
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        bands:
+        - RED
+        - GREEN
+        - BLUE
+        - NIR
+        num_classes: 7
+    datamodule:
+      class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
+      init_args:
+        partition: 0.10x_train
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          # - class_path: albumentations.RandomRotate90
+          #   init_args:
+          #     p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          # - class_path: albumentations.RandomBrightnessContrast
+          #   init_args:
+          #     p: 0.8
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 6
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+          - "NIR"
+n_trials: 2
+save_models: False
+storage_uri: /dccstor/geofm-finetuning/carlosgomes/benchmark
+ray_storage_path: /dccstor/geofm-finetuning/carlosgomes/ray_storage
+optimization_space:
+  batch_size:
+      - 8
+      - 32
+      - 64
+  lr:
+    max: 1e-3
+    min: 1e-6
+    type: real
+    log: true
+  optimizer_hparams:
+    weight_decay:
+      min: 0
+      max: 0.4
+      type: real
+  model_args:
+    decoder_channels:
+      - 64
+      - 128
+      - 256

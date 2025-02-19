@@ -7,13 +7,14 @@ import copy
 import dataclasses
 import importlib
 import os
+import shutil
 import types
 import uuid
 import warnings
 from abc import abstractmethod
 from functools import wraps
 from typing import Any, Callable
-
+import pandas as pd
 import lightning.pytorch as pl
 import mlflow
 import optuna
@@ -55,7 +56,7 @@ from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
 
-from benchmark_types import (
+from benchmark.benchmark_types import (
     ParameterBounds,
     ParameterTypeEnum,
     TrainingSpec,
@@ -280,6 +281,7 @@ def launch_training(
             raise Exception(f"Direction must be `max` or `min` but got {direction}")
 
 
+
 def fit_model(
     training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
@@ -294,18 +296,12 @@ def fit_model(
     training_spec_copy = copy.deepcopy(training_spec)
     task = training_spec_copy.task
 
-    #print(f"\ntask: {task}")
-
     if lightning_task_class in [
         SemanticSegmentationTask,
         PixelwiseRegressionTask,
     ]:
         task.terratorch_task["plot_on_val"] = False
-    #print("\n initializing lightning_task")
     lightning_task = lightning_task_class(**task.terratorch_task)
-
-    #print(f"\nlightning_task: {lightning_task}")
-    #print(f"\nlightning_task model: {lightning_task.model}")
 
     if len(training_spec.trainer_args.get("callbacks", [])) > 0:
         warnings.warn(

@@ -4,85 +4,96 @@
 # - setup.py discouraged; minimal stub included only for compatibility with legacy tools
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
-[tool.poetry]
-name = "benchmark"
+[tool.setuptools.packages.find]
+include = ["benchmark*"]
+
+[project]
+
+name = "terratorch-iterate"
 version = "0.1.0"
 description = "A tool for benchmarking and hpo"
 authors = [
-    "Carlos Gomes <carlos.gomes@ibm.com>",
+     { name = "Carlos Gomes", email = "carlos.gomes@ibm.com" },
+]
+license = { "text" = "Apache License, Version 2.0" }
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
 ]
 readme = "README.md"
-repository = "https://github.ibm.com/GeoFM-Finetuning/benchmark"
 
-[tool.poetry.dependencies]
-python = ">= 3.10, < 3.13"
-click = "*"
+dependencies = [
+"click",
 # optional dependencies that can be opted in by apps.
-pytest = { version = "*", optional = true }
-pytest-cov = { version = "*", optional = true }
-torch = ">=2.2.0"
-torchvision = ">=0.17.0"
-# terratorch = {git = "git@github.ibm.com:GeoFM-Finetuning/terratorch.git"}
-# terratorch = {git = "git@github.ibm.com:GeoFM-Finetuning/terratorch.git", branch="feature/multimae"}
-# terratorch = {git = "https://github.com/IBM/terratorch.git", branch="feature/geobench_partitions"}
-# terratorch = {git = "https://github.com/IBM/terratorch.git", branch="feature/scale_mae_simplify"}
-terratorch = {git = "https://github.com/IBM/terratorch.git"}
+"torchvision>=0.17.0",
+"terratorch>=0.99.8", 
 
-# temporal lat lon encoding
-# terratorch = {path = "/u/carlosgomes/terratorch_os/terratorch"}
-more-itertools = "^10.2.0"
-mlflow = "^2.10.2"
-importlib-metadata = "4.13.0"
-numpy = "^1.26.0"
-optuna = "^3.5.0"
-tabulate = "^0.9.0"
-types-tabulate = "^0.9.0.20240106"
-ray = {extras = ["default"], version = "^2.9.3"}
-gputil = "^1.4.0"
-asyncio = "^3.4.3"
-opencv-python = "^4.9.0.80"
-h5py = "^3.10.0"
-hpbandster = "^0.7.4"
-configspace = "^0.7.1"
-geobench = "^1.0.0"
-optuna-integration = "^3.6.0"
-torchmetrics = ">=0.10,<1.3.2"
-albucore = "0.0.16"
-setuptools = "^75.1.0"
-wheel = "^0.44.0"
+# requests>=2.32.0 because of this vulnerability https://github.com/psf/requests/security/advisories/GHSA-9wx4-h78v-vm56
+"requests>=2.32.0",
+# Jinja2 vulnerability issue https://github.com/pallets/jinja/security/advisories/GHSA-h75v-3vvj-5mfj
+"Jinja2>=3.1.5",
+# urllib3 vulnerability issue https://github.com/urllib3/urllib3/security/advisories/GHSA-34jh-p97f-mpxf
+"urllib3>=2.2.2",
+# fix this sqlparse issue https://www.cve.org/CVERecord?id=CVE-2024-4340
+"sqlparse>=0.5.0",
+# fix this scikit-learn issue https://www.cve.org/CVERecord?id=CVE-2024-5206
+"scikit-learn>=1.5.0",
+# fix this pillow issue https://pillow.readthedocs.io/en/stable/releasenotes/10.3.0.html#security
+"pillow>=10.3.0",
+# fix this aiohttp issue https://github.com/aio-libs/aiohttp/security/advisories/GHSA-7gpw-8wmc-pm8g
+"aiohttp>=3.9.4",
+# fix this tqdm issue https://github.com/tqdm/tqdm/security/advisories/GHSA-g7vv-2v7x-gj9p
+"tqdm>=4.66.3",
+# fix this werkzeug issue https://github.com/pallets/werkzeug/security/advisories/GHSA-2g68-c3qc-8985
+"werkzeug>=3.0.3",
+# fix this pytorch-lightning issue https://nvd.nist.gov/vuln/detail/CVE-2024-5452
+"pytorch-lightning>=2.3.3",
+"more-itertools~=10.2.0", 
+"importlib-metadata~=4.13.0",
+"numpy~=1.26.0",
+"optuna~=3.5.0",
+"tabulate~=0.9.0",
+"types-tabulate~=0.9.0.20240106",
+"ray~=2.37.0",
+"gputil~=1.4.0",
+"asyncio~=3.4.3",
+"opencv-python-headless~=4.9.0.80",
+"hpbandster~=0.7.4",
+"configspace~=0.7.1",
+"optuna-integration~=3.6.0",
+]
 
-[tool.poetry.extras]
-test = ["pytest", "pytest-cov"]
+[project.optional-dependencies]
+dev = [
+  "black",
+  "mkdocs-material",
+  "mkdocstrings[python]",
+  "mike" # for building docs with versions
+]
 
-[tool.poetry.group.dev]
-optional = false
-
-[tool.poetry.group.dev.dependencies]
-pytest = "*"
-pytest-cov = "*"
-black = "*"
-flake8 = "*"
-pep8-naming = "*"
-mypy = "*"
-six = "*"
-myst-parser = "*"
-ruff = "^0.2.2"
-mkdocs-material = "^9.5.11"
-mkdocstrings = {extras = ["python"], version = "^0.24.1"}
-debugpy = "^1.8.1"
-ipykernel = "^6.29.5"
-
-[tool.poetry.scripts]
-benchmark = "benchmark.backbone_benchmark:main"
-ray_benchmark = "benchmark.benchmark_ray:main"
+test = [
+  "coverage",
+  "pytest",
+  "pytest-cov"
+]
 
 [tool.black]
+target-version = ["py310"]
 line-length = 88
-skip-string-normalization = false
-target-version = ['py37']
+skip-string-normalization = true
+
+[project.scripts]
+benchmark = "benchmark.backbone_benchmark:main"
+ray_benchmark = "benchmark.benchmark_ray:main"
+repeat_experiments = "benchmark.repeat_best_experiment:main"
+
 
 [tool.isort]
 multi_line_output = 3
@@ -99,3 +110,6 @@ check_untyped_defs = true
 [[tool.mypy.overrides]]
 module = "pytest.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = "--cov=benchmark --cov-report html"

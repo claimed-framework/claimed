@@ -238,7 +238,7 @@ def benchmark_backbone(
     description: str = "No description provided",
     bayesian_search: bool = True,
     continue_existing_experiment: bool = True
-):
+    )-> str:
     """Highest level function to benchmark a backbone using a single node
 
     Args:
@@ -414,9 +414,13 @@ def benchmark_backbone(
         use_ray = False,
         previously_completed_task_run_names = completed_task_run_names
     )
+    
+    experiment_id = run.info.experiment_id
+    return experiment_id
 
 
 def main():
+        
     CLI(benchmark_backbone, fail_untyped=False)
 
 

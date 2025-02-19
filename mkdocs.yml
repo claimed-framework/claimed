@@ -6,21 +6,28 @@ theme:
   features:
     - content.code.copy
     - content.code.select
+
 plugins:
   - autorefs
   - mkdocstrings:
       handlers:
         python:
-          paths: [src] # search packages in the src folde
+          paths: [src]  # Ensure this points to your source folder
           options:
             show_root_heading: true
 
 repo_url: https://github.ibm.com/GeoFM-Finetuning/benchmark
+
 nav:
   - index.md
   - mlflow.md
   - new_backbone.md
   - ray.md
+  - plotting.md
+  - repeating_experiments.md
+  - troubleshooting.md
+  - for_developers.md
+  - handover.md
 
 markdown_extensions:
   - pymdownx.highlight:

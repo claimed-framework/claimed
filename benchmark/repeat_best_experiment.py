@@ -41,7 +41,7 @@ from benchmark.model_fitting import (
 
 
 @ray.remote(num_cpus=8, num_gpus=1)
-def remote_fit(  #ANYTHING WITH RAY HAS NOT BEEN TESTED
+def remote_fit(
     training_spec: TrainingSpec,
     lightning_task_class: valid_task_types,
     best_params: dict,
@@ -102,17 +102,17 @@ def remote_fit(  #ANYTHING WITH RAY HAS NOT BEEN TESTED
 
 
 def non_remote_fit(
-    logger,
-    experiment_name: str,
-    parent_run_id: str,
-    storage_uri: str,
-    task: Task,
-    training_spec: TrainingSpec,
-    lightning_task_class: valid_task_types,
-    best_params: dict,
-    seed: int,
-    backbone_import: str | None = None
-) -> float | None:
+        logger,
+        experiment_name: str,
+        parent_run_id: str,
+        storage_uri: str,
+        task: Task,
+        training_spec: TrainingSpec,
+        lightning_task_class: valid_task_types,
+        best_params: dict,
+        seed: int,
+        backbone_import: str | None = None
+    ) -> float | None:
     seed_everything(seed, workers=True)
     if backbone_import:
         importlib.import_module(backbone_import)

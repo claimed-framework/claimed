@@ -5,7 +5,6 @@ import os
 import importlib
 from functools import partial
 from typing import Any
-
 import mlflow
 import optuna
 import pandas as pd
@@ -32,10 +31,9 @@ from benchmark.repeat_best_experiment import rerun_best_from_backbone
 from benchmark.mlflow_utils import (delete_nested_experiment_parent_runs,
                                     check_existing_task_parent_runs,
                                     check_existing_experiments,
-                                    get_logger)
+                                    get_logger, sync_mlflow_optuna)
 
 direction_type_to_optuna = {"min": "minimize", "max": "maximize"}
-
 smp_decoders = ["unet", "deeplab"]
 
 
@@ -71,64 +69,14 @@ def benchmark_backbone_on_task(
         os.makedirs(optuna_db_path)
     optuna_db_path = f"{optuna_db_path}/{experiment_name}_{experiment_run_id}.db"
 
-
-    #check number of successful mlflow runs in task
-    client = mlflow.tracking.MlflowClient(tracking_uri=storage_uri)
-    completed_in_mlflow_for_task = []
-    all_mlflow_runs_for_task = []
-    if task_run_id is not None:
-        all_mlflow_runs_for_task.append(task_run_id)
-        logger.info(f"task_run_id : {task_run_id}")
-        experiment_info = client.get_experiment_by_name(experiment_name)
-        individual_run_data = client.search_runs(experiment_ids=[experiment_info.experiment_id], 
-                    filter_string=f'tags."mlflow.parentRunId" LIKE "{task_run_id}"')
-        for individual_run in individual_run_data:
-            if individual_run.info.status == "FINISHED":
-                completed_in_mlflow_for_task.append(individual_run.info.run_id)
-            all_mlflow_runs_for_task.append(individual_run.info.run_id)
-
-    #check number of successful optuna trials in the database
-    study_names = optuna.study.get_all_study_names(storage= "sqlite:///{}.db".format(optuna_db_path))
-    if task.name in study_names:
-        loaded_study = optuna.load_study(study_name=task.name, 
-                                        storage= "sqlite:///{}.db".format(optuna_db_path))
-        logger.info(f"loaded_study has : {len(loaded_study.trials)} trials")
-        incomplete = 0
-        for trial in loaded_study.trials:
-            if (trial.state == optuna.trial.TrialState.FAIL) | (trial.state == optuna.trial.TrialState.RUNNING):
-                incomplete+=1
-        logger.info(f"{incomplete} trials are incomplete")
-        successful_optuna_trials = len(loaded_study.trials) - incomplete
-        too_many_trials = successful_optuna_trials > n_trials
-        no_existing_task =  task_run_id is None
-        optuna_mlflow_mismatch = len(completed_in_mlflow_for_task) != successful_optuna_trials
-        logger.info(f"successful optuna trials {successful_optuna_trials} . mlflow runs {len(completed_in_mlflow_for_task)}")
-
-        if too_many_trials or no_existing_task or optuna_mlflow_mismatch:
-            logger.info(f"deleting study with name {task.name}")
-            logger.info(f"too_many_trials {too_many_trials}")
-            logger.info(f"no_existing_task {no_existing_task}")
-
-            #delete optuna study in database
-            optuna.delete_study(study_name=task.name, 
-                                storage= "sqlite:///{}.db".format(optuna_db_path))
-
-            #delete any existing mlflow runs
-            if len(all_mlflow_runs_for_task) > 0:
-                for item in all_mlflow_runs_for_task:
-                    logger.info(f"deleting {item}")
-                    client.delete_run(item)
-                    os.system(f"rm -r {experiment_info.artifact_location}/{item}")
-                    task_run_id = None
-    else:
-        #delete any existing mlflow runs
-        if len(all_mlflow_runs_for_task) > 0:
-            for item in all_mlflow_runs_for_task:
-                logger.info(f"deleting {item}")
-                client.delete_run(item)
-                os.system(f"rm -r {experiment_info.artifact_location}/{item}")
-            task_run_id = None
-    ###################################
+    task_run_id = sync_mlflow_optuna(
+                            optuna_db_path = optuna_db_path,
+                            storage_uri = storage_uri,
+                            experiment_name = experiment_name,
+                            task_run_id = task_run_id,
+                            task = task,
+                            logger = logger
+                            )
 
     with mlflow.start_run(
         run_name=task.name,
@@ -182,20 +130,16 @@ def benchmark_backbone_on_task(
             save_models,
         )
 
-        additional_trials = False
-        if additional_trials == False:
-            completed_trials = len(study.trials)
-            n_trials = n_trials - completed_trials
-            #check for failed trials
-            for trial in study.trials:
-                if (trial.state == optuna.trial.TrialState.FAIL) | (trial.state == optuna.trial.TrialState.RUNNING):
-                    n_trials=n_trials+1
+        n_trials = n_trials - len(study.trials)
+        for trial in study.trials:
+            if (trial.state == optuna.trial.TrialState.FAIL) | (trial.state == optuna.trial.TrialState.RUNNING):
+                n_trials=n_trials+1
 
         study.optimize(
             objective,
             n_trials=n_trials,
             # callbacks=[champion_callback],
-            catch=[torch.cuda.OutOfMemoryError],  # add a few more here?
+            catch=[torch.cuda.OutOfMemoryError], 
         )
         best_params = unflatten(study.best_trial.params)
         mlflow.log_params(best_params) # unflatten
@@ -371,6 +315,7 @@ def benchmark_backbone(
                 "results_table.json",
                 run.info.run_id,
             )
+            experiment_id = run.info.experiment_id
 
         #check completion of HPO for all tasks before proceeding to next stage  
         existing_experiments = check_existing_experiments(
@@ -415,7 +360,6 @@ def benchmark_backbone(
         previously_completed_task_run_names = completed_task_run_names
     )
     
-    experiment_id = run.info.experiment_id
     return experiment_id
 
 

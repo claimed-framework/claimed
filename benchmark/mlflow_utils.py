@@ -15,10 +15,84 @@ import yaml
 import seaborn as sns
 from matplotlib import pyplot as plt
 from ast import literal_eval
+import optuna
+from benchmark.benchmark_types import Task
 
 SEGMENTATION_BASE_TASKS = ['chesapeake', 'sa_crop_type', 'pv4ger_seg', 'cashew', 'neontree', 'nz_cattle']
 CLASSIFICATION_BASE_TASKS = ['pv4ger', 'so2sat', 'brick_kiln', 'big_earth_net', 'eurosat', 'forestnet']
 
+
+
+
+def sync_mlflow_optuna(optuna_db_path: str,
+                       storage_uri: str,
+                       experiment_name: str,
+                       task_run_id: str | None,
+                       task: Task,
+                       logger,
+                       ) -> str | None:
+    """
+        syncs the number of completed trials in mflow and optuna
+    Returns:
+        task_run_id: run id of the task to be continued (if one exists) or None
+    """
+    #check number of successful mlflow runs in task
+    client = mlflow.tracking.MlflowClient(tracking_uri=storage_uri)
+    completed_in_mlflow_for_task = []
+    all_mlflow_runs_for_task = []
+    if task_run_id is not None:
+        all_mlflow_runs_for_task.append(task_run_id)
+        logger.info(f"task_run_id : {task_run_id}")
+        experiment_info = client.get_experiment_by_name(experiment_name)
+        individual_run_data = client.search_runs(experiment_ids=[experiment_info.experiment_id], 
+                    filter_string=f'tags."mlflow.parentRunId" LIKE "{task_run_id}"')
+        for individual_run in individual_run_data:
+            if individual_run.info.status == "FINISHED":
+                completed_in_mlflow_for_task.append(individual_run.info.run_id)
+            all_mlflow_runs_for_task.append(individual_run.info.run_id)
+
+    #check number of successful optuna trials in the database
+    study_names = optuna.study.get_all_study_names(storage= "sqlite:///{}.db".format(optuna_db_path))
+    if task.name in study_names:
+        loaded_study = optuna.load_study(study_name=task.name, 
+                                        storage= "sqlite:///{}.db".format(optuna_db_path))
+        logger.info(f"loaded_study has : {len(loaded_study.trials)} trials")
+        incomplete = 0
+        for trial in loaded_study.trials:
+            if (trial.state == optuna.trial.TrialState.FAIL) | (trial.state == optuna.trial.TrialState.RUNNING):
+                incomplete+=1
+        logger.info(f"{incomplete} trials are incomplete")
+        successful_optuna_trials = len(loaded_study.trials) - incomplete
+        too_many_trials = successful_optuna_trials > n_trials
+        no_existing_task =  task_run_id is None
+        optuna_mlflow_mismatch = len(completed_in_mlflow_for_task) != successful_optuna_trials
+        logger.info(f"successful optuna trials {successful_optuna_trials} . mlflow runs {len(completed_in_mlflow_for_task)}")
+
+        if too_many_trials or no_existing_task or optuna_mlflow_mismatch:
+            logger.info(f"deleting study with name {task.name}")
+            logger.info(f"too_many_trials {too_many_trials}")
+            logger.info(f"no_existing_task {no_existing_task}")
+
+            #delete optuna study in database
+            optuna.delete_study(study_name=task.name, 
+                                storage= "sqlite:///{}.db".format(optuna_db_path))
+
+            #delete any existing mlflow runs
+            if len(all_mlflow_runs_for_task) > 0:
+                for item in all_mlflow_runs_for_task:
+                    logger.info(f"deleting {item}")
+                    client.delete_run(item)
+                    os.system(f"rm -r {experiment_info.artifact_location}/{item}")
+                    task_run_id = None
+    else:
+        #delete any existing mlflow runs
+        if len(all_mlflow_runs_for_task) > 0:
+            for item in all_mlflow_runs_for_task:
+                logger.info(f"deleting {item}")
+                client.delete_run(item)
+                os.system(f"rm -r {experiment_info.artifact_location}/{item}")
+            task_run_id = None
+    return task_run_id
 
 
 def extract_repeated_experiment_results(

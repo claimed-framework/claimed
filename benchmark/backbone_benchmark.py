@@ -61,7 +61,7 @@ def benchmark_backbone_on_task(
     optimization_space: optimization_space_type | None = None,
     n_trials: int = 1,
     save_models: bool = False,
-    sampler: BaseSampler | None = None
+    sampler: BaseSampler | None = None,
     test_models: bool = False,
 ) -> tuple[float, str | list[str] | None, dict[str, Any]]:
 

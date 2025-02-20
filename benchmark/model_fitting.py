@@ -211,10 +211,6 @@ def _generate_parameters(
                 suggestion = parameter_picker.pick_categorical(
                     full_parameter_name, space
                 )
-                if suggestion is None:
-                    raise Exception(
-                        f"Optuna suggested None for parameter {full_parameter_name}"
-                    )
                 current_hparams[parameter] = suggestion
             elif isinstance(space, ParameterBounds):
                 match space.type:

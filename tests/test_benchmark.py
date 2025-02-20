@@ -134,7 +134,9 @@ def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
     assert meta_yaml_path.exists(), f"Error! {meta_yaml_path=} does not exist"
     # open file and check that the experiment name is the same
     with open(meta_yaml_path, mode="r") as f:
+        # read all the lines
         lines = f.readlines()
+        # try to find experiment id and name in these lines
         experiment_name_found: bool = False
         experiment_id_found: bool = False
         for line in lines:
@@ -144,5 +146,5 @@ def test_run_benchmark(defaults: Defaults, tasks: List[Task]):
                 experiment_id_found = True
         assert (
             experiment_name_found and experiment_id_found
-        ), f"Error! {experiment_id_found=} {experiment_name_found=}"
+        ), f"Error! Both experiment id and name should be in the {meta_yaml_path=}: {experiment_id_found=} {experiment_name_found=}"
     # TODO delete the directories that were created by this test case

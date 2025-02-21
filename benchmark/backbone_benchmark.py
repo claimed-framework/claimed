@@ -88,9 +88,14 @@ def benchmark_backbone_on_task(
         training_spec = combine_with_defaults(task, defaults)
         if "max_epochs" not in training_spec.trainer_args:
             raise Exception("Must specify max_epochs for the trainer")
+        mlflow.log_params("early_stop_patience", training_spec.task.early_stop_patience) 
+        mlflow.log_params("partition_name", training_spec.task.datamodule.init_args.partition) 
+        mlflow.log_params("decoder", training_spec.task.terratorch_task.model_args.decoder) 
+        mlflow.log_params("backbone", training_spec.task.terratorch_task.model_args.backbone) 
+        mlflow.log_params("n_trials", n_trials) 
         task = training_spec.task
         lightning_task_class = training_spec.task.type.get_class_from_enum()
-
+        
         # if no optimization params, just run it
         if optimization_space is None:
             return (
@@ -231,6 +236,7 @@ def benchmark_backbone(
 
     backbone = defaults.terratorch_task["model_args"]["backbone"]
     task_names = [task.name for task in tasks]
+    run_name = f"top_run_{experiment_name}" if run_name is None else run_name
 
     completed_task_run_names = []
     run_hpo = True
@@ -277,7 +283,7 @@ def benchmark_backbone(
     
     #only run hyperparameter optimization (HPO) if there are no experiments with finished HPO 
     if run_hpo:
-        logger.info("Running hyperparameter optimization ")
+        logger.info("Running hyperparameter optimization")
         with mlflow.start_run(run_name=run_name, run_id=run_id, description=description) as run:
             for task in tasks:
                 #only run task if it was not completed before

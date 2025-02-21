@@ -39,7 +39,7 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 
 - `experiment_name`: MLFLow experiment to run the benchmark on. This is the highest level grouping of runs in MLFLow.
 
-- `run_name`: Name of the parent (top-level) run under the experiment.
+- `run_name`: Name of the parent (top-level) run under the experiment. NOTE: This item should not be included in the config if you wish to use the parameters extraction function in `mlfow_utils` to compile results.
 
 - `defaults`: Defaults that are set for all tasks. Can be overriden under each task.
 

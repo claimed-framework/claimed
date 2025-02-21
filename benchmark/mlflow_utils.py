@@ -23,15 +23,23 @@ SEGMENTATION_BASE_TASKS = ['chesapeake', 'sa_crop_type', 'pv4ger_seg', 'cashew',
 CLASSIFICATION_BASE_TASKS = ['pv4ger', 'so2sat', 'brick_kiln', 'big_earth_net', 'eurosat', 'forestnet']
 N_TRIALS_DEFAULT = 16
 REPEATED_SEEDS_DEFAULT = 10
+DATA_PARTITIONS = {
+                    "default": 100,
+                    "0.20x_train": 50,
+                    "0.20x_train": 20,
+                    "0.10x_train": 10,
+                    "0.01x_train": 1,
+                    }
 
 
-def sync_mlflow_optuna(optuna_db_path: str,
-                       storage_uri: str,
-                       experiment_name: str,
-                       task_run_id: str | None,
-                       task: Task,
-                       logger: logging.RootLogger,
-                       ) -> str | None:
+def sync_mlflow_optuna(
+        optuna_db_path: str,
+        storage_uri: str,
+        experiment_name: str,
+        task_run_id: str | None,
+        task: Task,
+        logger: logging.RootLogger,
+        ) -> str | None:
     """        
         syncs the number of completed trials in mflow and optuna
     Args:
@@ -153,7 +161,7 @@ def extract_repeated_experiment_results(
             run_name = run.info.run_name
             task = "_".join(run_name.split("_")[:-1])
             if (task in task_names) and (run.info.status =="FINISHED"):
-                seed = run.data.params["seed"] if "seed" in run.data.params else "NA"
+                seed = int(run.info.run_name.split("_")[-1])
                 if task in SEGMENTATION_BASE_TASKS:
                     metric_name = 'test_test/Multiclass_Jaccard_Index' 
                 else: #conditions for other task types to be added
@@ -218,7 +226,6 @@ def extract_parameters(
         experiments: list,
         task_names: list = SEGMENTATION_BASE_TASKS
         ) -> pd.DataFrame:
-
     """
     extracts hyper-parameter information for each experiment from the mlflow logs
     saves this information to a csv file
@@ -234,24 +241,6 @@ def extract_parameters(
     all_params = []
     client = mlflow.tracking.MlflowClient(tracking_uri=storage_uri)
     for experiment_name in experiments:
-        #IMPORTANT ######################################
-        #    THIS NEEDS TO COME FROM THE CONFIGS
-
-        #get backbone name
-        exp_info = experiment_data.loc[experiment_data["experiment_name"] == f"experiment_name: {experiment_name}"]
-        backbone = exp_info["backbones"].tolist()[0]
-
-        #colect all relevant settings from csv file
-        decoder = exp_info["decoders"].tolist()[0]
-        early_stop_patience = exp_info["early_stop_patience"].tolist()[0]
-        n_trials = exp_info["n_trials"].tolist()[0]
-        data_percentages = exp_info["data_percentages"].tolist()[0]
-
-
-
-        exp_parent_run_name = f"{backbone}_geobench_v2" #this was just a convention I followed
-        ######################################
-
         #get experiment id
         experiment_info = client.get_experiment_by_name(experiment_name)
         if experiment_info is None:
@@ -259,8 +248,7 @@ def extract_parameters(
         experiment_id = experiment_info.experiment_id
         logger.info(f"\nexperiment_name: {experiment_name} ")  
         logger.info(f"\nexperiment_id: {experiment_info.experiment_id}")
-        #logger.info(f"backbone: {backbone} decoder: {decoder} early_stop_patience:\
-        #                {early_stop_patience} n_trials: {n_trials} data_percentages: {data_percentages}")  
+        exp_parent_run_name = f"top_run_{experiment_name}"
         experiment_parent_run_data = client.search_runs(experiment_ids=[experiment_id], 
                                             filter_string=f'tags."mlflow.runName" LIKE "{exp_parent_run_name}"')
         if (len(experiment_parent_run_data) > 1) or (len(experiment_parent_run_data) == 0):
@@ -281,21 +269,15 @@ def extract_parameters(
             logger.info(f"task: {task}")  
             matching_runs = [run for run in runs if run.info.run_name.endswith(task)]  # type: ignore
             best_params = matching_runs[0].data.params
+
             # eval them
             best_params = {k: literal_eval(v) for k, v in best_params.items()}
             best_params["experiment_name"] = experiment_name
             best_params["dataset"] = task
-
-
-            #TBD: SHOULD COME FROM NEW PULL
-            best_params["partition_name"] = #########
-
-            
-            best_params["backbone"] = backbone
-            best_params["decoder"] = decoder
-            best_params["early_stop_patience"] = early_stop_patience
-            best_params["n_trials"] = n_trials
-            best_params["data_percentages"] = data_percentages
+            #best_params["decoder"] = decoder
+            #best_params["early_stop_patience"] = early_stop_patience
+            #best_params["n_trials"] = n_trials
+            best_params["data_percentages"] = DATA_PARTITIONS[best_params["partition_name"]]
             if 'optimizer_hparams' in best_params:
                 logger.info(f"optimizer_hparams: {best_params['optimizer_hparams'].items()}")  
                 optimizer_hparams = {k: v for k,v in best_params['optimizer_hparams'].items()}
@@ -475,14 +457,15 @@ def check_existing_task_parent_runs(
     return complete_task_run_names, all_tasks_finished, task_run_to_id_match
 
 
-
-def check_existing_experiments(logger,
-                            storage_uri: str, 
-                            experiment_name: str, 
-                            exp_parent_run_name: str,
-                            backbone: str,
-                            task_names: list,
-                            n_trials: int):
+def check_existing_experiments(
+        logger: logging.RootLogger,
+        storage_uri: str, 
+        experiment_name: str, 
+        exp_parent_run_name: str,
+        backbone: str,
+        task_names: list,
+        n_trials: int
+        ):
     """
         checks if experiment has been completed (i.e. both task run and nested individual runs are complete)
         Args:
@@ -504,10 +487,12 @@ def check_existing_experiments(logger,
     client = mlflow.tracking.MlflowClient(tracking_uri=storage_uri)
     experiment_info = client.get_experiment_by_name(experiment_name)
 
-    output = {"no_existing_runs": True,
-            "incomplete_run_to_finish":None,
-            "finished_run":None,
-            "experiment_id":None}
+    output = {
+                "no_existing_runs": True,
+                "incomplete_run_to_finish": None,
+                "finished_run": None,
+                "experiment_id": None
+            }
     if experiment_info is None:
         return output
 
@@ -566,7 +551,6 @@ def check_existing_experiments(logger,
     return output
 
 
-
 def visualize_combined_results(
                         combined_results: pd.DataFrame,
                         storage_uri: str,
@@ -587,8 +571,6 @@ def visualize_combined_results(
         os.makedirs(f"{save_folder}/tables/")
     if not os.path.exists(f"{save_folder}/plots/"):
         os.makedirs(f"{save_folder}/plots/")
-    if not os.path.exists(f"{save_folder}/tracking/"):
-        os.makedirs(f"{save_folder}/tracking/")
 
     combined_results = []
     model_order = []
@@ -634,8 +616,6 @@ def visualize_combined_results(
         combined_results.to_csv(f"{save_folder}/tables/{plot_file_base_name}_normalized_combined_results.csv")
     except Exception as e:
         logger.info(f"could not visualize due to error: {e}")
-
-
 
 
 def get_logger(log_level="INFO",

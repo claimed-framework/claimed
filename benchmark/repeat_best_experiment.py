@@ -124,10 +124,6 @@ def non_remote_fit(
     nested=True,
     ) as run:
         mlflow.set_tag("mlflow.parentRunId", parent_run_id)
-        #mlflow.log_param("seed", seed)
-        #print(f"task.name {task.name}")
-        #mlflow.log_param("task", task.name)
-
         training_spec_copy = copy.deepcopy(training_spec)
         training_spec_with_generated_hparams = inject_hparams(training_spec_copy, best_params)
         task = training_spec_with_generated_hparams.task
@@ -175,7 +171,6 @@ def non_remote_fit(
     #        return None
         test_metric = "test/" + task.metric.split("/")[1]
         mlflow.log_metric(f"test_{test_metric}", metrics[test_metric])
-        #mlflow.end_run()
         return metrics[test_metric]
 
 

@@ -1,5 +1,4 @@
 experiment_name: ssl4eos12_resnet50_sentinel2_all_moco_smp_unet
-run_name: ssl4eos12_resnet50_sentinel2_all_moco_geobench_v2
 defaults:
   trainer_args:
     max_epochs: 100

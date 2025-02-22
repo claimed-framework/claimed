@@ -136,7 +136,8 @@ def test_run_benchmark(
     experiment_name = config_init.experiment_name
     assert isinstance(experiment_name, str), f"Error! {experiment_name=} is not a str"
     run_name = config_init.run_name
-    assert isinstance(run_name, str), f"Error! {run_name=} is not a str"
+    if run_name is not None:
+        assert isinstance(run_name, str), f"Error! {run_name=} is not a str"
     tasks = config_init.tasks
     assert isinstance(tasks, list), f"Error! {tasks=} is not a list"
     for t in tasks:

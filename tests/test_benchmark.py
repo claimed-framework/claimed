@@ -156,7 +156,11 @@ def test_run_benchmark(
     assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
     storage_uri_path = Path(storage_uri) / uuid.uuid4().hex / "hpo"
     if not storage_uri_path.exists():
-        storage_uri_path.mkdir()
+        try:
+            storage_uri_path.mkdir(parents=True, exist_ok=True)
+            print(f"Directory created at: {path}")
+        except FileNotFoundError as e:
+            print(f"Error creating directory: {e}")
     optimization_space = config_init.optimization_space
     assert isinstance(
         optimization_space, dict
@@ -165,7 +169,11 @@ def test_run_benchmark(
     assert isinstance(ray_storage, str), f"Error! {ray_storage=} is not a str"
     ray_storage_path = Path(ray_storage) / uuid.uuid4().hex 
     if not ray_storage_path.exists():
-        ray_storage_path.mkdir()
+        try:
+            ray_storage_path.mkdir(parents=True, exist_ok=True)
+            print(f"Directory created at: {path}")
+        except FileNotFoundError as e:
+            print(f"Error creating directory: {e}")
     n_trials = config_init.n_trials
     assert isinstance(n_trials, int) and n_trials > 0, f"Error! {n_trials=} is invalid"
     mlflow_experiment_id = benchmark_backbone(
@@ -176,8 +184,8 @@ def test_run_benchmark(
         tasks=tasks,
         n_trials=n_trials,
         save_models=False,
-        storage_uri=storage_uri,
-        ray_storage_path=ray_storage,
+        storage_uri=str(storage_uri_path),
+        ray_storage_path=str(ray_storage_path),
         optimization_space=optimization_space,
         continue_existing_experiment=continue_existing_experiment,
         test_models=test_models,

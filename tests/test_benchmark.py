@@ -29,8 +29,6 @@ RAY_STORAGE = os.getenv(
 )
 
 
-
-
 @pytest.fixture(scope="module")
 def defaults() -> Defaults:
     file = BACKBONE_PRETRAINED_FILE
@@ -108,11 +106,14 @@ def find_file(directory: str, filename: str):
 @pytest.mark.parametrize(
     "config, continue_existing_experiment, test_models",
     [
-        # ("configs/benchmark_v2_template.yaml", False, True),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, True),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, False),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, True),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, False),
+        ("configs/benchmark_v2_simple.yaml", False, False),
+        ("configs/benchmark_v2_simple.yaml", False, True),
+        ("configs/benchmark_v2_simple.yaml", True, True),
+        ("configs/benchmark_v2_simple.yaml", True, False),
+        # ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, True),
+        # ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, False),
+        # ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, True),
+        # ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, False),
     ],
 )
 def test_run_benchmark(
@@ -134,6 +135,7 @@ def test_run_benchmark(
     parser.add_argument('--storage_uri', type=str)  # to ignore model
     parser.add_argument('--ray_storage_path', type=str)  # to ignore model
     parser.add_argument('--n_trials', type=int)  # to ignore model
+    parser.add_argument('--run_repetitions', type=int)  # to ignore model
     parser.add_argument('--tasks', type=list[Task])
     config = parser.parse_path(str(config_path))
     config_init = parser.instantiate_classes(config)
@@ -151,7 +153,7 @@ def test_run_benchmark(
     defaults = config_init.defaults
     assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
     # defaults.trainer_args["max_epochs"] = 5
-    storage_uri = OUTPUT_DIR 
+    storage_uri = OUTPUT_DIR
     assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
     storage_uri_path = Path(storage_uri) / uuid.uuid4().hex / "hpo"
     if not storage_uri_path.exists():
@@ -164,9 +166,9 @@ def test_run_benchmark(
     assert isinstance(
         optimization_space, dict
     ), f"Error! {optimization_space=} is not a dict"
-    ray_storage = RAY_STORAGE 
+    ray_storage = RAY_STORAGE
     assert isinstance(ray_storage, str), f"Error! {ray_storage=} is not a str"
-    ray_storage_path = Path(ray_storage) / uuid.uuid4().hex 
+    ray_storage_path = Path(ray_storage) / uuid.uuid4().hex
     if not ray_storage_path.exists():
         try:
             ray_storage_path.mkdir(parents=True, exist_ok=True)
@@ -175,6 +177,11 @@ def test_run_benchmark(
             print(f"Error creating directory: {e}")
     n_trials = config_init.n_trials
     assert isinstance(n_trials, int) and n_trials > 0, f"Error! {n_trials=} is invalid"
+
+    run_repetitions = config_init.run_repetitions
+    assert (
+        isinstance(run_repetitions, int) and run_repetitions > 0
+    ), f"Error! {run_repetitions=} is invalid"
     mlflow_experiment_id = benchmark_backbone(
         experiment_name=experiment_name,
         run_name=run_name,
@@ -188,6 +195,7 @@ def test_run_benchmark(
         optimization_space=optimization_space,
         continue_existing_experiment=continue_existing_experiment,
         test_models=test_models,
+        run_repetitions=run_repetitions,
     )
     validate_results(
         experiment_name=experiment_name,

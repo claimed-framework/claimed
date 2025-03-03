@@ -1,23 +1,19 @@
-[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
-![alt text](./coverage.svg)
-# Terratorch-iterate
+<!-- [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)[![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
+![alt text](./coverage.svg) -->
+# TerraTorch-iterate
 
 A tool for benchmarking and hyper-parameter optimization using [TerraTorch](https://github.ibm.com/GeoFM-Finetuning/terratorch).
 
 Leverages MLFlow for experiment logging, optuna for hyperparameter optimization and ray for parallelization.
 
-## Environment
-
-Using a virtual environment for all commands in this guide is strongly recommended.
-
 ## Installation
 
+We recommend using python 3.10, 3.11 or 3.12 and also using a virtual environment for all commands in this guide.
 
 ### Package installation
 
 ```sh
-# assuming you have an SSH key set up on GitHub
-pip install "git+ssh://git@github.ibm.com/GeoFM-Finetuning/benchmark.git@main"
+pip install "git+https://github.com/IBM/terratorch-iterate"
 ```
 
 ### Suggested setup for development
@@ -59,16 +55,12 @@ To run a benchmark, use `benchmark --config <benchmark_file>`.
 
 To run a benchmark over a ray cluster (which must be created before running), use `ray_benchmark --config <benchmark_file>`.
 
-To check the experiment results, use `mlflow ui --host $(hostname -f) --port <port> --backend-store-uri <storage_uri>` and click the link.
-![mlflow demo](images/mlflow.png)
+To check the experiment results, use `mlflow ui --host $(hostname -f) --port <port> --backend-store-uri <storage_uri>` 
 
 ## Ray
-You can also parallelize your runs over a ray cluster
-![ray_cluster](docs/images/ray_cluster.png)
+You can also parallelize your runs over a ray cluster. 
 
-Check out instructions in the [docs](https://pages.github.ibm.com/GeoFM-Finetuning/benchmark/ray/)
+Check out instructions in the [docs](./docs/ray.md)
 
 
-## Credits
 
-This project was created using https://github.ibm.com/innersource/python-blueprint.

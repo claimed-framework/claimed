@@ -15,9 +15,8 @@ defaults:
         - 23
     model_factory: EncoderDecoderFactory
     optimizer: AdamW
-    
 tasks:
-  - name: chesapeake
+  - name: nz_cattle
     type: segmentation
     direction: max
     metric: val/Multiclass_Jaccard_Index
@@ -25,19 +24,18 @@ tasks:
     terratorch_task:
       loss: ce
       model_args:
+        backbone_model_bands:
+          - RED
+          - GREEN
+          - BLUE
+        num_classes: 2
         decoder: UperNetDecoder
         decoder_channels: 128
         decoder_scale_modules: true
-        backbone_model_bands:
-        - RED
-        - GREEN
-        - BLUE
-        - NIR_NARROW
-        num_classes: 7
         necks:
         - name: ReshapeTokensToImage
     datamodule:
-      class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
+      class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
       init_args:
         partition: "0.01x_train"
         train_transform:
@@ -71,7 +69,6 @@ tasks:
           - "RED"
           - "GREEN"
           - "BLUE"
-          - "NIR"
 n_trials: 1
 save_models: False
 storage_uri: /dccstor/geofm-finetuning/terratorch-iterate-test
@@ -97,3 +94,4 @@ optimization_space:
       - 128
       - 256
       - 512
+run_repetitions: 1

@@ -13,10 +13,6 @@ from jsonargparse import CLI
 from optuna.pruners import HyperbandPruner
 from optuna.samplers import BaseSampler, RandomSampler
 from tabulate import tabulate
-from optuna.study import MaxTrialsCallback
-from mlflow.exceptions import MlflowException, MissingConfigException
-import subprocess
-import datetime
 import pickle
 
 from benchmark.benchmark_types import (
@@ -181,6 +177,7 @@ def benchmark_backbone(
     bayesian_search: bool = True,
     continue_existing_experiment: bool = True,
     test_models: bool = False,
+    run_repetitions: int = REPEATED_SEEDS_DEFAULT
     )-> str:
     """Highest level function to benchmark a backbone using a single node
 
@@ -356,7 +353,7 @@ def benchmark_backbone(
         save_models = save_models,
         description = description,
         use_ray = False,
-        run_repetitions = REPEATED_SEEDS_DEFAULT
+        run_repetitions = run_repetitions
     )
 
     return experiment_id

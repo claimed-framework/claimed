@@ -183,6 +183,8 @@ def test_run_benchmark(
         assert (
             isinstance(run_repetitions, int) and run_repetitions > 0
         ), f"Error! {run_repetitions=} is invalid"
+    else:
+        run_repetitions = 1
     mlflow_experiment_id = benchmark_backbone(
         experiment_name=experiment_name,
         run_name=run_name,

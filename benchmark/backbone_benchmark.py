@@ -196,6 +196,7 @@ def benchmark_backbone(
         run_id (str | None): id of existing mlflow run to use as top-level run. Useful to add more experiments to a previous benchmark run. Defaults to None.
         description (str): Optional description for mlflow parent run.
         bayesian_search (bool): Whether to use bayesian optimization for the hyperparameter search. False uses random sampling. Defaults to True.
+        run_repetitions (int): Number of times that the experiment will be repeated. Defaults to 1.
     """
     base = "/".join(storage_uri.split("/")[:-1]) 
     PATH_TO_JOB_TRACKING = base + "/" + "job_progress_tracking"

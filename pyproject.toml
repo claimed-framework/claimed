@@ -82,7 +82,8 @@ dev = [
   "flake8", 
   "mkdocs-material",
   "mkdocstrings[python]",
-  "mike" # for building docs with versions
+  "mike", # for building docs with versions
+  "tox"
 ]
 
 test = [

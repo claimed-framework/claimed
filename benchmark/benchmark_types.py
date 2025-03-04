@@ -6,9 +6,6 @@ import enum
 from dataclasses import dataclass, field, replace
 from typing import Any, Union
 
-import torch
-from lightning import Trainer
-from terratorch.datasets import HLSBands
 from terratorch.tasks import (
     ClassificationTask,
     MultiLabelClassificationTask,

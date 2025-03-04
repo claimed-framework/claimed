@@ -13,7 +13,7 @@ import uuid
 import warnings
 from abc import abstractmethod
 from functools import wraps
-from typing import Any, Callable
+from typing import Callable
 import pandas as pd
 import lightning.pytorch as pl
 import mlflow
@@ -51,7 +51,6 @@ from ray.tune.schedulers import FIFOScheduler, TrialScheduler
 from ray.tune.schedulers.hb_bohb import HyperBandForBOHB
 from ray.tune.search import SearchAlgorithm, Searcher
 from ray.tune.search.bohb import TuneBOHB
-from ray.tune.search.optuna import OptunaSearch
 from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask

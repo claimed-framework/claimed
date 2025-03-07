@@ -29,7 +29,9 @@ def main():
     path = paths[0]
     print(f"args={args} path={path}")
     repeat = args.repeat
+    assert isinstance(repeat, bool), f"Error! {repeat=} is not a bool"
     hpo = args.hpo
+    assert isinstance(hpo, bool), f"Error! {hpo=} is not a bool"
     config = parser.parse_path(path)
 
     config_init = parser.instantiate_classes(config)

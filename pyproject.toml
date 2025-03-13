@@ -114,6 +114,7 @@ force_to_top = ["rdkit", "scikit-learn"]
 
 [tool.mypy]
 check_untyped_defs = true
+disable_error_code = ["import-untyped"]
 
 [[tool.mypy.overrides]]
 module = "pytest.*"

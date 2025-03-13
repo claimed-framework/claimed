@@ -2,6 +2,7 @@ import os
 import mlflow
 import datetime
 import logging
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import datetime
@@ -135,9 +136,14 @@ def extract_repeated_experiment_results(
         num_repetitions: number of repeated seeds per task
         task_names: list of tasks
     """
-    repeated_exp_storage_uri = f"{storage_uri}_repeated_exp"
-    logger.info(f"\n Extracting results of repeated experiments from: {repeated_exp_storage_uri}") 
-    client = mlflow.tracking.MlflowClient(tracking_uri=repeated_exp_storage_uri)
+    if Path(storage_uri).exists() and Path(storage_uri).is_dir():
+        storage_uri = Path(storage_uri) 
+        repeated_exp_storage_uri = storage_uri.with_name(f"{storage_uri.name}_repeated_exp")
+    else:
+        print("Please use a valid directory for storage_uri")
+        raise ValueError
+    logger.info(f"\n Extracting results of repeated experiments from: {str(repeated_exp_storage_uri)}") 
+    client = mlflow.tracking.MlflowClient(tracking_uri=str(repeated_exp_storage_uri))
     experiments = list(set(experiments))
     incomplete_experiments = []
     num_tasks = len(task_names)
@@ -148,7 +154,7 @@ def extract_repeated_experiment_results(
         logger.info(f"\nexperiment_name: {experiment_name}") 
         experiment_info = client.get_experiment_by_name(experiment_name)
         if experiment_info is None:
-            logger.info(f"EXPERIMENT {experiment_name} DOES NOT EXIST IN THIS FOLDER: {repeated_exp_storage_uri}")
+            logger.info(f"EXPERIMENT {experiment_name} DOES NOT EXIST IN THIS FOLDER: {str(repeated_exp_storage_uri)}")
             incomplete_experiments.append(experiment_name)
             continue
         experiment_id = experiment_info.experiment_id
@@ -326,7 +332,11 @@ def get_results_and_parameters(
     Returns:
         pd.DataFrame with results and parameters
     """
-    results_dir = "/".join(storage_uri.split("/")[:-1]) + "/" + "benchmark_results"
+    if Path(storage_uri).exists() and Path(storage_uri).is_dir():
+        results_dir =  Path(storage_uri).parents[0] / "benchmark_results"
+    else:
+        print("Please use a valid directory for storage_uri")
+        raise ValueError
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
@@ -350,7 +360,7 @@ def get_results_and_parameters(
         for line in incomplete_experiments:
             f.write(f"{line}\n")
     results_and_parameters = results.merge(parameters, on=['experiment_name', 'dataset'])
-    results_and_parameters.to_csv(f"{results_dir}/results_and_parameters.csv", index=False)
+    results_and_parameters.to_csv(f"{str(results_dir)}/results_and_parameters.csv", index=False)
     return results_and_parameters
 
 

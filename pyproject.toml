@@ -38,6 +38,7 @@ dependencies = [
 "click",
 # optional dependencies that can be opted in by apps.
 "torchvision>=0.17.0",
+# terratorch versions before 1.0.0 do not support call 'terratorch iterate'
 "terratorch>=1.0.0", 
 # "terratorch",
 # requests>=2.32.0 because of this vulnerability https://github.com/psf/requests/security/advisories/GHSA-9wx4-h78v-vm56
@@ -70,10 +71,8 @@ dependencies = [
 "gputil",
 "asyncio",
 "opencv-python-headless",
-# "hpbandster", deprecated https://github.com/automl/HpBandSter/tree/master?tab=readme-ov-file#news-not-maintained-anymore
 "configspace",
-"optuna-integration",
-"geobench @ git+https://github.com/ServiceNow/geo-bench.git@119dfdb6bb77582f9816e362b032455cfd6c52a7"
+"optuna-integration"
 ]
 
 [project.optional-dependencies]
@@ -90,6 +89,10 @@ test = [
   "coverage",
   "pytest",
   "pytest-cov"
+]
+
+utility = [
+  "geobench @ git+https://github.com/ServiceNow/geo-bench.git@119dfdb6bb77582f9816e362b032455cfd6c52a7"
 ]
 
 [tool.black]

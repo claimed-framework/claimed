@@ -135,7 +135,7 @@ def extract_repeated_experiment_results(
         num_repetitions: number of repeated seeds per task
         task_names: list of tasks
     """
-    repeated_exp_storage_uri = "/".join(storage_uri.split("/")[:-1]) + "/" + "repeated_exp_output"
+    repeated_exp_storage_uri = f"{storage_uri}_repeated_exp"
     logger.info(f"\n Extracting results of repeated experiments from: {repeated_exp_storage_uri}") 
     client = mlflow.tracking.MlflowClient(tracking_uri=repeated_exp_storage_uri)
     experiments = list(set(experiments))
@@ -143,8 +143,8 @@ def extract_repeated_experiment_results(
     num_tasks = len(task_names)
     combine_exp_results = []
 
-    for experiment_name in experiments:
-        experiment_name = f"{experiment_name}_repeated_exp"
+    for original_experiment_name in experiments:
+        experiment_name = f"{original_experiment_name}_repeated_exp"
         logger.info(f"\nexperiment_name: {experiment_name}") 
         experiment_info = client.get_experiment_by_name(experiment_name)
         if experiment_info is None:
@@ -164,6 +164,7 @@ def extract_repeated_experiment_results(
         run_status = []
         exp_ids = []
         exp_names = []
+        logger.info(f"experiment_parent_run_data: {len(experiment_parent_run_data)}")
         for run in experiment_parent_run_data:
             run_name = run.info.run_name
             task = "_".join(run_name.split("_")[:-1])
@@ -181,7 +182,7 @@ def extract_repeated_experiment_results(
                 score = run.data.metrics[metric_name]
                 run_names.append(run.info.run_name)
                 exp_ids.append(experiment_id)
-                exp_names.append(experiment_name)
+                exp_names.append(original_experiment_name)
                 run_ids.append(run.info.run_id)
                 run_status.append(run.info.status)
                 run_seed.append(seed)
@@ -204,6 +205,7 @@ def extract_repeated_experiment_results(
             logger.info(f"EXPERIMENT INCOMPLETE: {experiment_name} has no complete tasks.")
             incomplete_experiments.append(experiment_name)
             continue
+        print(f"\n\n\ndf: {df}")
 
         #get successful results per task
         combine_task_results = []
@@ -223,7 +225,8 @@ def extract_repeated_experiment_results(
         if len(combine_task_results) < num_tasks:
             logger.info(f"EXPERIMENT INCOMPLETE: {experiment_name} has {len(combine_task_results)} complete tasks only")
             incomplete_experiments.append(experiment_name)
-    combine_exp_results = pd.concat(combine_exp_results, axis=0)    
+    combine_exp_results = pd.concat(combine_exp_results, axis=0)   
+    print(f"\n\n\ncombine_exp_results: {combine_exp_results}") 
     return (combine_exp_results, incomplete_experiments)
 
 
@@ -276,22 +279,27 @@ def extract_parameters(
             logger.info(f"task: {task}")  
             matching_runs = [run for run in runs if run.info.run_name.endswith(task)]  # type: ignore
             best_params = matching_runs[0].data.params
-
+            
             # eval them
             best_params = {k: literal_eval(v) for k, v in best_params.items()}
             best_params["experiment_name"] = experiment_name
             best_params["dataset"] = task
-            best_params["decoder"] = run.data.tags["decoder"]
-            best_params["backbone"] = run.data.tags["backbone"]
-            best_params["early_stop_patience"] = run.data.tags["early_stop_patience"]
-            best_params["n_trials"] = run.data.tags["n_trials"]
-            best_params["partition_name"] = run.data.tags["partition_name"]
+            best_params["decoder"] = matching_runs[0].data.tags["decoder"]
+            best_params["backbone"] = matching_runs[0].data.tags["backbone"]
+            best_params["early_stop_patience"] = matching_runs[0].data.tags["early_stop_patience"]
+            best_params["n_trials"] = matching_runs[0].data.tags["n_trials"]
+            best_params["partition_name"] = matching_runs[0].data.tags["partition_name"]
             best_params["data_percentages"] = DATA_PARTITIONS[best_params["partition_name"]]
             if 'optimizer_hparams' in best_params:
                 logger.info(f"optimizer_hparams: {best_params['optimizer_hparams'].items()}")  
                 optimizer_hparams = {k: v for k,v in best_params['optimizer_hparams'].items()}
                 best_params.update(optimizer_hparams) 
                 del best_params['optimizer_hparams']
+            if 'model_args' in best_params:
+                model_args = {k: v for k,v in best_params['model_args'].items()}
+                best_params.update(model_args) 
+                del best_params['model_args']
+
             best_params = pd.DataFrame(best_params, index=[0])
             all_params.append(best_params)
     all_params = pd.concat(all_params, axis=0)
@@ -325,7 +333,7 @@ def get_results_and_parameters(
     parameters = extract_parameters(
                                 storage_uri = storage_uri,
                                 logger = logger,
-                                experiments = list_of_experiments,
+                                experiments = experiments,
                                 task_names = task_names
                                 )
 
@@ -652,16 +660,14 @@ def get_logger(log_level="INFO",
 
 if __name__ == "__main__":
     logger = get_logger()
-    storage_uri = "results/hpo_exp_results" #storage_uri from config
+    storage_uri = "results_folder/hpo" #storage_uri from config
 
-    list_of_experiments = [] ########################
+    list_of_experiments = ["early_stopping_10_prithvi_600", "early_stopping_10_prithvi_600_tl", "early_stopping_10_dofa_vit_300"] 
     #get results and parameters from mlflow logs
     results_and_parameters = get_results_and_parameters(
                                     storage_uri = storage_uri,
                                     logger = logger,
                                     experiments = list_of_experiments,
-                                    task_names = SEGMENTATION_BASE_TASKS + CLASSIFICATION_BASE_TASKS,
-                                    num_repetitions = REPEATED_SEEDS_DEFAULT
                                     )
 
 
@@ -678,4 +684,3 @@ if __name__ == "__main__":
                                     logger = logger,
                                     plot_file_base_name = f"multiple_models_{setting}"
                                     )
-

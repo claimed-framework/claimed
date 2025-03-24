@@ -39,7 +39,7 @@ dependencies = [
 # optional dependencies that can be opted in by apps.
 "torchvision>=0.17.0",
 # terratorch versions before 1.0.0 do not support call 'terratorch iterate'
-"terratorch>=1.0.0", 
+"terratorch>=0.99.9post1", 
 # "terratorch",
 # requests>=2.32.0 because of this vulnerability https://github.com/psf/requests/security/advisories/GHSA-9wx4-h78v-vm56
 "requests>=2.32.0",

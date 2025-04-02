@@ -10,6 +10,7 @@ from matplotlib.ticker import FormatStrFormatter
 import json
 from scipy.stats import trim_mean
 
+
 sns.set_style("dark", {"grid.color": "0.98", "axes.facecolor": "(0.95, 0.95, 0.97)"})
 GEO_BENCH_DIR = "geobench"
 

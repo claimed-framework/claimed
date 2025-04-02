@@ -14,7 +14,7 @@ include = ["benchmark*"]
 
 name = "terratorch-iterate"
 version = "0.1.0"
-description = "A terratorch's plugin for benchmarking and hyperparameter optmization"
+description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
       { name = "Carlos Gomes"},
       { name = "Naomi Simumba"},

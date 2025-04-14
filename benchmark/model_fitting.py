@@ -60,7 +60,6 @@ from benchmark.benchmark_types import (
     ParameterTypeEnum,
     TrainingSpec,
     optimization_space_type,
-    recursive_merge,
     valid_task_types,
 )
 
@@ -132,8 +131,9 @@ def inject_hparams(training_spec: TrainingSpec, config: dict):
     terratorch_task_with_generated_hparams = copy.deepcopy(
         training_spec.task.terratorch_task
     )
-    recursive_merge(terratorch_task_with_generated_hparams, config_without_batch_size)
-
+    terratorch_task_with_generated_hparams = (
+        terratorch_task_with_generated_hparams | config_without_batch_size
+    )
     task_with_generated_hparams = dataclasses.replace(
         training_spec.task,
         terratorch_task=terratorch_task_with_generated_hparams,

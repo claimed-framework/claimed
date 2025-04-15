@@ -6,19 +6,12 @@ import logging
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import datetime
 import seaborn as sns
 from matplotlib import pyplot as plt
 from ast import literal_eval
 import optuna
 from benchmark.benchmark_types import Task
-
-try:
-    from geobench import plot_tools
-
-    GEOBENCH_INSTALLED = True
-except ImportError:
-    GEOBENCH_INSTALLED = False
+from benchmark import plot_tools
 
 from mlflow.entities.experiment import Experiment
 
@@ -43,7 +36,7 @@ REPEATED_SEEDS_DEFAULT = 10
 DATA_PARTITIONS = {
     "default": 100,
     "1.00x_train": 100,
-    "0.20x_train": 50,
+    "0.50x_train": 50,
     "0.20x_train": 20,
     "0.10x_train": 10,
     "0.01x_train": 1,
@@ -587,10 +580,9 @@ def check_existing_experiments(
     storage_uri: str,
     experiment_name: str,
     exp_parent_run_name: str,
-    backbone: str,
     task_names: list,
     n_trials: int,
-):
+) -> Dict[str, Any]:
     """
     checks if experiment has been completed (i.e. both task run and nested individual runs are complete)
     Args:
@@ -598,7 +590,6 @@ def check_existing_experiments(
         storage_uri: folder containing mlflow log data
         experiment_name: name of experiment
         exp_parent_run_name: run name of the top level experiment run
-        backbone: name of backbone being used in experiment
         task_names: list of task names that should be completed
         n_trials: number of trials (runs) expected in HPO of each task
     Returns:
@@ -709,12 +700,14 @@ def visualize_combined_results(
         logger: logging.RootLogger to save logs to file
         plot_file_base_name: unique string to be added to all file names
     """
-    logger.info(f"\nStarting to visualize")
-    save_folder = "/".join(storage_uri.split("/")[:-1]) + "/" + "visualizations"
-    if not os.path.exists(f"{save_folder}/tables/"):
-        os.makedirs(f"{save_folder}/tables/")
-    if not os.path.exists(f"{save_folder}/plots/"):
-        os.makedirs(f"{save_folder}/plots/")
+    logger.info("Starting to visualize")
+    save_folder = Path(storage_uri).parents[0] / "visualizations"
+    tables_folder = save_folder / "tables"
+    plots_folder = save_folder / "plots"
+    if not os.path.exists(tables_folder):
+        os.makedirs(tables_folder)
+    if not os.path.exists(plots_folder):
+        os.makedirs(plots_folder)
 
     combined_results = []
     model_order = []
@@ -730,63 +723,59 @@ def visualize_combined_results(
 
     try:
         # plot raw values
-        if GEOBENCH_INSTALLED is True:
-            plot_tools.plot_per_dataset(
+        plot_tools.plot_per_dataset(
+            combined_results,
+            model_order=model_order,
+            plot_file_base_name=plot_file_base_name,
+            model_colors=model_colors,
+            metric="test metric",
+            sharey=False,
+            inner="points",
+            fig_size=fig_size,
+            n_legend_rows=n_legend_rows,
+        )
+        plt.savefig(
+            str(plots_folder / f"violin_{plot_file_base_name}_raw.png"),
+            bbox_inches="tight",
+        )
+        plt.close()
+
+        # plot normalized, bootstrapped values values
+        plot_tools.make_normalizer(
+            combined_results,
+            metrics=("test metric",),
+            benchmark_name=plot_file_base_name,
+        )
+        bootstrapped_iqm, normalized_combined_results = (
+            plot_tools.normalize_bootstrap_and_plot(
                 combined_results,
-                model_order=model_order,
                 plot_file_base_name=plot_file_base_name,
-                model_colors=model_colors,
                 metric="test metric",
-                sharey=False,
-                inner="points",
+                benchmark_name=plot_file_base_name,
+                model_order=model_order,
+                model_colors=model_colors,
                 fig_size=fig_size,
                 n_legend_rows=n_legend_rows,
             )
-            plt.savefig(
-                f"{save_folder}/plots/violin_{plot_file_base_name}_raw.png",
-                bbox_inches="tight",
-            )
-            plt.close()
+        )
+        # dataset_name_map=dataset_name_map)
 
-            # plot normalized, bootstrapped values values
-            normalizer = plot_tools.make_normalizer(
-                combined_results,
-                metrics=("test metric",),
-                benchmark_name=plot_file_base_name,
+        plt.savefig(
+            str(
+                plots_folder
+                / f"violin_{plot_file_base_name}_normalized_bootstrapped.png"
+            ),
+            bbox_inches="tight",
+        )
+        plt.close()
+        bootstrapped_iqm.to_csv(
+            str(tables_folder / f"{plot_file_base_name}_bootstrapped_iqm.csv")
+        )
+        combined_results.to_csv(
+            str(
+                tables_folder / f"{plot_file_base_name}_normalized_combined_results.csv"
             )
-            bootstrapped_iqm, normalized_combined_results = (
-                plot_tools.normalize_bootstrap_and_plot(
-                    combined_results,
-                    plot_file_base_name=plot_file_base_name,
-                    metric="test metric",
-                    benchmark_name=plot_file_base_name,
-                    model_order=model_order,
-                    model_colors=model_colors,
-                    fig_size=fig_size,
-                    n_legend_rows=n_legend_rows,
-                )
-            )
-            # dataset_name_map=dataset_name_map)
-
-            plt.savefig(
-                f"{save_folder}/plots/violin_{plot_file_base_name}_normalized_bootstrapped.png",
-                bbox_inches="tight",
-            )
-            plt.close()
-            bootstrapped_iqm.to_csv(
-                f"{save_folder}/tables/{plot_file_base_name}_bootstrapped_iqm.csv"
-            )
-            combined_results.to_csv(
-                f"{save_folder}/tables/{plot_file_base_name}_normalized_combined_results.csv"
-            )
-        else:
-            msg = (
-                "Error! geobench has not been installed. Please install geobench: pip install "
-                "git+https://github.com/ServiceNow/geo-bench.git"
-                "@119dfdb6bb77582f9816e362b032455cfd6c52a7"
-            )
-            logger.error(msg=msg)
-            raise ImportError(msg=msg)
+        )
     except Exception as e:
         logger.info(f"could not visualize due to error: {e}")
 

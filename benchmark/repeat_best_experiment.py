@@ -52,7 +52,7 @@ def remote_fit(
     with mlflow.start_run(
         run_name=f"{lightning_task_class.name}_{seed}",
         nested=True,
-    ) as run:
+    ):
 
         training_spec_copy = copy.deepcopy(training_spec)
         training_spec_with_generated_hparams = inject_hparams(
@@ -353,6 +353,7 @@ def rerun_best_from_backbone(
                     )
                     # check if run with name finished successfully
                     logger.info(f"score: {score}")
+                    # TODO improve this sleep command - try to get a better estimate than this
                     time.sleep(3600 * 2)
                     seed_run_data = mlflow.search_runs(
                         experiment_ids=[experiment_info.experiment_id],

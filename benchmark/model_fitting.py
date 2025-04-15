@@ -60,7 +60,6 @@ from benchmark.benchmark_types import (
     ParameterTypeEnum,
     TrainingSpec,
     optimization_space_type,
-    recursive_merge,
     valid_task_types,
 )
 
@@ -124,6 +123,9 @@ class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
 def inject_hparams(training_spec: TrainingSpec, config: dict):
     # treat batch size specially
     config_without_batch_size = copy.deepcopy(config)
+    assert isinstance(
+        config_without_batch_size, dict
+    ), f"Error! Unexpected config type: {config_without_batch_size}"
     batch_size: int | None = config_without_batch_size.pop("batch_size", None)  # type: ignore
     datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
     if batch_size:
@@ -132,8 +134,12 @@ def inject_hparams(training_spec: TrainingSpec, config: dict):
     terratorch_task_with_generated_hparams = copy.deepcopy(
         training_spec.task.terratorch_task
     )
-    recursive_merge(terratorch_task_with_generated_hparams, config_without_batch_size)
+    if terratorch_task_with_generated_hparams is None:
+        terratorch_task_with_generated_hparams = {}
 
+    terratorch_task_with_generated_hparams = (
+        terratorch_task_with_generated_hparams | config_without_batch_size
+    )
     task_with_generated_hparams = dataclasses.replace(
         training_spec.task,
         terratorch_task=terratorch_task_with_generated_hparams,
@@ -235,9 +241,11 @@ def _generate_parameters(
                 )
 
 
-###########################################
-########### SINGLE NODE - OPTUNA ##########
-###########################################
+"""
+single node - optuna
+"""
+
+
 def launch_training(
     trainer: Trainer,
     task: BaseTask,
@@ -445,9 +453,9 @@ def fit_model_with_hparams(
     ]  # return only the metric value for optuna
 
 
-###########################################
-########### MULTI NODE - RAY ##############
-###########################################
+"""
+multi node - ray
+"""
 
 
 def ray_tune_model(

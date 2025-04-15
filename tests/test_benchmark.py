@@ -6,7 +6,6 @@ from albumentations import HorizontalFlip, VerticalFlip, Resize
 from albumentations.pytorch.transforms import ToTensorV2
 import os
 from pathlib import Path
-from benchmark.benchmark_types import Task
 import uuid
 from jsonargparse import ArgumentParser
 
@@ -110,10 +109,26 @@ def find_file(directory: str, filename: str):
         # ("configs/benchmark_v2_simple.yaml", False, True),
         # ("configs/benchmark_v2_simple.yaml", True, True),
         # ("configs/benchmark_v2_simple.yaml", True, False),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, True),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", True, False),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, True),
-        ("configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml", False, False),
+        (
+            "configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
+            True,
+            True,
+        ),
+        (
+            "configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
+            True,
+            False,
+        ),
+        (
+            "configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
+            False,
+            True,
+        ),
+        (
+            "configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
+            False,
+            False,
+        ),
     ],
 )
 def test_run_benchmark(
@@ -150,6 +165,106 @@ def test_run_benchmark(
     assert isinstance(tasks, list), f"Error! {tasks=} is not a list"
     for t in tasks:
         assert isinstance(t, Task), f"Error! {t=} is not a Task"
+    defaults = config_init.defaults
+    assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
+    # defaults.trainer_args["max_epochs"] = 5
+    storage_uri = OUTPUT_DIR
+    assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
+    storage_uri_path = Path(storage_uri) / uuid.uuid4().hex / "hpo"
+    if not storage_uri_path.exists():
+        try:
+            storage_uri_path.mkdir(parents=True, exist_ok=True)
+            print(f"Directory created at: {path}")
+        except FileNotFoundError as e:
+            print(f"Error creating directory: {e}")
+    optimization_space = config_init.optimization_space
+    assert isinstance(
+        optimization_space, dict
+    ), f"Error! {optimization_space=} is not a dict"
+    ray_storage = RAY_STORAGE
+    assert isinstance(ray_storage, str), f"Error! {ray_storage=} is not a str"
+    ray_storage_path = Path(ray_storage) / uuid.uuid4().hex
+    if not ray_storage_path.exists():
+        try:
+            ray_storage_path.mkdir(parents=True, exist_ok=True)
+            print(f"Directory created at: {path}")
+        except FileNotFoundError as e:
+            print(f"Error creating directory: {e}")
+    n_trials = config_init.n_trials
+    assert isinstance(n_trials, int) and n_trials > 0, f"Error! {n_trials=} is invalid"
+    # run_repetions is an optional parameter
+    run_repetitions = config_init.run_repetitions
+    if run_repetitions is not None:
+        assert (
+            isinstance(run_repetitions, int) and run_repetitions >= 0
+        ), f"Error! {run_repetitions=} is invalid"
+    else:
+        run_repetitions = 0
+    mlflow_experiment_id = benchmark_backbone(
+        experiment_name=experiment_name,
+        run_name=run_name,
+        run_id=None,
+        defaults=defaults,
+        tasks=tasks,
+        n_trials=n_trials,
+        save_models=False,
+        storage_uri=str(storage_uri_path),
+        ray_storage_path=str(ray_storage_path),
+        optimization_space=optimization_space,
+        continue_existing_experiment=continue_existing_experiment,
+        test_models=test_models,
+        run_repetitions=run_repetitions,
+    )
+    validate_results(
+        experiment_name=experiment_name,
+        storage_uri=str(storage_uri_path),
+        mlflow_experiment_id=mlflow_experiment_id,
+    )
+
+@pytest.mark.parametrize(
+    "config, continue_existing_experiment, test_models",
+    [
+        ("configs/tests/benchmark_marida_l2a_terramind_base.yaml", False, False),
+        
+    ],
+)
+def test_run_benchmark_no_specific_terratorch_task(
+    config: str, continue_existing_experiment: bool, test_models: bool
+):
+
+    path = os.path.join(os.getcwd(), config)
+    config_path = Path(path)
+    assert (
+        config_path.exists()
+    ), f"Error! config does not exist: {config_path.resolve()}"
+    # instantiate objects from yaml
+    parser = ArgumentParser()
+    parser.add_argument('--defaults', type=Defaults)  # to ignore model
+    parser.add_argument('--optimization_space', type=dict)  # to ignore model
+    parser.add_argument('--experiment_name', type=str)  # to ignore model
+    parser.add_argument('--run_name', type=str)  # to ignore model
+    parser.add_argument('--save_models', type=bool)  # to ignore model
+    parser.add_argument('--storage_uri', type=str)  # to ignore model
+    parser.add_argument('--ray_storage_path', type=str)  # to ignore model
+    parser.add_argument('--n_trials', type=int)  # to ignore model
+    parser.add_argument('--run_repetitions', type=int)  # to ignore model
+    parser.add_argument('--tasks', type=list[Task])
+    config = parser.parse_path(str(config_path))
+    config_init = parser.instantiate_classes(config)
+    # validate the objects
+    experiment_name = config_init.experiment_name
+    experiment_name = f"{experiment_name}_continue_{continue_existing_experiment}_test_models_{test_models}"
+    assert isinstance(experiment_name, str), f"Error! {experiment_name=} is not a str"
+    run_name = config_init.run_name
+    if run_name is not None:
+        assert isinstance(run_name, str), f"Error! {run_name=} is not a str"
+    tasks = config_init.tasks
+    assert isinstance(tasks, list), f"Error! {tasks=} is not a list"
+    for t in tasks:
+        assert isinstance(t, Task), f"Error! {t=} is not a Task"
+        if t.terratorch_task is not None:
+            t.terratorch_task = None
+            
     defaults = config_init.defaults
     assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
     # defaults.trainer_args["max_epochs"] = 5

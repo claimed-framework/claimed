@@ -13,8 +13,9 @@ include = ["benchmark*"]
 [project]
 
 name = "terratorch-iterate"
-version = "0.1.0"
-description = "A terratorch's plugin for benchmarking and hyperparameter optmization"
+version = "0.1.3post1"
+requires-python = ">= 3.9"
+description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
       { name = "Carlos Gomes"},
       { name = "Naomi Simumba"},

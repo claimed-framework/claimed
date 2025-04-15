@@ -51,12 +51,17 @@ def main():
     run_name = config_init.run_name
     if run_name is not None:
         assert isinstance(run_name, str), f"Error! {run_name=} is not a str"
+    # validate defaults
+    defaults = config_init.defaults
+    assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
+
     tasks = config_init.tasks
     assert isinstance(tasks, list), f"Error! {tasks=} is not a list"
     for t in tasks:
         assert isinstance(t, Task), f"Error! {t=} is not a Task"
-    defaults = config_init.defaults
-    assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
+        # if there is not specific terratorch_task specified, then use default terratorch_task
+        if t.terratorch_task is None:
+            t.terratorch_task = defaults.terratorch_task
     # defaults.trainer_args["max_epochs"] = 5
     storage_uri = config_init.storage_uri
     assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
@@ -65,15 +70,21 @@ def main():
     assert isinstance(
         optimization_space, dict
     ), f"Error! {optimization_space=} is not a dict"
+
+    # ray_storage_path is optional
     ray_storage_path = config_init.ray_storage_path
-    assert isinstance(ray_storage_path, str), f"Error! {ray_storage_path=} is not a str"
+    if ray_storage_path is not None:
+        assert isinstance(
+            ray_storage_path, str
+        ), f"Error! {ray_storage_path=} is not a str"
 
     n_trials = config_init.n_trials
     assert isinstance(n_trials, int) and n_trials > 0, f"Error! {n_trials=} is invalid"
     run_repetitions = config_init.run_repetitions
 
     parent_run_id = config_init.parent_run_id
-    assert isinstance(parent_run_id, str), f"Error! {parent_run_id=} is invalid"
+    if parent_run_id is not None:
+        assert isinstance(parent_run_id, str), f"Error! {parent_run_id=} is not a str"
 
     output = config_init.output_path
     if output is None:

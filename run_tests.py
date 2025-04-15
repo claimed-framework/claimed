@@ -1,17 +1,18 @@
 import subprocess
 from pathlib import Path
 
-STD_ERR_FILE="test-terratorch-iterate.err"
-STD_OUT_FILE="test-terratorch-iterate.out"
+STD_ERR_FILE = "test-terratorch-iterate.err"
+STD_OUT_FILE = "test-terratorch-iterate.out"
+
 
 def main():
     err_file = Path.home() / STD_ERR_FILE
     if err_file.exists():
         print(f"Delete file {err_file}")
         err_file.unlink(missing_ok=True)
-        assert not err_file.exists() 
+        assert not err_file.exists()
     out_file = Path.home() / STD_OUT_FILE
-    
+
     if out_file.exists():
         print(f"Delete file {out_file}")
         out_file.unlink(missing_ok=True)

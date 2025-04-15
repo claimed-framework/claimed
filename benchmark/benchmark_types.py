@@ -2,10 +2,11 @@
 This module defines all the types expected at input. Used for type checking by jsonargparse.
 """
 
+from ast import Dict
 import copy
 import enum
 from dataclasses import dataclass, field, replace
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from terratorch.tasks import (
     ClassificationTask,
@@ -121,9 +122,9 @@ class Task:
 
     name: str
     type: TaskTypeEnum
-    terratorch_task: dict[str, Any]
     datamodule: BaseDataModule
     direction: str
+    terratorch_task: Optional[dict[str, Any]] = None
     metric: str = "val/loss"
     early_prune: bool = False
     early_stop_patience: int | None = None
@@ -137,22 +138,23 @@ class TrainingSpec:
     trainer_args: dict[str, Any] = field(default_factory=dict)
 
 
-def recursive_merge(first_dict: dict[str, Any], second_dict: dict[str, Any]):
-    # consider using deepmerge instead of this
-    for key, val in second_dict.items():
-        if key not in first_dict:
-            first_dict[key] = val
-        else:
-            # if it is a dictionary, recurse deeper
-            if isinstance(val, dict):
-                recursive_merge(first_dict[key], val)
-            # if it is not further nested, just replace the value
-            else:
-                first_dict[key] = val
-
-
 def combine_with_defaults(task: Task, defaults: Defaults) -> TrainingSpec:
-    terratorch_task = copy.deepcopy(defaults.terratorch_task)
-    recursive_merge(terratorch_task, task.terratorch_task)
+    """
+    Combine task-specific parameters with default parameters.
+
+    Args:
+        task (Task): Task object containing task-specific parameters.
+        defaults (Defaults): Defaults object containing default parameters.
+
+    Returns:
+        TrainingSpec: TrainingSpec object containing combined parameters.
+    """
+    terratorch_task: Optional[Dict[str, Any]] = copy.deepcopy(defaults.terratorch_task)
+    if terratorch_task is None:
+        terratorch_task = {}
+    if task.terratorch_task is None:
+        task.terratorch_task = {}
+    # merge task specific args with default args
+    terratorch_task = terratorch_task | task.terratorch_task
     task_with_defaults = replace(task, terratorch_task=terratorch_task)
     return TrainingSpec(task_with_defaults, defaults.trainer_args)

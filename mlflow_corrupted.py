@@ -16,18 +16,33 @@ def identify_corrupted(filestore_root_dir, experiment_id, delete=False):
                 if delete:
                     do_delete = True
                 else:
-                    do_delete = input("Do you want to delete this run? y to delete") == "y"
+                    do_delete = (
+                        input("Do you want to delete this run? y to delete") == "y"
+                    )
                 if do_delete:
                     shutil.rmtree(str(Path(meta_file_path).parent))
                     print("Deleted")
                 else:
                     print("Not deleted")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Script to help identify and delete corrupted runs in mlflow.")
-    parser.add_argument("filestore_root_dir", type=str, help="Path to the root directory for mlflow")
-    parser.add_argument("experiment_id", type=int, help="ID of the problematic experiment. Can be found in the url in mlflow ui")
-    parser.add_argument("-d", action="store_true", help="Do not ask for permission to delete, but do it automatically")
+    parser = argparse.ArgumentParser(
+        description="Script to help identify and delete corrupted runs in mlflow."
+    )
+    parser.add_argument(
+        "filestore_root_dir", type=str, help="Path to the root directory for mlflow"
+    )
+    parser.add_argument(
+        "experiment_id",
+        type=int,
+        help="ID of the problematic experiment. Can be found in the url in mlflow ui",
+    )
+    parser.add_argument(
+        "-d",
+        action="store_true",
+        help="Do not ask for permission to delete, but do it automatically",
+    )
 
     args = parser.parse_args()
     identify_corrupted(args.filestore_root_dir, args.experiment_id, delete=args.d)

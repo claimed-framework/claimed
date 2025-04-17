@@ -349,6 +349,8 @@ def fit_model(
         PixelwiseRegressionTask,
     ]:
         task.terratorch_task["plot_on_val"] = False
+    assert isinstance(task.terratorch_task, dict), f"Error! Invalid type: {task.terratorch_task}"
+    
     lightning_task = lightning_task_class(**task.terratorch_task)
 
     if len(training_spec.trainer_args.get("callbacks", [])) > 0:

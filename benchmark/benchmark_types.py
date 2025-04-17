@@ -138,6 +138,21 @@ class TrainingSpec:
     trainer_args: dict[str, Any] = field(default_factory=dict)
 
 
+def recursive_merge(first_dict: dict[str, Any], second_dict: dict[str, Any]):
+
+    # consider using deepmerge instead of this
+    for key, val in second_dict.items():
+        if key not in first_dict:
+            first_dict[key] = val
+        else:
+            # if it is a dictionary, recurse deeper
+            if isinstance(val, dict):
+                recursive_merge(first_dict[key], val)
+            # if it is not further nested, just replace the value
+            else:
+                first_dict[key] = val
+
+
 def combine_with_defaults(task: Task, defaults: Defaults) -> TrainingSpec:
     """
     Combine task-specific parameters with default parameters.
@@ -155,6 +170,6 @@ def combine_with_defaults(task: Task, defaults: Defaults) -> TrainingSpec:
     if task.terratorch_task is None:
         task.terratorch_task = {}
     # merge task specific args with default args
-    terratorch_task = terratorch_task | task.terratorch_task
+    recursive_merge(terratorch_task, task.terratorch_task)
     task_with_defaults = replace(task, terratorch_task=terratorch_task)
     return TrainingSpec(task_with_defaults, defaults.trainer_args)

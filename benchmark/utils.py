@@ -371,6 +371,7 @@ def extract_parameters(
 
 
 def get_results_and_parameters(
+    benchmark_name: str,
     storage_uri: str,
     logger: logging.RootLogger,
     experiments: list,
@@ -382,16 +383,18 @@ def get_results_and_parameters(
     extracts results and parameters for experiments from mlflow logs
 
     Args:
+        benchmark_name: string to used to name resulting csv file
         storage_uri: path to mlflow storage folder used in configs
         logger: logging.RootLogger to save logs to file
         experiment_data: list of experiment names
+        task_metrics: metrics used to evaluate each task
         task_names: list of tasks
         num_repetitions: number of repeated seeds per task
     Returns:
         pd.DataFrame with results and parameters
     """
     if Path(storage_uri).exists() and Path(storage_uri).is_dir():
-        results_dir = Path(storage_uri).parents[0] / "summarized_results"
+        results_dir = Path(storage_uri).parents[0] / "summarized_results" / benchmark_name
     else:
         print("Please use a valid directory for storage_uri")
         raise ValueError

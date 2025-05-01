@@ -105,7 +105,9 @@ Summarizing results and hyperparameters of multiple experiments relies on a conf
 
 - `storage_uri`: Location to use for mlflow storage for the hyperparameter optimization (hpo) stage. This should be the same value used as `storage_uri` in each experiment config file during optimization (see above).
 
-- `task_metrics`: List of metrics that were reported for each each task, e.g. `val/Multiclass_Jaccard_Index`
+- `benchmark_name`: string to used to name resulting csv file
+
+
 
 See `configs/summarize_results_template.yaml` in the git repo for an example.
 
@@ -118,7 +120,7 @@ For instance:
 terratorch iterate --summarize --config configs/summarize_results.yaml
 ```
 
-The results and hyperparameters are extracted into the csv file: `summarized_results/results_and_parameters.csv`.
+The results and hyperparameters are extracted into the csv file: `summarized_results/<benchmark_name>/results_and_parameters.csv`.
 
 
 ## Ray

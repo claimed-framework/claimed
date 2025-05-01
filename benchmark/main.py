@@ -37,6 +37,7 @@ def main():
     parser.add_argument('--list_of_experiment_names', type=list[str]) 
     parser.add_argument('--task_names', type=list[str]) 
     parser.add_argument('--task_metrics', type=list[str]) 
+    parser.add_argument('--benchmark_name', type=str, help="name of summarized results file", ) 
 
     args = parser.parse_args()
     paths: List[Any] = args.config
@@ -82,10 +83,15 @@ def main():
         for t in task_metrics:
             assert isinstance(t, str), f"Error! {t=} is not a str"
 
+        benchmark_name = config_init.benchmark_name
+        assert isinstance(benchmark_name, str), f"Error! {benchmark_name=} is not a str"
+            
+
         run_repetitions = config_init.run_repetitions
         assert isinstance(run_repetitions, int) and run_repetitions > 0, f"Error! {run_repetitions=} is invalid"
         #get results and parameters from mlflow logs
         results_and_parameters = get_results_and_parameters(
+                                        benchmark_name=benchmark_name,
                                         storage_uri = storage_uri,
                                         logger = logger,
                                         experiments = list_of_experiment_names,

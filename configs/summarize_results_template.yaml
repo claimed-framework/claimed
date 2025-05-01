@@ -1,3 +1,4 @@
+benchmark_name: quick_comparison
 storage_uri: /mnt/rg_climate_benchmark/code/test_naomi/testing/test_final_code/results/hpo 
 run_repetitions: 2
 list_of_experiment_names:

@@ -57,11 +57,11 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 - `storage_uri`: Location to use for mlflow storage for the hyperparameter optimization (hpo) stage. During optimization, additional folders will be created in parent directory of `storage_uri`. For example, if `storage_uri` is `/opt/benchmark_experiments/hpo`, additional folders will include: 
 ```
 /opt/benchmark_experiments/
-└──hpo_results
-└──hpo_repeated_exp
-└──repeated_exp_output_csv
-└──job_logs
-└──optuna_db
+        └──hpo_results
+        └──hpo_repeated_exp
+        └──repeated_exp_output_csv
+        └──job_logs
+        └──optuna_db
 ```
 
 Please see `configs/benchmark_v2_template.yaml` in the git repo for an example.
@@ -131,13 +131,13 @@ terratorch iterate --summarize --config configs/summarize_results.yaml
 The results and hyperparameters are extracted into a csv file. For example, if `storage_uri` is `/opt/benchmark_experiments/hpo`, then sumarized results will be saved in last file as shown below:
 ```
 /opt/benchmark_experiments/
-└──hpo_results
-└──hpo_repeated_exp
-└──repeated_exp_output_csv
-└──job_logs
-└──optuna_db
-└──summarized_results/
-        └──<benchmark_name>/
+        └──hpo_results
+        └──hpo_repeated_exp
+        └──repeated_exp_output_csv
+        └──job_logs
+        └──optuna_db
+        └──summarized_results/
+            └──<benchmark_name>/
                 └──results_and_parameters.csv
 ```
 

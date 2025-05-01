@@ -86,7 +86,6 @@ def main():
         benchmark_name = config_init.benchmark_name
         assert isinstance(benchmark_name, str), f"Error! {benchmark_name=} is not a str"
             
-
         run_repetitions = config_init.run_repetitions
         assert isinstance(run_repetitions, int) and run_repetitions > 0, f"Error! {run_repetitions=} is invalid"
         #get results and parameters from mlflow logs

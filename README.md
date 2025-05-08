@@ -19,6 +19,8 @@ pip install terratorch-iterate
 ### Suggested setup for development
 
 ```sh
+git clone https://github.com/IBM/terratorch-iterate.git
+cd terratorch-iterate
 pip install --upgrade pip setuptools wheel
 pip install -e .
 pip install -e ".[dev]"
@@ -26,7 +28,7 @@ pip install -e ".[test]"
 pip install -e ".[utilities]"
 ```
 
-## Usage
+## Usage for benchmarking
 
 This tool allows you to design a benchmark test for a backbone that exists in `TerraTorch` over:
 
@@ -48,11 +50,21 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 
 - `save_models`: Whether to save models. Defaults to False. (Setting this to true can take up a lot of space). Models will be logged as artifacts for each run in MLFlow.
 
-- `storage_uri`: Location to use for storage for mlflow.
-
 - `optimization_space`: Hyperparameter space to search over. Bayesian optimization tends to work well with a small number of hyperparameters.
 
-See `benchmark_v2_template.yaml` in the git repo for an example.
+- `run_repetitions`: number of repetitions to be run using best setting from optimization. 
+
+- `storage_uri`: Location to use for mlflow storage for the hyperparameter optimization (hpo) stage. During optimization, additional folders will be created in parent directory of `storage_uri`. For example, if `storage_uri` is `/opt/benchmark_experiments/hpo`, additional folders will include: 
+```
+/opt/benchmark_experiments/
+        └──hpo_results
+        └──hpo_repeated_exp
+        └──repeated_exp_output_csv
+        └──job_logs
+        └──optuna_db
+```
+
+Please see `configs/benchmark_v2_template.yaml` in the git repo for an example.
 
 Besides the `--config` argument, terratorch-iterate also has two other arguments: 
 * if users include `--hpo` argument, then terratorch-iterate will optimize hyperparameters. Otherwise, it will rerun best experiment 
@@ -69,16 +81,66 @@ terratorch iterate --hpo --config configs/dofa_large_patch16_224_upernetdecoder_
 ```
 
 
-If users want to rerun best experiment:
+If users want to rerun best experiment, please use the same config file. Additionally, the `parent_run_id`, which is the mlflow run id from optimization, should be added as shown below:
 ```shell
-terratorch iterate --repeat --config <config-file>
+terratorch iterate --repeat --config <config-file> --parent_run_id <mlflow run_id from hpo>
 ```
 For instance:
 ```shell
-terratorch iterate --repeat --config configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml
+terratorch iterate --repeat --config configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml --parent_run_id 61bdee4a35a94f988ad30c46c87d4fbd
+```
+
+If users want to optimize hyperparameters then the rerun best experiment in a single command, please use both settings as shown below:
+```shell
+terratorch iterate --hpo --repeat --config <config-file>
+```
+For instance:
+```shell
+terratorch iterate --hpo --repeat --config configs/dofa_large_patch16_224_upernetdecoder_true_modified.yaml
 ```
 
 To check the experiment results, use `mlflow ui --host $(hostname -f) --port <port> --backend-store-uri <storage_uri>` 
+
+
+## Summarizing results
+Summarizing results and hyperparameters of multiple experiments relies on a configuration file where the experiments and tasks are defined. This consists of:
+
+- `list_of_experiment_names`: List of MLFLOW experiment names which had been completed.
+
+- `task_names`: List of tasks found in each experiment in `list_of_experiment_names`.
+
+- `run_repetitions`: Number of repetitions to be expected for each experiment. This should be the same as the value used in in each experiment config file during optimization. 
+
+- `storage_uri`: Location to use for mlflow storage for the hyperparameter optimization (hpo) stage. This should be the same value used as `storage_uri` in each experiment config file during optimization (see above).
+
+- `benchmark_name`: string to be used to name resulting csv file
+
+
+
+See `configs/summarize_results_template.yaml` in the git repo for an example.
+
+To summarize results and hyperparameters, please run the following: 
+```shell
+terratorch iterate --summarize --config <summarize-config-file>
+```
+For instance:
+```shell
+terratorch iterate --summarize --config configs/summarize_results.yaml
+```
+
+The results and hyperparameters are extracted into a csv file. For example, if `storage_uri` is `/opt/benchmark_experiments/hpo`, then sumarized results will be saved in last file as shown below:
+```
+/opt/benchmark_experiments/
+        └──hpo_results
+        └──hpo_repeated_exp
+        └──repeated_exp_output_csv
+        └──job_logs
+        └──optuna_db
+        └──summarized_results/
+            └──<benchmark_name>/
+                └──results_and_parameters.csv
+```
+
 
 ## Ray
 You can also parallelize your runs over a ray cluster. 

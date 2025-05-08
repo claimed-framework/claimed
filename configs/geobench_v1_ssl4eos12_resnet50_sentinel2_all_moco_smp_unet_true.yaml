@@ -381,7 +381,7 @@ tasks:
           - "SWIR_1"
           - "SWIR_2"
 
-n_trials: 1
+n_trials: 16
 save_models: False
 storage_uri: /nsimumba/test_terratorch/output/hpo_results
 ray_storage_path: /nsimumba/test_terratorch/output/ray_storage_results

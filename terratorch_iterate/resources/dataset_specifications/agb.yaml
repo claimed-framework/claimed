@@ -1,0 +1,64 @@
+class_path: terratorch.datamodules.GenericNonGeoPixelwiseRegressionDataModule
+init_args:
+  batch_size: 16
+  num_workers: 4
+  train_transform:
+    - class_path: albumentations.HorizontalFlip
+      init_args:
+        p: 0.5
+    - class_path: albumentations.augmentations.geometric.rotate.Rotate
+      init_args:
+        limit: 30
+        border_mode: 0 # cv2.BORDER_CONSTANT
+        # value: 0
+        # mask_value: 1
+        p: 0.5
+      dict_kwargs:
+        value: 0
+        mask_value: 1
+    - class_path: ToTensorV2
+  dataset_bands:
+    - 0
+    - BLUE
+    - GREEN
+    - RED
+    - NIR_NARROW
+    - SWIR_1
+    - SWIR_2
+    - 1
+    - 2
+    - 3
+    - 4
+  output_bands:
+    - BLUE
+    - GREEN
+    - RED
+    - NIR_NARROW
+    - SWIR_1
+    - SWIR_2
+  rgb_indices:
+    - 2
+    - 1
+    - 0
+  train_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/train_images
+  train_label_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/train_labels
+  val_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/val_images
+  val_label_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/val_labels
+  test_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/test_images
+  test_label_data_root: /dccstor/hhr-weather/latest_filters_all_agb_patches_tts_clipped_0_500/test_labels
+  # img_grep: "*.tif"
+  # label_grep: "*.tif"
+  means:
+    - 385.88501817
+    - 714.60615207
+    - 658.96267376
+    - 3314.57774238
+    - 2238.71812558
+    - 1250.00982518
+  stds:
+    - 264.62872
+    - 355.62848
+    - 504.54855
+    - 898.4953
+    - 947.22894
+    - 828.1297

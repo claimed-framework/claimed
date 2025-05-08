@@ -1,0 +1,10 @@
+benchmark_name: quick_comparison
+storage_uri: /mnt/rg_climate_benchmark/code/test_naomi/testing/test_final_code/results/hpo 
+run_repetitions: 2
+list_of_experiment_names:
+  - quick_test2
+  - quick_test3
+task_names:
+  - nz_cattle
+task_metrics:
+  - val/Multiclass_Jaccard_Index

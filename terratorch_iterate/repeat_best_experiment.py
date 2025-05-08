@@ -10,7 +10,7 @@ import warnings
 import logging
 from ast import literal_eval
 from random import randint
-import pdb
+
 import mlflow
 import mlflow.entities
 import pandas as pd
@@ -315,7 +315,7 @@ def rerun_best_from_backbone(
             logger.info(f"output path: {output_path}")
             if os.path.exists(output_path):
                 logger.info("there are previous results from repeated experiments")
-                existing_output = pd.read_csv(output_path, index_col=False)
+                existing_output = pd.read_csv(output_path)
                 existing_output = existing_output[table_columns]
                 existing_task_output = existing_output.loc[
                     existing_output["Task"] == task.name
@@ -421,8 +421,7 @@ def rerun_best_from_backbone(
                             logger.info(
                                 "there are previous results from repeated experiments"
                             )
-
-                            existing_output = pd.read_csv(output_path, index_col=False)
+                            existing_output = pd.read_csv(output_path)
                             existing_output = existing_output[table_columns]
                             existing_output.reset_index(inplace=True)
                             existing_task_output = existing_output.loc[
@@ -436,7 +435,6 @@ def rerun_best_from_backbone(
                                 [existing_output, new_data], axis=0
                             )
                             existing_output.reset_index(inplace=True)
-                            existing_output = existing_output.drop(columns=['index', 'level_0'])
                             existing_output.to_csv(output_path, index=False)
                         else:
                             new_data.to_csv(output_path, index=False)

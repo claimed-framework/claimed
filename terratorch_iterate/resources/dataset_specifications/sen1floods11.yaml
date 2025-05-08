@@ -1,0 +1,59 @@
+class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule
+init_args:
+  batch_size: 8
+  num_workers: 4
+  constant_scale: 0.0001
+  dataset_bands:
+      - COASTAL_AEROSOL
+      - BLUE
+      - GREEN
+      - RED
+      - RED_EDGE_1
+      - RED_EDGE_2
+      - RED_EDGE_3
+      - NIR_BROAD
+      - NIR_NARROW
+      - WATER_VAPOR
+      - CIRRUS
+      - SWIR_1
+      - SWIR_2
+  output_bands:
+    - BLUE
+    - GREEN
+    - RED
+    - NIR_NARROW
+    - SWIR_1
+    - SWIR_2
+  rgb_indices:
+    - 2
+    - 1
+    - 0
+  train_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/S2Hand/
+  train_label_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/LabelHand
+  val_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/S2Hand/
+  val_label_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/LabelHand
+  test_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/S2Hand/
+  test_label_data_root: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/data/flood_events/HandLabeled/LabelHand
+  # these must be obtained by running terratorch/examples/scripts/convert_sen1floods11_splits.py on the original split csv files
+  train_split: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/splits/flood_handlabeled/flood_train_data.txt
+  test_split: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/splits/flood_handlabeled/flood_test_data.txt
+  val_split: /dccstor/geofm-finetuning/datasets/sen1floods11/v1.1/splits/flood_handlabeled/flood_valid_data.txt
+  img_grep: "*_S2Hand.tif"
+  label_grep: "*_LabelHand.tif"
+  no_label_replace: -1
+  no_data_replace: 0
+means:
+  - 0.1412956
+  - 0.13795798
+  - 0.12353792
+  - 0.30902815
+  - 0.2044958
+  - 0.11912015
+stds:
+  - 0.07406382
+  - 0.07370365
+  - 0.08692279
+  - 0.11798815
+  - 0.09772074
+  - 0.07659938
+num_classes: 2

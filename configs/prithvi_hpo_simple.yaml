@@ -1,50 +1,57 @@
-experiment_name: dofa_large_patch16_224_upernetdecoder_true_modified
+experiment_name: geobench_v2_test
+run_name: test_models_saved_multiple_epochs_no_ray
 defaults:
   trainer_args:
-    max_epochs: 2
-    precision: bf16-mixed
-    log_every_n_steps: 1
+    precision: bf16-mixed # for these new models pretrained with bf16-mixed we should probably finetune with bf16-mixed
+    max_epochs: 10
   terratorch_task:
     model_args:
-      backbone_pretrained: True
-      backbone: dofa_large_patch16_224
+      pretrained: True
+      backbone: prithvi_eo_v1_100
       backbone_out_indices:
+        - 2
         - 5
+        - 8
         - 11
-        - 17
-        - 23
-    model_factory: EncoderDecoderFactory
+      backbone_pretrained_cfg_overlay:
+        file: /dccstor/geofm-finetuning/pretrain_ckpts/v9_no_sea/vit_b/epoch-395-loss-0.0339_clean.pt
+    model_factory: PrithviModelFactory
     optimizer: AdamW
 tasks:
-  - name: nz_cattle
+  - name: chesapeake
     type: segmentation
     direction: max
     metric: val/Multiclass_Jaccard_Index
-    early_stop_patience: 5
+    early_stop_patience: 10
     terratorch_task:
       loss: ce
       model_args:
-        backbone_model_bands:
-          - RED
-          - GREEN
-          - BLUE
-        num_classes: 2
         decoder: UperNetDecoder
         decoder_channels: 128
         decoder_scale_modules: true
-        necks:
-        - name: ReshapeTokensToImage
+        bands:
+        - RED
+        - GREEN
+        - BLUE
+        - NIR
+        num_classes: 7
     datamodule:
-      class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
+      class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
       init_args:
-        partition: "0.01x_train"
+        partition: 0.10x_train
         train_transform:
           - class_path: albumentations.HorizontalFlip
             init_args:
               p: 0.5
+          # - class_path: albumentations.RandomRotate90
+          #   init_args:
+          #     p: 0.5
           - class_path: albumentations.VerticalFlip
             init_args:
               p: 0.5
+          # - class_path: albumentations.RandomBrightnessContrast
+          #   init_args:
+          #     p: 0.8
           - class_path: albumentations.Resize
             init_args:
               height: 224
@@ -63,24 +70,26 @@ tasks:
               width: 224
           - class_path: ToTensorV2
         batch_size: 16
-        num_workers: 4
+        num_workers: 6
         data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
         bands:
           - "RED"
           - "GREEN"
           - "BLUE"
-n_trials: 1
+          - "NIR"
+n_trials: 2
 save_models: False
-storage_uri: /dccstor/geofm-finetuning/terratorch-iterate-test
+storage_uri: /dccstor/geofm-finetuning/terratorch-iterate-test/
 ray_storage_path: /dccstor/geofm-finetuning/terratorch-iterate-test/ray_storage
+run_repetitions: 0
 optimization_space:
   batch_size:
-    - 8
-    - 16
-    - 32
+      - 8
+      - 32
+      - 64
   lr:
-    min: 6e-5
     max: 1e-3
+    min: 1e-6
     type: real
     log: true
   optimizer_hparams:
@@ -93,5 +102,3 @@ optimization_space:
       - 64
       - 128
       - 256
-      - 512
-run_repetitions: 1

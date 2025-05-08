@@ -7,7 +7,7 @@ defaults:
   terratorch_task:
     model_args:
       pretrained: True
-      backbone: prithvi_vit_100
+      backbone: prithvi_eo_v1_100
       backbone_out_indices:
         - 2
         - 5

@@ -1,3 +1,4 @@
+import logging
 from benchmark.benchmark_types import Defaults, Task, TaskTypeEnum
 import pytest
 from benchmark.backbone_benchmark import benchmark_backbone
@@ -8,6 +9,8 @@ import os
 from pathlib import Path
 import uuid
 from jsonargparse import ArgumentParser
+
+from benchmark.utils import get_logger
 
 
 BACKBONE_PRETRAINED_FILE = os.getenv(
@@ -177,6 +180,15 @@ def test_run_benchmark(
             print(f"Directory created at: {path}")
         except FileNotFoundError as e:
             print(f"Error creating directory: {e}")
+
+    logger_path = config_init.logger
+    if logger_path is None:
+        storage_uri_path = Path(storage_uri)
+        logger = get_logger(log_folder=f"{str(storage_uri_path.parents[0])}/job_logs")
+    else:
+        logging.config.fileConfig(fname=logger_path, disable_existing_loggers=False)
+        logger = logging.getLogger("terratorch-iterate")
+        
     optimization_space = config_init.optimization_space
     assert isinstance(
         optimization_space, dict
@@ -214,6 +226,7 @@ def test_run_benchmark(
         continue_existing_experiment=continue_existing_experiment,
         test_models=test_models,
         run_repetitions=run_repetitions,
+        logger=logger,
     )
     validate_results(
         experiment_name=experiment_name,

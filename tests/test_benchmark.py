@@ -22,13 +22,15 @@ SEGMENTATION_V1 = os.getenv(
     "SEGMENTATION_V1", "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
 )
 
-OUTPUT_DIR = os.getenv(
-    "OUTPUT_DIR", "/dccstor/geofm-finetuning/terratorch-iterate-test-2/"
-)
+# OUTPUT_DIR = os.getenv(
+#     "OUTPUT_DIR", "/dccstor/geofm-finetuning/terratorch-iterate-test/"
+# )
 
 RAY_STORAGE = os.getenv(
-    "RAY_STORAGE", "/dccstor/geofm-finetuning/terratorch-iterate-test-2/ray_storage"
+    "RAY_STORAGE", "/dccstor/geofm-finetuning/terratorch-iterate-test/ray_storage"
 )
+
+TEST_CASE_IDS = ["0", "1", "2", "3", "4", "5", "6", "7"]
 
 
 @pytest.fixture(scope="module")
@@ -133,6 +135,7 @@ def find_file(directory: str, filename: str):
             False,
         ),
     ],
+    ids=TEST_CASE_IDS,
 )
 def test_run_benchmark(
     config: str, continue_existing_experiment: bool, test_models: bool
@@ -171,7 +174,7 @@ def test_run_benchmark(
     defaults = config_init.defaults
     assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
     # defaults.trainer_args["max_epochs"] = 5
-    storage_uri = OUTPUT_DIR
+    storage_uri = config_init.storage_uri
     assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
     storage_uri_path = Path(storage_uri) / uuid.uuid4().hex / "hpo"
     if not storage_uri_path.exists():
@@ -223,7 +226,7 @@ def test_run_benchmark(
     validate_results(
         experiment_name=experiment_name,
         storage_uri=str(storage_uri_path),
-        mlflow_experiment_id=mlflow_experiment_id,
+        finished_run_id=mlflow_experiment_id,
     )
 
 
@@ -273,7 +276,7 @@ def test_run_benchmark_no_specific_terratorch_task(
     defaults = config_init.defaults
     assert isinstance(defaults, Defaults), f"Error! {defaults=} is not a Defaults"
     # defaults.trainer_args["max_epochs"] = 5
-    storage_uri = OUTPUT_DIR
+    storage_uri = config_init.storage_uri
     assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
     storage_uri_path = Path(storage_uri) / uuid.uuid4().hex / "hpo"
     if not storage_uri_path.exists():
@@ -305,7 +308,7 @@ def test_run_benchmark_no_specific_terratorch_task(
         ), f"Error! {run_repetitions=} is invalid"
     else:
         run_repetitions = 0
-    mlflow_experiment_id = benchmark_backbone(
+    finished_run_id = benchmark_backbone(
         experiment_name=experiment_name,
         run_name=run_name,
         run_id=None,
@@ -323,19 +326,19 @@ def test_run_benchmark_no_specific_terratorch_task(
     validate_results(
         experiment_name=experiment_name,
         storage_uri=str(storage_uri_path),
-        mlflow_experiment_id=mlflow_experiment_id,
+        finished_run_id=finished_run_id,
     )
 
 
-def validate_results(experiment_name: str, storage_uri: str, mlflow_experiment_id: str):
+def validate_results(experiment_name: str, storage_uri: str, finished_run_id: str):
     # get the most recent modified directory
-    dir_path = Path(storage_uri) / mlflow_experiment_id
-    assert dir_path.exists(), f"Error! directory does not exist: {dir_path}"
+    dir_path = Path(storage_uri) / finished_run_id
+    assert dir_path.exists(), f"Error! Directory does not exist: {dir_path}"
     # find mlflow.runName files within the result dir
     meta_yaml = "meta.yaml"
 
     meta_yaml_path = dir_path / meta_yaml
-    assert meta_yaml_path.exists(), f"Error! {meta_yaml_path=} does not exist"
+    assert meta_yaml_path.exists(), f"Error! meta.yaml file {meta_yaml_path} does not exist"
     # open file and check that the experiment name is the same
     with open(meta_yaml_path, mode="r") as f:
         # read all the lines
@@ -346,7 +349,7 @@ def validate_results(experiment_name: str, storage_uri: str, mlflow_experiment_i
         for line in lines:
             if experiment_name in line:
                 experiment_name_found = True
-            if mlflow_experiment_id in line:
+            if finished_run_id in line:
                 experiment_id_found = True
         assert (
             experiment_name_found and experiment_id_found

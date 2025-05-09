@@ -10,7 +10,6 @@ import warnings
 import logging
 from ast import literal_eval
 from random import randint
-import pdb
 import mlflow
 import mlflow.entities
 import pandas as pd
@@ -37,7 +36,6 @@ from benchmark.model_fitting import (
     inject_hparams,
     valid_task_types,
 )
-import pdb
 
 @ray.remote(num_cpus=8, num_gpus=1)
 def remote_fit(

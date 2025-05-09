@@ -1,11 +1,17 @@
 import subprocess
 from pathlib import Path
+from typing import Optional
 from tests.test_benchmark import TEST_CASE_IDS
+import click
 
-
-def main():
-
-    for tc_id in TEST_CASE_IDS:
+@click.command()
+@click.option('--test_id', default=None, help='test ID')
+def run_tests(test_id: Optional[str] = None):
+    if test_id is None:
+        test_ids = TEST_CASE_IDS
+    else:
+        test_ids = [test_id]
+    for tc_id in test_ids:
         print(f"Running test case {tc_id}")
         stderr_file = f"test-benchmark-{tc_id}.err"
         stdout_file = f"test-benchmark-{tc_id}.out"
@@ -36,4 +42,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run_tests()

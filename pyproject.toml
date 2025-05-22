@@ -74,7 +74,7 @@ dependencies = [
 "optuna-integration",
 "seaborn",
 # temporary fix to use AugmentationSequential from torchgeo
-"torchgeo<0.7.0"
+"torchgeo<0.7.1"
 ]
 
 [project.urls]

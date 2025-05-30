@@ -7,17 +7,20 @@ import copy
 import enum
 from dataclasses import dataclass, field, replace
 from typing import Any, Optional, Union
-
 from terratorch.tasks import (
     ClassificationTask,
     MultiLabelClassificationTask,
     PixelwiseRegressionTask,
     SemanticSegmentationTask,
+    ObjectDetectionTask,
 )
 from torchgeo.datamodules import BaseDataModule
 
 valid_task_types = type[
-    SemanticSegmentationTask | ClassificationTask | PixelwiseRegressionTask
+    SemanticSegmentationTask
+    | ClassificationTask
+    | PixelwiseRegressionTask
+    | ObjectDetectionTask
 ]
 
 
@@ -30,6 +33,7 @@ class TaskTypeEnum(enum.Enum):
     regression = "regression"
     classification = "classification"
     multilabel_classification = "multilabel_classification"
+    object_detection = "object_detection"
 
     def get_class_from_enum(
         self,
@@ -43,6 +47,8 @@ class TaskTypeEnum(enum.Enum):
                 return ClassificationTask
             case TaskTypeEnum.multilabel_classification:
                 return MultiLabelClassificationTask
+            case TaskTypeEnum.object_detection:
+                return ObjectDetectionTask
             case _:
                 raise TypeError("Task type does not exist")
 

@@ -1,3 +1,4 @@
+import itertools
 import logging
 from benchmark.benchmark_types import Defaults, Task, TaskTypeEnum
 import pytest
@@ -105,115 +106,22 @@ def find_file(directory: str, filename: str):
     return None
 
 
-INPUT_TEST_RUN_BENCHMARK = [
-    (
-        "configs/tests/geobench_v1_prithvi_big_earth_net.yaml",
-        True,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_big_earth_net.yaml",
-        True,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_big_earth_net.yaml",
-        False,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_big_earth_net.yaml",
-        False,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_chesapeake.yaml",
-        True,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_chesapeake.yaml",
-        True,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_chesapeake.yaml",
-        False,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_chesapeake.yaml",
-        False,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_cashew.yaml",
-        True,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_cashew.yaml",
-        True,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_cashew.yaml",
-        False,
-        True,
-    ),
-    (
-        "configs/tests/geobench_v1_prithvi_cashew.yaml",
-        False,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_resnet_cashew.yaml",
-        False,
-        False,
-    ),
-    (
-        "configs/tests/geobench_v1_resnet_cashew.yaml",
-        False,
-        True,
-    ),
-]
-
 CONFIG_FILES = [
     "configs/tests/geobench_v1_resnet_cashew.yaml",
     "configs/tests/geobench_v1_prithvi_cashew.yaml",
 ]
-
-
-@pytest.fixture(scope="module")
-@pytest.mark.parametrize(
-    "path",
-    CONFIG_FILES,
+CONTINUE_EXISTING_EXPERIMENT = [True, False]
+TEST_MODELS = [True, False]
+INPUT_TEST_RUN_BENCHMARK = list(
+    itertools.product(CONFIG_FILES, CONTINUE_EXISTING_EXPERIMENT, TEST_MODELS)
 )
-def config(path):
-    path = os.path.join(os.getcwd(), config)
-    config_path = Path(path)
-    assert (
-        config_path.exists()
-    ), f"Error! config does not exist: {config_path.resolve()}"
-    return path
-
-
-@pytest.fixture(scope="module")
-@pytest.mark.parametrize("cont", [False, True])
-def continue_existing_experiment(cont: bool):
-    return cont
-
-
-@pytest.fixture(scope="module")
-@pytest.mark.parametrize("test", [False, True])
-def test_models(test: bool):
-    return test
+TEST_CASE_IDS = [str(i) for i in range(0, len(INPUT_TEST_RUN_BENCHMARK))]
 
 
 @pytest.mark.parametrize(
     "config, continue_existing_experiment, test_models",
-    [("config", 'continue_existing_experiment', "test_models")],
-    indirect=["config", "continue_existing_experiment", "test_models"],
+    INPUT_TEST_RUN_BENCHMARK,
+    ids=TEST_CASE_IDS,
 )
 def test_run_benchmark(
     config: str, continue_existing_experiment: bool, test_models: bool

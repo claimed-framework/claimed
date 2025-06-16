@@ -215,7 +215,7 @@ def test_models(test: bool):
 
 @pytest.mark.parametrize(
     "config, continue_existing_experiment, test_models",
-    ["config", 'continue_existing_experiment', "test_models"],
+    [("config", 'continue_existing_experiment', "test_models")],
     ids=TEST_CASE_IDS,
     indirect=["config", "continue_existing_experiment", "test_models"],
 )

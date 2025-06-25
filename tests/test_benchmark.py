@@ -107,6 +107,8 @@ def find_file(directory: str, filename: str):
 CONFIG_FILES = [
     "configs/tests/geobench_v1_resnet_cashew.yaml",
     "configs/tests/geobench_v1_prithvi_cashew.yaml",
+    "configs/tests/benchmark_v2_simple.yaml",
+    "configs/tests/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
     "configs/tests/geobench_v1_ssl4eos12_resnet50_sentinel2_all_moco_smp_unet_true.yaml",
     "configs/nasabench_vit_b_os.yaml",
 ]

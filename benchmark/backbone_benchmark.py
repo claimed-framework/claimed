@@ -232,6 +232,7 @@ def benchmark_backbone(
 
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
+    experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
 
     if bayesian_search:
         sampler: BaseSampler | None = None  # take the default
@@ -344,7 +345,7 @@ def benchmark_backbone(
                 "results_table.json",
                 run.info.run_id,
             )
-            experiment_id = run.info.experiment_id
+            # experiment_id = run.info.experiment_id
 
         # check completion of HPO for all tasks before proceeding to next stage
         existing_experiments = check_existing_experiments(

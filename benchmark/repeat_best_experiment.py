@@ -37,6 +37,9 @@ from benchmark.model_fitting import (
     valid_task_types,
 )
 
+from .utils import get_nested_runs
+
+
 @ray.remote(num_cpus=8, num_gpus=1)
 def remote_fit(
     training_spec: TrainingSpec,
@@ -261,6 +264,7 @@ def rerun_best_from_backbone(
     if backbone_import:
         importlib.import_module(backbone_import)
     mlflow.set_tracking_uri(storage_uri)
+    
     mlflow.set_experiment(experiment_name)
 
     runs: list[mlflow.entities.Run] = mlflow.search_runs(
@@ -290,9 +294,17 @@ def rerun_best_from_backbone(
     repeated_experiment_name = f"{experiment_name}_repeated_exp"
     mlflow.set_tracking_uri(repeated_storage_uri)
     mlflow.set_experiment(repeated_experiment_name)
+    experiment_id = mlflow.get_experiment_by_name(repeated_experiment_name).experiment_id
 
+    tmp_runs = get_nested_runs(experiment_id, experiment_name, repeated_storage_uri)
+    if len(tmp_runs) > 0:
+        if len(tmp_runs) > 1: tmp_runs = [x for x in runs if x["run_name"] == experiment_name]
+        run_id = tmp_runs[0]["run_id"]
+    else:
+        run_id = None
+    
     #backbone_name = defaults.terratorch_task["model_args"]["backbone"]
-    with mlflow.start_run(run_name=experiment_name, run_id=None) as run:
+    with mlflow.start_run(run_name=experiment_name, run_id=run_id) as run:
         for task in tasks:
             logger.info(f"\n\ntask: {task.name}")
             matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore

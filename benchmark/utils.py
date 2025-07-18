@@ -16,6 +16,11 @@ import sys
 from mlflow.entities.experiment import Experiment
 import importlib
 import logging
+from mlflow.tracking import MlflowClient
+from mlflow.entities import ViewType
+from collections import defaultdict
+
+
 
 N_TRIALS_DEFAULT = 16
 REPEATED_SEEDS_DEFAULT = 10
@@ -854,3 +859,49 @@ if __name__ == "__main__":
             logger=logger,
             plot_file_base_name=f"multiple_models_{setting}",
         )
+
+        
+
+### code written with the help of Perplexity platform
+def get_nested_runs(experiment_id, filter_string = None, mlflow_uri= "mlflow"):
+    client = MlflowClient(mlflow_uri)
+    
+    # Get all runs for the experiment
+    all_runs = client.search_runs(
+        experiment_ids=[experiment_id],
+        run_view_type=ViewType.ACTIVE_ONLY
+    )
+    
+    # Create a dictionary to store the run hierarchy
+    run_hierarchy = defaultdict(list)
+    parent_runs = []
+
+    # First pass: Identify parent-child relationships
+    for run in all_runs:
+        parent_run_id = run.data.tags.get("mlflow.parentRunId")
+        
+        if parent_run_id:
+            run_hierarchy[parent_run_id].append(run)
+        else:
+            parent_runs.append(run)
+
+    # Function to create a nested dictionary for a run and its children
+    def create_nested_dict(run):
+        
+        run_dict = {
+            "run": run,
+            "run_id": run.info.run_id,
+            "run_name": run.data.tags.get("mlflow.runName", "Unnamed"),
+            "status": run.info.status,
+            "start_time": run.info.start_time,
+            "end_time": run.info.end_time,
+            "children": [create_nested_dict(child) for child in run_hierarchy[run.info.run_id]]
+        }
+        return run_dict
+     # Create the final nested structure
+    if filter_string:
+        nested_runs = [create_nested_dict(parent_run) for parent_run in parent_runs if parent_run.data.tags.get("mlflow.runName", "Unnamed").find(filter_string) > -1]
+    else:
+        nested_runs = [create_nested_dict(parent_run) for parent_run in parent_runs]
+    
+    return nested_runs

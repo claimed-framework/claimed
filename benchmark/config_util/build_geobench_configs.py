@@ -139,6 +139,14 @@ def _generate_iterate_config(
     output: Path,
     template: Path,
 ):
+    """ generate the tt-iterate based on yaml files located within the specified directory, based
+    on previously defined template and save the result using specified output filename
+
+    Args:
+        directory (Path): contains all terratorch yaml files
+        output (Path): filename of the result
+        template (Path): template file that contains pre-defined values
+    """
 
     config_files = directory.glob('**/*.yaml')
     files_df = _build_dataframe(config_files=config_files)

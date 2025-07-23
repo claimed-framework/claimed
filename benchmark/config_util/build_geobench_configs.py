@@ -7,7 +7,6 @@ from dataclasses import asdict
 from benchmark.benchmark_types import (
     IterateBaseDataModule,
     Task,
-    BaseDataModule,
     TaskTypeEnum,
 )
 
@@ -37,14 +36,17 @@ def _build_dataframe(config_files) -> pd.DataFrame:
     return pd.DataFrame(data={"file": files, "model": model, "dataset": dataset})
 
 
-def _create_basemodule(data: dict[str, Any], model_filter: str) -> BaseDataModule:
-    """_summary_
+def _create_basemodule(
+    data: dict[str, Any], model_filter: str
+) -> IterateBaseDataModule:
+    """instantiate IterateBaseDataModule class based on the "data" field of the terratorch config
 
     Args:
-        datamodule (dict[str, Any]): _description_
+        data (dict[str, Any]): _description_
+        model_filter (str): model name is used to specify batch_size and eval_batch_size
 
     Returns:
-        BaseDataModule: _description_
+        IterateBaseDataModule: subclass of torchgeo BaseDataModule that is part of iterate's config
     """
     dataset_class = data["class_path"]
     if "dict_kwargs" in data.keys():
@@ -62,19 +64,36 @@ def _create_task(
     metric: str,
     terratorch_task: dict,
     task_type: TaskTypeEnum,
-    task_direction: str,
+    direction: str,
     optimization_except: set[str] = set(),
     max_run_duration: str | None = None,
     early_stop_patience: int | None = None,
     early_prune: bool = False,
 ) -> dict:
+    """instantiate Task dataclass and convert it to dict
+
+    Args:
+        name (str): name of the task - comes from terratorch config - data.init_args.cls
+        datamodule (IterateBaseDataModule): _description_
+        metric (str): _description_
+        terratorch_task (dict): _description_
+        task_type (TaskTypeEnum): type of task, e.g., regression, classification
+        direction (str): direction to optimize
+        optimization_except (set[str], optional): _description_. Defaults to set().
+        max_run_duration (str | None, optional): _description_. Defaults to None.
+        early_stop_patience (int | None, optional): _description_. Defaults to None.
+        early_prune (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        dict: _description_
+    """
     task = Task(
         name=name,
         datamodule=datamodule,
         metric=metric,
         terratorch_task=terratorch_task,
         type=task_type,
-        direction=task_direction,
+        direction=direction,
         optimization_except=optimization_except,
         max_run_duration=max_run_duration,
         early_stop_patience=early_stop_patience,
@@ -89,13 +108,36 @@ def _create_task(
     return task_dict
 
 
+def _get_task_type(template: dict) -> TaskTypeEnum:
+    tasks = template["tasks"]
+    task = tasks[0]
+    task_type = task["type"]
+    assert isinstance(task_type, str)
+
+    return TaskTypeEnum(value=task_type)
+
+
+def _get_task_direction(template: dict) -> str:
+    """extract task direction from template
+
+    Args:
+        template (dict): template created by user
+
+    Returns:
+        str: direction of the optimization (max or min)
+    """
+    tasks = template["tasks"]
+    task = tasks[0]
+    direction = task["direction"]
+    assert isinstance(direction, str)
+    assert direction in ["min", "max"]
+    return direction
+
+
 def _generate_iterate_config(
     directory: Path,
     output: Path,
     template: Path,
-    task_type: TaskTypeEnum = TaskTypeEnum.object_detection,
-    task_direction: str = "max",
-    experiment_name: str = "test_geobench2_detection",
 ):
 
     config_files = directory.glob('**/*.yaml')
@@ -110,8 +152,6 @@ def _generate_iterate_config(
 
     with open(GEOBENCH_TEMPLATE, 'r') as file:
         template = yaml.safe_load(file)
-
-    template['experiment_name'] = experiment_name
 
     for model in models:
 
@@ -140,13 +180,15 @@ def _generate_iterate_config(
 
             data = data['data']
             datamodule = _create_basemodule(data=data, model_filter=model)
+            task_type = _get_task_type(template=template)
+            task_direction = _get_task_direction(template=template)
             task = _create_task(
                 name=name,
                 datamodule=datamodule,
                 metric=metric,
                 terratorch_task=terratorch_task,
                 task_type=task_type,
-                task_direction=task_direction,
+                direction=task_direction,
             )
             tasks.append(task)
 
@@ -181,7 +223,9 @@ def generate_tt_iterate_config(directory: str, output: str, template: str):
     if output_path.exists():
         print(f"Delete existing {output_path} file")
         output_path.unlink()
-    _generate_iterate_config(directory=directory_path, output=output_path)
+    _generate_iterate_config(
+        directory=directory_path, output=output_path, template=template_path
+    )
 
 
 if __name__ == '__main__':

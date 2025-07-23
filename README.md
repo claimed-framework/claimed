@@ -148,4 +148,18 @@ You can also parallelize your runs over a ray cluster.
 Check out instructions in the [docs](./docs/ray.md)
 
 
+## terratorch integration
 
+terratorch-iterate provides an utility to convert terratorch's config file into a single terratorch-iterate's config file. You have to follow these steps:
+
+1. Go to `<$TERRATORCH-ITERATE-HOME>/benchmark/config_util`
+2. Copy all terratorch config files to a directory. Note that all yaml files within this directory will be parsed to generate the terratorch-iterate file, so make sure that only yaml files that you want to be parsed are located in this directory. 
+3. Run build_geobench_configs.py script by specifying 3 input parameters:
+     1. `directory`  - Full path to the directory that contains all terratorch config yaml files
+     2. `output` - Name of the config file that will be generated
+     3. `template` - Full or relative path to the template file
+   
+For instance, this is an example of such command:
+```shell
+python3 build_geobench_configs.py --directory /Users/john/terratorch/examples/confs/geobenchv2_detection --output test.yaml --template geobenchv2_template.yaml
+```

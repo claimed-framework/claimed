@@ -202,7 +202,7 @@ def _generate_iterate_config(
 
     with open(output, 'w') as file:
         yaml.dump(template, file)
-        print(f"{output} has been created")
+        print(f"{output} file has been created")
 
 
 @click.command()

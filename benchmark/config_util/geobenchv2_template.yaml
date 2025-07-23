@@ -1,0 +1,28 @@
+experiment_name: my_experiment
+defaults:
+  terratorch_task:
+    model_args:
+      backbone: terramind_v1_large
+      backbone_pretrained: true
+    model_factory: ObjectDetectionModelFactory
+    optimizer: AdamW
+  trainer_args:
+    log_every_n_steps: 1
+    max_epochs: 1
+tasks:
+  - name: X
+    type: object_detection
+    direction: max
+    metric: X
+    terratorch_task:
+    datamodule:
+n_trials: 1
+save_models: False
+storage_uri: /opt/app-root/src/fm-geospatial/pf/logs/geobench/mlflow
+run_repetitions: 1
+optimization_space:
+  lr:
+    max: 1e-3
+    min: 1e-6
+    type: real
+    log: true

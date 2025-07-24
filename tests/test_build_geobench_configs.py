@@ -6,7 +6,7 @@ from deepdiff import DeepDiff
 
 
 @pytest.mark.parametrize(
-    "directory, output, template, prefix",
+    "input_dir, output_dir, template, prefix",
     [
         (
             "/Users/ltizzei/Projects/Orgs/IBM/terratorch/examples/confs/geobenchv2_detection",
@@ -15,23 +15,23 @@ from deepdiff import DeepDiff
             "test_examples_confs_geobenchv2_detection",
         ),
         (
-            "/Users/ltizzei/Projects/Orgs/IBM/terratorch/tests/resources/configs",
-            "/Users/ltizzei/Projects/Orgs/IBM/terratorch-iterate/benchmark/config_util/",
+            "/Users/ltizzei/Projects/Orgs/IBM/terratorch-iterate/tests/test_config_util",
+            "/Users/ltizzei/Projects/Orgs/IBM/terratorch-iterate/tests/test_config_util",
             "/Users/ltizzei/Projects/Orgs/IBM/terratorch-iterate/benchmark/config_util/geobenchv2_template.yaml",
-            "test_tests_resources",
+            "test_config_util_",
         ),
     ],
 )
-def test__generate_iterate_config(directory, output, template, prefix):
-    directory_path = Path(directory)
-    assert directory_path.exists()
-    assert directory_path.is_dir()
-    output_path = Path(output)
+def test__generate_iterate_config(input_dir, output_dir, template, prefix):
+    input_dir_path = Path(input_dir)
+    assert input_dir_path.exists()
+    assert input_dir_path.is_dir()
+    output_path = Path(output_dir)
     assert output_path.exists()
     assert output_path.is_dir()
 
     generate_iterate_config(
-        directory=directory_path, output=output_path, template=template, prefix=prefix
+        input_dir=input_dir_path, output_dir=output_path, template=template, prefix=prefix
     )
 
     assert output_path.exists()

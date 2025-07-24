@@ -40,14 +40,14 @@ def _build_dataframe(config_files) -> pd.DataFrame:
 
 
 def _create_basemodule(data: dict[str, Any], model_filter: str) -> dict:
-    """instantiate IterateBaseDataModule class based on the "data" field of the terratorch config
+    """create a dict based on the "data" field of the terratorch config
 
     Args:
         data (dict[str, Any]): _description_
         model_filter (str): model name is used to specify batch_size and eval_batch_size
 
     Returns:
-        IterateBaseDataModule: subclass of torchgeo BaseDataModule that is part of iterate's config
+        dict: returns a dict that represents the datamodule field of iterate config file
     """
     base_module = dict()
     base_module["class_path"] = data["class_path"]
@@ -69,7 +69,6 @@ def _create_task(
     terratorch_task: dict,
     task_type: TaskTypeEnum,
     direction: str,
-    optimization_except: set[str] = set(),
     max_run_duration: str | None = None,
     early_stop_patience: int | None = None,
     early_prune: bool = False,
@@ -78,12 +77,11 @@ def _create_task(
 
     Args:
         name (str): name of the task - comes from terratorch config - data.init_args.cls
-        datamodule (IterateBaseDataModule): _description_
+        datamodule (dict): _description_
         metric (str): _description_
         terratorch_task (dict): _description_
         task_type (TaskTypeEnum): type of task, e.g., regression, classification
         direction (str): direction to optimize
-        optimization_except (set[str], optional): _description_. Defaults to set().
         max_run_duration (str | None, optional): _description_. Defaults to None.
         early_stop_patience (int | None, optional): _description_. Defaults to None.
         early_prune (bool, optional): _description_. Defaults to False.
@@ -134,18 +132,18 @@ def _get_task_direction(template: dict) -> str:
 
 
 def generate_iterate_config(
-    directory: Path, template: Path, output: Path, prefix: str = "test_"
+    input_dir: Path, template: Path, output_dir: Path, prefix: str = "test_"
 ):
     """generate the tt-iterate based on yaml files located within the specified directory, based
     on previously defined template and save the result using specified output filename
 
     Args:
-        directory (Path): contains all terratorch yaml files
-        output (Path): filename of the result
+        input_dir (Path): contains all terratorch yaml files
+        output_dir (Path): filename of the result
         template (Path): template file that contains pre-defined values
     """
 
-    config_files = directory.glob('**/*.yaml')
+    config_files = input_dir.glob('**/*.yaml')
     files_df = _build_dataframe(config_files=config_files)
 
     files_df = files_df[files_df['dataset'].values != 'M4SAR']
@@ -200,7 +198,7 @@ def generate_iterate_config(
             tasks.append(task)
 
         model_specific_template['tasks'] = tasks
-        path = output / f"{prefix}_{model}.yaml"
+        path = output_dir / f"{prefix}_{model}.yaml"
         if path.exists():
             path.unlink()
         with open(path, 'w') as file:
@@ -210,12 +208,12 @@ def generate_iterate_config(
 
 @click.command()
 @click.option(
-    '--directory',
+    '--input_dir',
     prompt='Full path to the directory that contains all terratorch config yaml files',
     help='Full path to the directory that contains all terratorch config yaml files',
 )
 @click.option(
-    '--output',
+    '--output_dir',
     prompt='Full path to the directory in which the new config files will be stored',
     help='Full path to the directory in which the new config files will be stored',
 )
@@ -229,8 +227,8 @@ def generate_iterate_config(
     prompt='Prefix of the config filename, e.g., my-config-',
     help='Prefix of the config filename',
 )
-def generate_tt_iterate_config(directory: str, output: str, template: str, prefix: str):
-    directory_path = Path(directory)
+def generate_tt_iterate_config(input_dir: str, output_dir: str, template: str, prefix: str):
+    directory_path = Path(input_dir)
     assert directory_path.exists()
     assert directory_path.is_dir
     
@@ -238,14 +236,14 @@ def generate_tt_iterate_config(directory: str, output: str, template: str, prefi
     assert template_path.exists()
     assert template_path.is_file
     
-    output_path = Path(output)
+    output_path = Path(output_dir)
     assert output_path.exists()
     assert output_path.is_dir
 
     assert isinstance(prefix, str), f"Error! {type(prefix)} is not a str"
     generate_iterate_config(
-        directory=directory_path,
-        output=output_path,
+        input_dir=directory_path,
+        output_dir=output_path,
         template=template_path,
         prefix=prefix,
     )

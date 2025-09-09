@@ -221,10 +221,10 @@ def benchmark_backbone(
     base = Path(storage_uri).parents[0]
     PATH_TO_JOB_TRACKING = base / "job_progress_tracking"
     REPEATED_EXP_FOLDER = base / "repeated_exp_output_csv"
-    
+
     # https://mlflow.org/docs/latest/ml/tracking/system-metrics/#using-the-environment-variable-to-control-system-metrics-logging
     if os.getenv("MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING") is None:
-        os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"] = "true" 
+        os.environ["MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING"] = "true"
 
     if logger is None:
         logger = get_logger(log_folder=str(base / "job_logs"))

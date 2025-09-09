@@ -228,15 +228,17 @@ def generate_iterate_config(
     prompt='Prefix of the config filename, e.g., my-config-',
     help='Prefix of the config filename',
 )
-def generate_tt_iterate_config(input_dir: str, output_dir: str, template: str, prefix: str):
+def generate_tt_iterate_config(
+    input_dir: str, output_dir: str, template: str, prefix: str
+):
     directory_path = Path(input_dir)
     assert directory_path.exists()
     assert directory_path.is_dir
-    
+
     template_path = Path(template)
     assert template_path.exists()
     assert template_path.is_file
-    
+
     output_path = Path(output_dir)
     assert output_path.exists()
     assert output_path.is_dir

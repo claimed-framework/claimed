@@ -313,13 +313,17 @@ def launch_training(
             ["metric_name", "step"], verify_integrity=True
         )
         series_val_metrics = df_val_metrics["value"]
-        assert metric in series_val_metrics, f"Error! {metric} is not in {series_val_metrics}"
+        assert (
+            metric in series_val_metrics
+        ), f"Error! {metric} is not in {series_val_metrics}"
         if direction == "max":
             best_step = series_val_metrics[metric].idxmax()
         elif direction == "min":
             best_step = series_val_metrics[metric].idxmin()
         else:
-            raise Exception(f"Error! Direction must be either `max` or `min` but got {direction}")
+            raise Exception(
+                f"Error! Direction must be either `max` or `min` but got {direction}"
+            )
 
         for val_metric_name in val_metrics_names:
             mlflow.log_metric(

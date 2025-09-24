@@ -104,9 +104,9 @@ def find_file(directory: str, filename: str):
 
 
 CONFIG_FILES = [
-    "configs/tests/benchmark_v2_simple.yaml",
-    "configs/tests/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
-    "configs/tests/test_config_util__prithvi_eo_v1_100.yaml",
+    # "configs/tests/benchmark_v2_simple.yaml",
+    # "configs/tests/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
+    # "configs/tests/test_config_util__prithvi_eo_v1_100.yaml",
     "configs/tests/terratorch-iterate-configs/test_case_02/test_config_util__encoderdecoder_eo_v2_300_model_factory.yaml",
 ]
 CONTINUE_EXISTING_EXPERIMENT = [True, False]

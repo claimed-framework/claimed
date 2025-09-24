@@ -114,13 +114,20 @@ TEST_MODELS = [True, False]
 INPUT_TEST_RUN_BENCHMARK = list(
     itertools.product(CONFIG_FILES, CONTINUE_EXISTING_EXPERIMENT, TEST_MODELS)
 )
-TEST_CASE_IDS = [str(i) for i in range(0, len(INPUT_TEST_RUN_BENCHMARK))]
 
+
+def get_test_ids() -> list[str]:
+    test_case_ids = list()
+    for config, cee, tm in INPUT_TEST_RUN_BENCHMARK:
+        filename = config.split("/")[-1].replace(".yaml", "")
+        tid = f"{filename}_{cee}_{tm}"
+        test_case_ids.append(tid)
+    return test_case_ids
 
 @pytest.mark.parametrize(
     "config, continue_existing_experiment, test_models",
     INPUT_TEST_RUN_BENCHMARK,
-    ids=TEST_CASE_IDS,
+    ids=get_test_ids(),
 )
 def test_run_benchmark(
     config: str, continue_existing_experiment: bool, test_models: bool

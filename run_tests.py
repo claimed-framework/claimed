@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from typing import Optional
-from tests.test_benchmark import TEST_CASE_IDS
+from tests.test_benchmark import get_test_ids
 import click
 
 # rm geobench_v1_prithvi* && bsub -e ~/geobench_v1_prithvi.err -o ~/geobench_v1_prithvi.out -M 40G -gpu "num=1/task:mode=exclusive_process:gmodel=NVIDIAA100_SXM4_80GB" terratorch iterate --hpo --config configs/geobench_v1_prithvi.yaml
@@ -52,7 +52,7 @@ def submit_job(
 @click.option('--test_id', default=None, help='test ID')
 def run_tests(test_id: Optional[str] = None):
     if test_id is None:
-        test_ids = TEST_CASE_IDS
+        test_ids = get_test_ids()
     else:
         test_ids = [test_id]
     for tc_id in test_ids:

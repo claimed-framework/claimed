@@ -7,7 +7,14 @@ import click
 # rm geobench_v1_prithvi* && bsub -e ~/geobench_v1_prithvi.err -o ~/geobench_v1_prithvi.out -M 40G -gpu "num=1/task:mode=exclusive_process:gmodel=NVIDIAA100_SXM4_80GB" terratorch iterate --hpo --config configs/geobench_v1_prithvi.yaml
 
 
-def submit_job(err_file: str, out_file: str, tc_id: str | None = None, config: str | None = None):
+@click.group()
+def cli():
+    pass
+
+
+def submit_job(
+    err_file: str, out_file: str, tc_id: str | None = None, config: str | None = None
+):
     if tc_id is not None:
         jbsub = f"bsub -e {err_file} -o {out_file} -M 40G -gpu \"num=1/task:mode=exclusive_process:gmodel=NVIDIAA100_SXM4_80GB\" pytest -vv tests/test_benchmark.py::test_run_benchmark[{tc_id}]"
     elif config is not None:
@@ -65,5 +72,8 @@ def run_job(config: str):
     submit_job(err_file=err_file, out_file=out_file, config=config)
 
 
-if __name__ == "__main__":
-    run_tests()
+cli.add_command(run_job)
+cli.add_command(run_tests)
+
+if __name__ == '__main__':
+    cli()

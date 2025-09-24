@@ -1,7 +1,6 @@
 from jsonargparse import Namespace
 import logging
 from pathlib import Path
-from typing import Any, List
 from jsonargparse import ArgumentParser
 import pandas as pd
 from benchmark.backbone_benchmark import benchmark_backbone

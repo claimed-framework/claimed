@@ -104,13 +104,10 @@ def find_file(directory: str, filename: str):
 
 
 CONFIG_FILES = [
-    # "configs/tests/geobench_v1_resnet_cashew.yaml",
-    # "configs/tests/geobench_v1_prithvi_cashew.yaml",
     "configs/tests/benchmark_v2_simple.yaml",
     "configs/tests/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
     "configs/tests/test_config_util__prithvi_eo_v1_100.yaml",
-    # "configs/tests/geobench_v1_ssl4eos12_resnet50_sentinel2_all_moco_smp_unet_true.yaml",
-    # "configs/nasabench_vit_b_os.yaml",
+    "configs/tests/terratorch-iterate-configs/test_case_02/test_config_util__encoderdecoder_eo_v2_300_model_factory.yaml",
 ]
 CONTINUE_EXISTING_EXPERIMENT = [True, False]
 TEST_MODELS = [True, False]

@@ -28,7 +28,7 @@ optimization_space:
     type: real
 run_repetitions: 5
 save_models: false
-storage_uri: ./mlflow
+storage_uri: /dccstor/geofm-finetuning/terratorch-iterate-test/
 tasks:
 - datamodule:
     class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule

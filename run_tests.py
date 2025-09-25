@@ -6,6 +6,11 @@ import click
 
 # rm geobench_v1_prithvi* && bsub -e ~/geobench_v1_prithvi.err -o ~/geobench_v1_prithvi.out -M 40G -gpu "num=1/task:mode=exclusive_process:gmodel=NVIDIAA100_SXM4_80GB" terratorch iterate --hpo --config configs/geobench_v1_prithvi.yaml
 
+REPO_HOME_DIR = Path(__file__).parent
+LOGS_DIR = REPO_HOME_DIR / "logs"
+
+if not LOGS_DIR.exists():
+    LOGS_DIR.mkdir()
 
 @click.group()
 def cli():
@@ -18,14 +23,14 @@ def submit_job(
     tc_id: str | None = None,
     config: str | None = None,
 ):
-    err_file = Path.home() / stderr_file
+    err_file = LOGS_DIR / stderr_file
     # delete file if it exists
     if err_file.exists():
         print(f"Delete file {err_file}")
         err_file.unlink(missing_ok=True)
         assert not err_file.exists()
 
-    out_file = Path.home() / stdout_file
+    out_file = LOGS_DIR / stdout_file
     # delete file if it exists
     if out_file.exists():
         print(f"Delete file {out_file}")

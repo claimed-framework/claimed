@@ -193,6 +193,12 @@ def main():
 
         storage_uri = config_init.storage_uri
         assert isinstance(storage_uri, str), f"Error! {storage_uri=} is not a str"
+        # handling relative paths
+        if storage_uri.startswith(".") or storage_uri.startswith(".."):
+            repo_home_dir = Path(__file__).parent.parent 
+            abs_path = repo_home_dir / storage_uri
+            storage_uri = str(abs_path.resolve())
+
         logger_path = config_init.logger
         if logger_path is None:
             storage_uri_path = Path(storage_uri)

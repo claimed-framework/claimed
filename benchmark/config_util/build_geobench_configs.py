@@ -39,27 +39,27 @@ def _build_dataframe(config_files) -> pd.DataFrame:
     return df
 
 
-def _create_basemodule(data: dict[str, Any], model_filter: str) -> dict:
-    """create a dict based on the "data" field of the terratorch config
+# def _create_basemodule(data: dict[str, Any], model_filter: str) -> dict:
+#     """create a dict based on the "data" field of the terratorch config
 
-    Args:
-        data (dict[str, Any]): _description_
-        model_filter (str): model name is used to specify batch_size and eval_batch_size
+#     Args:
+#         data (dict[str, Any]): _description_
+#         model_filter (str): model name is used to specify batch_size and eval_batch_size
 
-    Returns:
-        dict: returns a dict that represents the datamodule field of iterate config file
-    """
-    base_module = dict()
-    base_module["class_path"] = data["class_path"]
-    if "dict_kwargs" in data.keys():
-        dict_kwargs = data["dict_kwargs"]
-        batch_size = 8 if model_filter != PRITHVI_600M else 4
-        dict_kwargs["batch_size"] = batch_size
-        dict_kwargs['eval_batch_size'] = 8 if model_filter != PRITHVI_600M else 4
+#     Returns:
+#         dict: returns a dict that represents the datamodule field of iterate config file
+#     """
+#     base_module = dict()
+#     base_module["class_path"] = data["class_path"]
+#     if "dict_kwargs" in data.keys():
+#         dict_kwargs = data["dict_kwargs"]
+#         batch_size = 8 if model_filter != PRITHVI_600M else 4
+#         dict_kwargs["batch_size"] = batch_size
+#         dict_kwargs['eval_batch_size'] = 8 if model_filter != PRITHVI_600M else 4
 
-        base_module["dict_kwargs"] = dict_kwargs
-    base_module["init_args"] = data["init_args"]
-    return base_module
+#         base_module["dict_kwargs"] = dict_kwargs
+#     base_module["init_args"] = data["init_args"]
+#     return base_module
 
 
 def _create_task(
@@ -146,31 +146,29 @@ def generate_iterate_config(
         input_dir (Path): contains all terratorch yaml files
         output_dir (Path): filename of the result
         template (Path): template file that contains pre-defined values
+        prefix (str): prefix for creating new config files
     """
 
     config_files = input_dir.glob('**/*.yaml')
     files_df = _build_dataframe(config_files=config_files)
 
-    files_df = files_df[files_df['dataset'].values != 'M4SAR']
-    files_df = files_df[files_df['model'].values != 'resnet50_torchgeo']
-
-    files_df = files_df.sort_values(['model', 'dataset'])
-
     models = files_df['model'].unique()
 
     with open(template, 'r') as file:
-        template = yaml.safe_load(file)
+        template_dict: dict = yaml.safe_load(file)
 
     # generate one config per model
     for model in models:
-        model_specific_template = deepcopy(template)
+        model_specific_template = deepcopy(template_dict)
+        # create unique name for experiment
         model_specific_template["experiment_name"] = f"{prefix}_{model}"
-        tasks = list()
-
+        tasks = list()  
+        
+        # filter dataframe by model
         single_model_df = files_df[files_df['model'].values == model]
 
         for i in range(single_model_df.shape[0]):
-
+            # open terratorch config file
             with open(single_model_df['file'].values[i], 'r') as file:
                 data = yaml.safe_load(file)
 
@@ -186,13 +184,12 @@ def generate_iterate_config(
             else:
                 metric = 'val/loss'
 
-            # terratorchtask is the data.model.init_args of terratorch config file
+            # terratorchtask is extracted from the data.model.init_args of terratorch config file
             terratorch_task = data['model']['init_args']
             # create datamodule based on data field
-            data = data['data']
-            datamodule = _create_basemodule(data=data, model_filter=model)
-            task_type = _get_task_type(template=template)
-            task_direction = _get_task_direction(template=template)
+            datamodule = data['data']
+            task_type = _get_task_type(template=template_dict)
+            task_direction = _get_task_direction(template=template_dict)
             task = _create_task(
                 name=name,
                 datamodule=datamodule,

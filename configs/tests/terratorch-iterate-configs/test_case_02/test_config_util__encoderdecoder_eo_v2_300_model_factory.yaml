@@ -2,7 +2,7 @@ defaults:
   terratorch_task:
     model_args:
       backbone: X
-      # backbone_pretrained: true
+      backbone_pretrained: true
     model_factory: EncoderDecoderFactory
     optimizer: AdamW
     scheduler: ReduceLROnPlateau
@@ -28,7 +28,7 @@ optimization_space:
     type: real
 run_repetitions: 5
 save_models: false
-storage_uri: /u/ltizzei/test_terratorch_iterate
+storage_uri: ./mlflow
 tasks:
 - datamodule:
     class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule
@@ -101,7 +101,7 @@ tasks:
       - '4'
       - '5'
       backbone_drop_path: 0.1
-      # backbone_pretrained: true
+      backbone_pretrained: true
       decoder: UNetDecoder
       decoder_channels:
       - 512

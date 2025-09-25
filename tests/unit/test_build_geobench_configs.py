@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
             "./configs/tests/terratorch-iterate-configs/test_case_02",
             "./configs/templates/template.yaml",
             "test_config_util_",
-            None,
+            "./configs/tests/terratorch-iterate-configs/test_case_02/oracle/test_config_util__encoderdecoder_eo_v2_300_model_factory.yaml",
         ),
         (
             "./configs/tests/terratorch_configs/test_case_03",
@@ -41,7 +41,7 @@ def test__generate_iterate_config(
     script_path = Path(__file__).resolve()
 
     # Get the home directory
-    repo_home_dir = script_path.parent.parent
+    repo_home_dir = script_path.parent.parent.parent
     input_dir_path: Path = repo_home_dir / input_dir
     assert input_dir_path.exists()
     assert input_dir_path.is_dir()

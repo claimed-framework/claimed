@@ -1,0 +1,130 @@
+defaults:
+  terratorch_task:
+    model_args:
+      backbone: X
+      backbone_pretrained: true
+    model_factory: EncoderDecoderFactory
+    optimizer: AdamW
+    scheduler: ReduceLROnPlateau
+    scheduler_hparams:
+      cooldown: 0
+      eps: 1.0e-08
+      factor: 0.5
+      min_lr: 0.0
+      mode: min
+      patience: 5
+      threshold: 0.0001
+      threshold_mode: rel
+  trainer_args:
+    log_every_n_steps: 1
+    max_epochs: 5
+experiment_name: test_config_util__encoderdecoder_eo_v2_300_model_factory
+n_trials: 1
+optimization_space:
+  lr:
+    log: true
+    max: 1e-3
+    min: 1e-6
+    type: real
+run_repetitions: 5
+save_models: false
+storage_uri: /u/ltizzei/test_terratorch_iterate
+tasks:
+- datamodule:
+    class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule
+    init_args:
+      allow_substring_split_file: true
+      batch_size: 4
+      constant_scale: 1.0
+      dataset_bands:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      ignore_split_file_extensions: true
+      img_grep: '*_merged.tif'
+      label_grep: '*.mask.tif'
+      means:
+      - 0.052829564761523104
+      - 0.07822514779700994
+      - 0.09545302348640401
+      - 0.2128596444116123
+      - 0.2363016737011897
+      - 0.17234100022878698
+      no_data_replace: 0
+      no_label_replace: -1
+      num_classes: 2
+      num_workers: 2
+      output_bands:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      rgb_indices:
+      - 0
+      - 1
+      - 2
+      stds:
+      - 0.028757146620143812
+      - 0.03540772770593507
+      - 0.05291947163682527
+      - 0.06949186937256507
+      - 0.08958868240264736
+      - 0.08198354165348874
+      test_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/validation
+      test_label_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/validation
+      test_transform:
+      - class_path: ToTensorV2
+      train_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/training
+      train_label_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/training
+      val_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/validation
+      val_label_data_root: /dccstor/geofm-finetuning/fire-scars/finetune-data/6_bands_no_replant_extended/validation
+  direction: max
+  metric: val/loss
+  name: test
+  terratorch_task:
+    freeze_backbone: false
+    freeze_decoder: false
+    ignore_index: -1
+    loss: ce
+    model_args:
+      backbone: prithvi_eo_v2_300
+      backbone_bands:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      backbone_drop_path: 0.1
+      # backbone_pretrained: true
+      decoder: UNetDecoder
+      decoder_channels:
+      - 512
+      - 256
+      - 128
+      - 64
+      head_dropout: 0.1
+      necks:
+      - indices:
+        - 5
+        - 11
+        - 17
+        - 23
+        name: SelectIndices
+      - name: ReshapeTokensToImage
+      - name: LearnedInterpolateToPyramidal
+      num_classes: 2
+    model_factory: EncoderDecoderFactory
+    plot_on_val: 2
+    tiled_inference_parameters:
+      average_patches: true
+      h_crop: 512
+      h_stride: 448
+      w_crop: 512
+      w_stride: 448
+  type: segmentation

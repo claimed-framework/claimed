@@ -8,7 +8,7 @@ CONFIG_FILES = [
     # "configs/tests/benchmark_v2_simple.yaml",
     "configs/tests/dofa_large_patch16_224_upernetdecoder_true_modified.yaml",
     "configs/tests/terratorch-iterate-configs/test_case_02/test_config_util__encoderdecoder_eo_v2_300_model_factory.yaml",
-    "configs/tests/terratorch-iterate-configs/test_case_03/terratorch__encoder_decoder_timm_resnet101_model_factory.yaml",
+    "configs/tests/terratorch-iterate-configs/test_case_03/test_config_util__encoder_decoder_timm_resnet101_model_factory.yaml",
 ]
 HPO = [True]
 INPUT_TEST_MAIN = list(

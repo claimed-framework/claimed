@@ -179,6 +179,99 @@ def parse_optimization_space(space: dict | None) -> optimization_space_type | No
     return parsed_space
 
 
+def _run_hpo(
+    run_name: str,
+    run_id: str,
+    description: str,
+    tasks: list,
+    completed_task_run_names: list,
+    task_run_to_id_match: dict,
+    defaults,
+    storage_uri: str,
+    experiment_name: str,
+    optimization_space,
+    n_trials,
+    save_models,
+    sampler,
+    test_models,
+    table_entries,
+    table_columns,
+    backbone,
+    task_names,
+    PATH_TO_JOB_TRACKING,
+    logger,
+) -> tuple[str, str]:
+    logger.info("Running hyperparameter optimization")
+    with mlflow.start_run(
+        run_name=run_name, run_id=run_id, description=description
+    ) as run:
+        for task in tasks:
+            # only run task if it was not completed before
+            task_run_name = task.name
+            if task_run_name in completed_task_run_names:
+                logger.info(f"{task_run_name} already completed")
+                continue
+            else:
+                logger.info(f"{task_run_name} not completed. starting now")
+
+            task_run_id = (
+                task_run_to_id_match[task_run_name]
+                if task_run_name in task_run_to_id_match
+                else None
+            )
+            best_value, metric_name, hparams = benchmark_backbone_on_task(
+                logger,
+                defaults,
+                task,
+                storage_uri,
+                experiment_name,
+                experiment_run_id=run.info.run_id,
+                task_run_id=task_run_id,
+                optimization_space=optimization_space,
+                n_trials=n_trials,
+                save_models=save_models,
+                sampler=sampler,
+                test_models=test_models,
+            )
+            table_entries.append([task.name, metric_name, best_value, hparams])
+            table_entries_filename = str(
+                PATH_TO_JOB_TRACKING
+                / f"{experiment_name}-{run.info.run_id}_table_entries.pkl"
+            )
+            with open(table_entries_filename, 'wb') as handle:
+                pickle.dump(table_entries, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        table = tabulate(table_entries, headers=table_columns)
+        logger.info(table)
+        df = pd.DataFrame(data=table_entries, columns=table_columns)
+        df.set_index("Task")
+        logger.info("Starting to save results")
+        mlflow.log_table(
+            df,
+            "results_table.json",
+            run.info.run_id,
+        )
+        experiment_id = run.info.experiment_id
+
+        # check completion of HPO for all tasks before proceeding to next stage
+        existing_experiments = check_existing_experiments(
+            logger=logger,
+            storage_uri=storage_uri,
+            experiment_name=experiment_name,
+            exp_parent_run_name=run_name,
+            task_names=task_names,
+            n_trials=n_trials,
+            backbone=backbone,
+        )
+        if existing_experiments["finished_run"] is not None:
+            finished_run_id = existing_experiments["finished_run"]
+        else:
+            logger.info("HPO is not complete. Please re-run this experiment")
+            raise RuntimeError
+
+        return experiment_id, finished_run_id
+
+
 def benchmark_backbone(
     defaults: Defaults,
     tasks: list[Task],
@@ -194,7 +287,7 @@ def benchmark_backbone(
     run_id: str | None = None,
     description: str = "No description provided",
     bayesian_search: bool = True,
-    continue_existing_experiment: bool = True,
+    continue_existing_experiment: bool = False,
     test_models: bool = False,
     run_repetitions: int = REPEATED_SEEDS_DEFAULT,
     report_on_best_val: bool = True,
@@ -240,21 +333,14 @@ def benchmark_backbone(
     mlflow.set_tracking_uri(storage_uri)
     mlflow.set_experiment(experiment_name)
 
-    if bayesian_search:
-        sampler: BaseSampler | None = None  # take the default
-    else:
-        sampler = RandomSampler()
-
     optimization_space = parse_optimization_space(optimization_space)
-    table_columns = ["Task", "Metric", "Best Score", "Hyperparameters"]
-    table_entries = []
 
     backbone: str = defaults.terratorch_task["model_args"]["backbone"]
     task_names = [task.name for task in tasks]
     run_name = f"top_run_{experiment_name}" if run_name is None else run_name
 
     completed_task_run_names = []
-    run_hpo = True
+    optimize_hyperparams = True
     task_run_to_id_match = {}
     if continue_existing_experiment:
         # find status of existing runs, and delete incomplete runs except one with the most complete tasks
@@ -276,10 +362,10 @@ def benchmark_backbone(
                 logger.info("Continuing previous experiment parent run")
                 run_id = existing_experiments["incomplete_run_to_finish"]
                 experiment_id = existing_experiments["experiment_id"]
-                run_hpo = True
+                optimize_hyperparams = True
 
             if existing_experiments["finished_run"] is not None:
-                run_hpo = False
+                optimize_hyperparams = False
                 finished_run_id = existing_experiments["finished_run"]
                 run_id = existing_experiments["finished_run"]
 
@@ -300,79 +386,38 @@ def benchmark_backbone(
         logger.info("Starting new experiment from scratch")
 
     # only run hyperparameter optimization (HPO) if there are no experiments with finished HPO
-    if run_hpo:
-        logger.info("Running hyperparameter optimization")
-        with mlflow.start_run(
-            run_name=run_name, run_id=run_id, description=description
-        ) as run:
-            for task in tasks:
-                # only run task if it was not completed before
-                task_run_name = task.name
-                if task_run_name in completed_task_run_names:
-                    logger.info(f"{task_run_name} already completed")
-                    continue
-                else:
-                    logger.info(f"{task_run_name} not completed. starting now")
-
-                task_run_id = (
-                    task_run_to_id_match[task_run_name]
-                    if task_run_name in task_run_to_id_match
-                    else None
-                )
-                best_value, metric_name, hparams = benchmark_backbone_on_task(
-                    logger,
-                    defaults,
-                    task,
-                    storage_uri,
-                    experiment_name,
-                    experiment_run_id=run.info.run_id,
-                    task_run_id=task_run_id,
-                    optimization_space=optimization_space,
-                    n_trials=n_trials,
-                    save_models=save_models,
-                    sampler=sampler,
-                    test_models=test_models,
-                )
-                table_entries.append([task.name, metric_name, best_value, hparams])
-                table_entries_filename = str(
-                    PATH_TO_JOB_TRACKING
-                    / f"{experiment_name}-{run.info.run_id}_table_entries.pkl"
-                )
-                with open(table_entries_filename, 'wb') as handle:
-                    pickle.dump(table_entries, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-            table = tabulate(table_entries, headers=table_columns)
-            logger.info(table)
-            df = pd.DataFrame(data=table_entries, columns=table_columns)
-            df.set_index("Task")
-            logger.info("Starting to save results")
-            mlflow.log_table(
-                df,
-                "results_table.json",
-                run.info.run_id,
-            )
-            experiment_id = run.info.experiment_id
-
-        # check completion of HPO for all tasks before proceeding to next stage
-        existing_experiments = check_existing_experiments(
-            logger=logger,
+    if optimize_hyperparams:
+        if bayesian_search:
+            sampler: BaseSampler | None = None  # take the default
+        else:
+            sampler = RandomSampler()
+        table_columns = ["Task", "Metric", "Best Score", "Hyperparameters"]
+        table_entries = []
+        experiment_id, finished_run_id = _run_hpo(
+            run_name=run_name,
+            run_id=run_id,
+            description=description,
+            tasks=tasks,
+            task_names=task_names,
+            completed_task_run_names=completed_task_run_names,
+            task_run_to_id_match=task_run_to_id_match,
+            defaults=defaults,
             storage_uri=storage_uri,
             experiment_name=experiment_name,
-            exp_parent_run_name=run_name,
-            task_names=task_names,
             n_trials=n_trials,
+            save_models=save_models,
+            sampler=sampler,
+            test_models=test_models,
+            table_entries=table_entries,
+            table_columns=table_columns,
             backbone=backbone,
+            PATH_TO_JOB_TRACKING=PATH_TO_JOB_TRACKING,
+            logger=logger,
         )
-        if existing_experiments["finished_run"] is not None:
-            finished_run_id = existing_experiments["finished_run"]
-        else:
-            logger.info("HPO is not complete. Please re-run this experiment")
-            raise RuntimeError
-    logger.info("HPO complete")
-
-    logger.info(f"run_repetitions: {run_repetitions}")
+        logger.info("HPO complete")
 
     if run_repetitions >= 1:
+        logger.info(f"run_repetitions: {run_repetitions}")
         # run repeated experiments
         logger.info(
             f"Now running {run_repetitions} repeats per experiment \n\

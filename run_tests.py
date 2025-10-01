@@ -66,7 +66,7 @@ def submit_job(
         logger.info("stderr:", result.stderr)
 
 
-@click.command("run tests")
+@click.command()
 @click.option("--test_id", default=None, help="test ID")
 def run_tests(test_id: Optional[str] = None):
     if test_id is None:
@@ -83,7 +83,7 @@ def run_tests(test_id: Optional[str] = None):
         submit_job(stderr_file=stderr_file, stdout_file=stdout_file, tc_id=tc_id)
 
 
-@click.command("run single job")
+@click.command()
 @click.option("--config", default=None, help="path to config file")
 def run_job(config: str):
     home_dir = Path(__file__).parent

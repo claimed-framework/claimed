@@ -36,9 +36,9 @@ def validate_results(experiment_name: str, storage_uri: str, finished_run_id: st
     meta_yaml = "meta.yaml"
 
     meta_yaml_path = dir_path / meta_yaml
-    assert (
-        meta_yaml_path.exists()
-    ), f"Error! meta.yaml file {meta_yaml_path} does not exist"
+    assert meta_yaml_path.exists(), (
+        f"Error! meta.yaml file {meta_yaml_path} does not exist"
+    )
     # open file and check that the experiment name is the same
     with open(meta_yaml_path, mode="r") as f:
         # read all the lines
@@ -51,9 +51,9 @@ def validate_results(experiment_name: str, storage_uri: str, finished_run_id: st
                 experiment_name_found = True
             if finished_run_id in line:
                 experiment_id_found = True
-        assert (
-            experiment_name_found and experiment_id_found
-        ), f"Error! Both experiment name ({experiment_name=}) and finished run id ({finished_run_id=}) must be in the {meta_yaml_path=}: {experiment_id_found=} {experiment_name_found=}"
+        assert experiment_name_found and experiment_id_found, (
+            f"Error! Both experiment name ({experiment_name=}) and finished run id ({finished_run_id=}) must be in the {meta_yaml_path=}: {experiment_id_found=} {experiment_name_found=}"
+        )
     # TODO delete the directories that were created by this test case
 
 
@@ -69,12 +69,12 @@ def test_main(
     home_dir = Path(__file__).parent.parent.parent
     config_file: Path = home_dir / config
     assert config_file.exists()
-    with open(config_file, 'r') as file:
+    with open(config_file, "r") as file:
         config_data = yaml.safe_load(file)
     storage_uri: str = config_data["storage_uri"]
     # handling relative paths
     if storage_uri.startswith(".") or storage_uri.startswith(".."):
-        repo_home_dir = Path(__file__).parent.parent.parent 
+        repo_home_dir = Path(__file__).parent.parent.parent
         abs_path = repo_home_dir / storage_uri
         storage_uri = str(abs_path.resolve())
     experiment_name = config_data["experiment_name"]

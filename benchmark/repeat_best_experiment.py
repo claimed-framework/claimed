@@ -53,7 +53,6 @@ def remote_fit(
         run_name=f"{lightning_task_class.name}_{seed}",
         nested=True,
     ):
-
         training_spec_copy = copy.deepcopy(training_spec)
         training_spec_with_generated_hparams = inject_hparams(
             training_spec_copy, best_params
@@ -78,9 +77,7 @@ def remote_fit(
         # get callbacks (set to empty list if none defined) and extend with default ones
         training_spec_with_generated_hparams.trainer_args.setdefault(
             "callbacks", []
-        ).extend(
-            default_callbacks
-        )  # type: ignore
+        ).extend(default_callbacks)  # type: ignore
         if "enable_checkpointing" in training_spec_with_generated_hparams.trainer_args:
             warnings.warn(
                 "enable_checkpointing found. Will be overwritten to False as ray will be responsible for saving models."
@@ -105,8 +102,8 @@ def remote_fit(
 
         test_metric = (
             "test/" + task.metric.split("/")[1]
-            if '/' in task.metric
-            else 'test_' + task.metric.replace(task.metric.split('_')[0] + "_", '')
+            if "/" in task.metric
+            else "test_" + task.metric.replace(task.metric.split("_")[0] + "_", "")
         )
         mlflow.log_metric(f"test_{test_metric}", metrics[test_metric])
         return metrics[test_metric]
@@ -179,9 +176,7 @@ def non_remote_fit(
         # get callbacks (set to empty list if none defined) and extend with default ones
         training_spec_with_generated_hparams.trainer_args.setdefault(
             "callbacks", []
-        ).extend(
-            default_callbacks
-        )  # type: ignore
+        ).extend(default_callbacks)  # type: ignore
 
         trainer = Trainer(**training_spec_with_generated_hparams.trainer_args)
         trainer.logger = MLFlowLogger(
@@ -217,8 +212,8 @@ def non_remote_fit(
         #        return None
         test_metric = (
             "test/" + task.metric.split("/")[1]
-            if '/' in task.metric
-            else 'test_' + task.metric.replace(task.metric.split('_')[0] + "_", '')
+            if "/" in task.metric
+            else "test_" + task.metric.replace(task.metric.split("_")[0] + "_", "")
         )
         mlflow.log_metric(f"test_{test_metric}", metrics[test_metric])
         return metrics[test_metric]
@@ -303,7 +298,9 @@ def rerun_best_from_backbone(
     with mlflow.start_run(run_name=experiment_name, run_id=None) as run:
         for task in tasks:
             logger.info(f"\n\ntask: {task.name}")
-            matching_runs = [run for run in runs if run.info.run_name.endswith(task.name)]  # type: ignore
+            matching_runs = [
+                run for run in runs if run.info.run_name.endswith(task.name)
+            ]  # type: ignore
             if len(matching_runs) == 0:
                 msg = f"No runs found for task {task.name}. Skipping."
                 warnings.warn(msg)
@@ -442,7 +439,7 @@ def rerun_best_from_backbone(
                             )
                             existing_output.reset_index(inplace=True)
                             existing_output = existing_output.drop(
-                                columns=['index', 'level_0']
+                                columns=["index", "level_0"]
                             )
                             existing_output.to_csv(output_path, index=False)
                         else:

@@ -166,7 +166,6 @@ def benchmark_backbone(
     with mlflow.start_run(
         run_name=run_name, run_id=run_id, description=description
     ) as run:
-
         if optimization_space is None:
             # no hparams, parallelize over tasks
             ray_tasks = []

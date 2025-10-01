@@ -119,9 +119,9 @@ class _TuneReportCallback(TuneReportCheckpointCallback, pl.Callback):
 def inject_hparams(training_spec: TrainingSpec, config: dict):
     # treat batch size specially
     config_without_batch_size = copy.deepcopy(config)
-    assert isinstance(
-        config_without_batch_size, dict
-    ), f"Error! Unexpected config type: {config_without_batch_size}"
+    assert isinstance(config_without_batch_size, dict), (
+        f"Error! Unexpected config type: {config_without_batch_size}"
+    )
     batch_size: int | None = config_without_batch_size.pop("batch_size", None)  # type: ignore
     datamodule_with_generated_hparams = copy.deepcopy(training_spec.task.datamodule)
     if batch_size:
@@ -310,9 +310,9 @@ def launch_training(
             ["metric_name", "step"], verify_integrity=True
         )
         series_val_metrics = df_val_metrics["value"]
-        assert (
-            metric in series_val_metrics
-        ), f"Error! {metric} is not in {series_val_metrics}"
+        assert metric in series_val_metrics, (
+            f"Error! {metric} is not in {series_val_metrics}"
+        )
         if direction == "max":
             best_step = series_val_metrics[metric].idxmax()
         elif direction == "min":
@@ -351,9 +351,9 @@ def fit_model(
         PixelwiseRegressionTask,
     ]:
         task.terratorch_task["plot_on_val"] = False
-    assert isinstance(
-        task.terratorch_task, dict
-    ), f"Error! Invalid type: {task.terratorch_task}"
+    assert isinstance(task.terratorch_task, dict), (
+        f"Error! Invalid type: {task.terratorch_task}"
+    )
 
     lightning_task = lightning_task_class(**task.terratorch_task)
 
@@ -454,9 +454,7 @@ def fit_model_with_hparams(
         trial,
         save_models=save_models,
         test_models=test_models,
-    )[
-        0
-    ]  # return only the metric value for optuna
+    )[0]  # return only the metric value for optuna
 
 
 """
@@ -476,7 +474,6 @@ def ray_tune_model(
     backbone_import: str | None = None,
     searcher: Searcher | SearchAlgorithm | None = None,
 ) -> tune.ResultGrid:
-
     if not searcher:
         raise ValueError("searcher must be specified")
     trainable = tune.with_parameters(

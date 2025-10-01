@@ -5,7 +5,7 @@ from benchmark.config_util.build_iterate_config import generate_iterate_config
 from deepdiff import DeepDiff
 import logging
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 @pytest.mark.parametrize(
@@ -41,9 +41,7 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
         ),
     ],
 )
-def test__generate_iterate_config(
-    input, output, template, prefix, oracle_config_file
-):
+def test__generate_iterate_config(input, output, template, prefix, oracle_config_file):
     # Get the absolute path of the current script file
     script_path = Path(__file__).resolve()
 
@@ -69,10 +67,10 @@ def test__generate_iterate_config(
         prefix=prefix,
     )
     if output_path.is_dir():
-        generated_config_files = list(output_path.glob(f'**/{prefix}*.yaml'))
+        generated_config_files = list(output_path.glob(f"**/{prefix}*.yaml"))
     else:
         generated_config_files = [output_path]
-        
+
     assert len(generated_config_files) > 0
 
     if oracle_config_file is not None:
@@ -81,7 +79,6 @@ def test__generate_iterate_config(
             oracle_config = yaml.safe_load(gt_file)
 
         for gen_config_file in generated_config_files:
-
             with open(gen_config_file, "r") as gen_file:
                 new_config = yaml.safe_load(gen_file)
 

@@ -71,9 +71,9 @@ def sync_mlflow_optuna(
         all_mlflow_runs_for_task.append(task_run_id)
         logger.info(f"task_run_id : {task_run_id}")
         experiment_info = client.get_experiment_by_name(experiment_name)
-        assert isinstance(
-            experiment_info, Experiment
-        ), f"Error! Unexpected type of {experiment_info=}"
+        assert isinstance(experiment_info, Experiment), (
+            f"Error! Unexpected type of {experiment_info=}"
+        )
         individual_run_data = client.search_runs(
             experiment_ids=[experiment_info.experiment_id],
             filter_string=f'tags."mlflow.parentRunId" LIKE "{task_run_id}"',
@@ -124,9 +124,9 @@ def sync_mlflow_optuna(
                 for item in all_mlflow_runs_for_task:
                     logger.info(f"deleting {item}")
                     client.delete_run(item)
-                    assert isinstance(
-                        experiment_info, Experiment
-                    ), f"Error! Unexpected type of {experiment_info=}"
+                    assert isinstance(experiment_info, Experiment), (
+                        f"Error! Unexpected type of {experiment_info=}"
+                    )
                     os.system(f"rm -r {experiment_info.artifact_location}/{item}")
                     task_run_id = None
     else:
@@ -135,9 +135,9 @@ def sync_mlflow_optuna(
             for item in all_mlflow_runs_for_task:
                 logger.info(f"deleting {item}")
                 client.delete_run(item)
-                assert isinstance(
-                    experiment_info, Experiment
-                ), f"Error! Unexpected type of {experiment_info=}"
+                assert isinstance(experiment_info, Experiment), (
+                    f"Error! Unexpected type of {experiment_info=}"
+                )
                 os.system(f"rm -r {experiment_info.artifact_location}/{item}")
             task_run_id = None
     return task_run_id
@@ -211,7 +211,7 @@ def extract_repeated_experiment_results(
                 seed = int(run.info.run_name.split("_")[-1])
                 if task in task_info:
                     metric_name = task_info[task]
-                    metric_name = 'test_test/' + metric_name.split("/")[-1]
+                    metric_name = "test_test/" + metric_name.split("/")[-1]
                 else:
                     continue
 
@@ -350,19 +350,19 @@ def extract_parameters(
             best_params["data_percentages"] = DATA_PARTITIONS[
                 best_params["partition_name"]
             ]
-            if 'optimizer_hparams' in best_params:
+            if "optimizer_hparams" in best_params:
                 logger.info(
                     f"optimizer_hparams: {best_params['optimizer_hparams'].items()}"
                 )
                 optimizer_hparams = {
-                    k: v for k, v in best_params['optimizer_hparams'].items()
+                    k: v for k, v in best_params["optimizer_hparams"].items()
                 }
                 best_params.update(optimizer_hparams)
-                del best_params['optimizer_hparams']
-            if 'model_args' in best_params:
-                model_args = {k: v for k, v in best_params['model_args'].items()}
+                del best_params["optimizer_hparams"]
+            if "model_args" in best_params:
+                model_args = {k: v for k, v in best_params["model_args"].items()}
                 best_params.update(model_args)
-                del best_params['model_args']
+                del best_params["model_args"]
 
             best_params = pd.DataFrame(best_params, index=[0])
             all_params.append(best_params)
@@ -421,11 +421,11 @@ def get_results_and_parameters(
         task_metrics=task_metrics,
     )
 
-    with open(f"{results_dir}/incomplete_experiments.txt", 'w') as f:
+    with open(f"{results_dir}/incomplete_experiments.txt", "w") as f:
         for line in incomplete_experiments:
             f.write(f"{line}\n")
     results_and_parameters = results.merge(
-        parameters, on=['experiment_name', 'dataset']
+        parameters, on=["experiment_name", "dataset"]
     )
     results_and_parameters.to_csv(
         f"{str(results_dir)}/results_and_parameters.csv", index=False
@@ -790,7 +790,7 @@ def get_logger(log_level="INFO", log_folder="./experiment_logs") -> logging.Root
     handler = logging.FileHandler(log_file)
     handler.setLevel(log_level)
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
@@ -802,13 +802,10 @@ def import_custom_modules(
     logger: logging.RootLogger,
     custom_modules_path: str | Path | None = None,
 ) -> None:
-
     if custom_modules_path:
-
         custom_modules_path = Path(custom_modules_path)
 
         if custom_modules_path.is_dir():
-
             # Add 'custom_modules' folder to sys.path
             workdir = custom_modules_path.parents[0]
             module_dir = custom_modules_path.name

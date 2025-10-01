@@ -52,7 +52,6 @@ def benchmark_backbone_on_task(
     sampler: BaseSampler | None = None,
     test_models: bool = False,
 ) -> tuple[float, str | list[str] | None, dict[str, Any]]:
-
     optuna_db_path = Path(storage_uri).parents[0] / "optuna_db"
     if not os.path.exists(optuna_db_path):
         os.makedirs(optuna_db_path)
@@ -136,15 +135,15 @@ def benchmark_backbone_on_task(
             "early_stop_patience": str(training_spec.task.early_stop_patience),
             "partition_name": (
                 str(training_spec.task.datamodule.partition)
-                if hasattr(training_spec.task.datamodule, 'partition')
-                else 'default'
+                if hasattr(training_spec.task.datamodule, "partition")
+                else "default"
             ),
             "decoder": (
                 str(training_spec.task.terratorch_task["model_args"]["decoder"])
                 if "decoder" in training_spec.task.terratorch_task["model_args"]
-                else training_spec.task.terratorch_task['model_args']['framework']
+                else training_spec.task.terratorch_task["model_args"]["framework"]
             ),
-            "task": str(training_spec.task.type).split('.')[-1],
+            "task": str(training_spec.task.type).split(".")[-1],
             "backbone": str(
                 training_spec.task.terratorch_task["model_args"]["backbone"]
             ),
@@ -238,7 +237,7 @@ def _run_hpo(
                 PATH_TO_JOB_TRACKING
                 / f"{experiment_name}-{run.info.run_id}_table_entries.pkl"
             )
-            with open(table_entries_filename, 'wb') as handle:
+            with open(table_entries_filename, "wb") as handle:
                 pickle.dump(table_entries, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         table = tabulate(table_entries, headers=table_columns)
@@ -329,8 +328,9 @@ def benchmark_backbone(
 
     if backbone_import:
         importlib.import_module(backbone_import)
-
+    logger.info(f"Setting tracking URI: {storage_uri}")
     mlflow.set_tracking_uri(storage_uri)
+    logger.info(f"Setting experiment name: {experiment_name}")
     mlflow.set_experiment(experiment_name)
 
     optimization_space = parse_optimization_space(optimization_space)
@@ -380,7 +380,7 @@ def benchmark_backbone(
                 PATH_TO_JOB_TRACKING / f"{experiment_name}-{run_id}_table_entries.pkl"
             )
             if os.path.exists(table_entries_filename):
-                with open(table_entries_filename, 'rb') as handle:
+                with open(table_entries_filename, "rb") as handle:
                     table_entries = pickle.load(handle)
     else:
         logger.info("Starting new experiment from scratch")

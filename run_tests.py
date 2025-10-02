@@ -4,9 +4,12 @@ from typing import Optional
 from tests.integration.test_main import get_test_ids
 import click
 import logging
+import sys
 
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+    stream=sys.stdout,
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
 )
 
 logger = logging.getLogger(__name__)

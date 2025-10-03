@@ -13,7 +13,7 @@ include = ["benchmark*"]
 [project]
 
 name = "terratorch-iterate"
-version = "0.1.5"
+version = "0.2.0"
 requires-python = ">= 3.9"
 description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
@@ -38,7 +38,6 @@ readme = "README.md"
 
 dependencies = [
 "terratorch>=1.1.0", 
-# "terratorch",
 # requests>=2.32.0 because of this vulnerability https://github.com/psf/requests/security/advisories/GHSA-9wx4-h78v-vm56
 "requests>=2.32.0",
 # Jinja2 vulnerability issue https://github.com/pallets/jinja/security/advisories/GHSA-h75v-3vvj-5mfj

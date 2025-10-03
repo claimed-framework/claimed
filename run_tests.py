@@ -6,13 +6,17 @@ import click
 import logging
 import sys
 
-logging.basicConfig(
-    stream=sys.stdout,
-    level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-)
-
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Set appropriate level
+
+# Create a StreamHandler that writes to stdout
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)  # Set appropriate level for the handler
+
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+ch.setFormatter(formatter)
+
+logger.addHandler(ch)
 
 # rm geobench_v1_prithvi* && bsub -e ~/geobench_v1_prithvi.err -o ~/geobench_v1_prithvi.out -M 40G -gpu "num=1/task:mode=exclusive_process:gmodel=NVIDIAA100_SXM4_80GB" terratorch iterate --hpo --config configs/geobench_v1_prithvi.yaml
 

@@ -71,7 +71,6 @@ dependencies = [
 "configspace",
 "optuna-integration",
 "seaborn",
-"torchgeo",
 "psutil",
 ]
 

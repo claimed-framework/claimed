@@ -1,8 +1,8 @@
 import itertools
 import logging
-from benchmark.benchmark_types import Defaults, Task, TaskTypeEnum
+from terratorch_iterate.benchmark_types import Defaults, Task, TaskTypeEnum
 import pytest
-from benchmark.backbone_benchmark import benchmark_backbone
+from terratorch_iterate.backbone_benchmark import benchmark_backbone
 from terratorch.datamodules import MChesapeakeLandcoverNonGeoDataModule
 from albumentations import HorizontalFlip, VerticalFlip, Resize
 from albumentations.pytorch.transforms import ToTensorV2

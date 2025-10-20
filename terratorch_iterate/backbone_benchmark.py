@@ -349,6 +349,7 @@ def benchmark_backbone(
     mlflow.set_tracking_uri(storage_uri)
     logger.info(f"Setting experiment name: {experiment_name}")
     mlflow.set_experiment(experiment_name)
+    experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
 
     optimization_space = parse_optimization_space(optimization_space)
 

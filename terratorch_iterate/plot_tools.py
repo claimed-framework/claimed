@@ -10,7 +10,6 @@ from matplotlib.ticker import FormatStrFormatter
 import json
 from scipy.stats import trim_mean
 
-
 sns.set_style("dark", {"grid.color": "0.98", "axes.facecolor": "(0.95, 0.95, 0.97)"})
 GEO_BENCH_DIR = "geobench"
 
@@ -28,7 +27,7 @@ def iqm(scores):
 
 def bootstrap_iqm(
     df,
-    group_keys=("model", "dataset", "partition name"),
+    group_keys=("model", "dataset", "partition_name"),
     metric="test_metric",
     repeat=100,
 ):
@@ -43,12 +42,13 @@ def bootstrap_iqm(
 
 def bootstrap_iqm_aggregate(df, metric="test_metric", repeat=100):
     """Stratified bootstrap (by dataset) of all seeds to compute iqm score distribution for each model."""
-    group = df.groupby(["model", "dataset", "partition name"])
+
+    group = df.groupby(["model", "dataset", "partition_name"])
 
     df_list = []
     for i in range(repeat):
         new_df = group.sample(frac=1, replace=True)
-        series = new_df.groupby(["model", "partition name"])[metric].apply(iqm)
+        series = new_df.groupby(["model", "partition_name"])[metric].apply(iqm)
         df_list.append(series.to_frame().reset_index())
 
     new_df = pd.concat(df_list)
@@ -57,7 +57,7 @@ def bootstrap_iqm_aggregate(df, metric="test_metric", repeat=100):
 
 
 def average_seeds(
-    df, group_keys=("model", "dataset", "partition name"), metric="test metric"
+    df, group_keys=("model", "dataset", "partition_name"), metric="test metric"
 ):
     """Average seeds for all model and all datasets."""
     df_avg = df.groupby(list(group_keys))[metric].mean()
@@ -70,8 +70,8 @@ def average_seeds(
 def extract_1x_data(df_all):
     """Extract only resutls trained on 100% of the data"""
     return df_all[
-        (df_all["partition name"] == "1.00x train")
-        | (df_all["partition name"] == "default")
+        (df_all["partition_name"] == "1.00x train")
+        | (df_all["partition_name"] == "default")
     ].copy()
 
 
@@ -150,13 +150,14 @@ class Normalizer:
 
     def save(self, benchmark_name):
         """Save normalizer to json file."""
-        with open(GEO_BENCH_DIR / benchmark_name / "normalizer.json", "w") as f:
+
+        with open(f"{benchmark_name}/normalizer.json", "w") as f:
             json.dump(self.range_dict, f, indent=2)
 
 
 def load_normalizer(benchmark_name):
     """Load normalizer from json file."""
-    with open(GEO_BENCH_DIR / benchmark_name / "normalizer.json", "r") as f:
+    with open(f"{benchmark_name}/normalizer.json", "r") as f:
         range_dict = json.load(f)
     return Normalizer(range_dict)
 

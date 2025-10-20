@@ -8,12 +8,12 @@ requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["benchmark*"]
+include = ["terratorch_iterate*"]
 
 [project]
 
 name = "terratorch-iterate"
-version = "0.2.0"
+version = "0.2.2rc1"
 requires-python = ">= 3.11"
 description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
@@ -61,6 +61,7 @@ dependencies = [
 "more-itertools", 
 "importlib-metadata",
 "numpy",
+"mlflow",
 "optuna",
 "types-tabulate",
 "ray",

@@ -15,12 +15,9 @@ from terratorch_iterate import plot_tools
 import sys
 from mlflow.entities.experiment import Experiment
 import importlib
-import logging
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 from collections import defaultdict
-import pdb
-
 
 N_TRIALS_DEFAULT = 16
 REPEATED_SEEDS_DEFAULT = 10
@@ -220,8 +217,13 @@ def extract_repeated_experiment_results(
                 seed = int(run.info.run_name.split("_")[-1])
                 if task in task_info:
                     metric_name = task_info[task]
-                    metric_name = 'test_test/' + metric_name.split("/")[-1] if '/' in metric_name else 'test_test_' + metric_name.replace(metric_name.split('_')[0] + "_", '')
-                else:  
+                    metric_name = (
+                        "test_test/" + metric_name.split("/")[-1]
+                        if "/" in metric_name
+                        else "test_test_"
+                        + metric_name.replace(metric_name.split("_")[0] + "_", "")
+                    )
+                else:
                     continue
 
                 if metric_name not in run.data.metrics:
@@ -283,7 +285,7 @@ def extract_repeated_experiment_results(
                 f"EXPERIMENT INCOMPLETE: {experiment_name} has {len(combine_task_results)} complete tasks only"
             )
             incomplete_experiments.append(experiment_name)
-    if len(combine_exp_results) > 0: 
+    if len(combine_exp_results) > 0:
         combine_exp_results = pd.concat(combine_exp_results, axis=0)
     else:
         combine_exp_results = pd.DataFrame()
@@ -444,14 +446,13 @@ def get_results_and_parameters(
     results_and_parameters.to_csv(
         f"{str(results_dir)}/results_and_parameters.csv", index=False
     )
-    
-    if visualise:
 
-        model_order = visualize_combined_results(
+    if visualise:
+        visualize_combined_results(
             combined_results=results_and_parameters,
             storage_uri=storage_uri,
             logger=logger,
-            plot_file_base_name=f"summary_plot",
+            plot_file_base_name="summary_plot",
         )
 
     return results_and_parameters
@@ -647,14 +648,16 @@ def check_existing_experiments(
 
         # check if one of the runs is complete
         for run in experiment_parent_run_data:
-            completed_task_run_names, all_tasks_in_experiment_finished, _ = (
-                check_existing_task_parent_runs(
-                    logger=logger,
-                    exp_parent_run_id=run.info.run_id,
-                    storage_uri=storage_uri,
-                    experiment_name=experiment_name,
-                    n_trials=n_trials,
-                )
+            (
+                completed_task_run_names,
+                all_tasks_in_experiment_finished,
+                _,
+            ) = check_existing_task_parent_runs(
+                logger=logger,
+                exp_parent_run_id=run.info.run_id,
+                storage_uri=storage_uri,
+                experiment_name=experiment_name,
+                n_trials=n_trials,
             )
             logger.info(f"tasks that should be completed: {task_names}")
             logger.info(f"completed_task_run_names: {completed_task_run_names}")
@@ -764,29 +767,25 @@ def visualize_combined_results(
         benchmark_name=plots_folder,
     )
 
-    tmp = (
-        plot_tools.normalize_bootstrap_and_plot(
-            combined_results,
-            # plot_file_base_name=plot_file_base_name,
-            metric="test metric",
-            benchmark_name=plots_folder,
-            model_order=model_order,
-            model_colors=model_colors,
-            fig_size=fig_size,
-            n_legend_rows=n_legend_rows,
-        )
+    plot_tools.normalize_bootstrap_and_plot(
+        combined_results,
+        # plot_file_base_name=plot_file_base_name,
+        metric="test metric",
+        benchmark_name=plots_folder,
+        model_order=model_order,
+        model_colors=model_colors,
+        fig_size=fig_size,
+        n_legend_rows=n_legend_rows,
     )
 
     plt.savefig(
-        str(f"{plots_folder}/violin_{plot_file_base_name}_normalized_bootstrapped.png"
-        ),
+        str(f"{plots_folder}/violin_{plot_file_base_name}_normalized_bootstrapped.png"),
         bbox_inches="tight",
     )
     plt.close()
 
     combined_results.to_csv(
-        str(f"{tables_folder}/{plot_file_base_name}_normalized_combined_results.csv"
-        )
+        str(f"{tables_folder}/{plot_file_base_name}_normalized_combined_results.csv")
     )
 
 
@@ -827,7 +826,7 @@ def import_custom_modules(
             sys.path.insert(0, str(workdir))
 
             try:
-                module = importlib.import_module(module_dir)
+                importlib.import_module(module_dir)
                 logger.info(f"Found {custom_modules_path}")
             except ImportError:
                 raise ImportError(
@@ -860,7 +859,7 @@ if __name__ == "__main__":
     settings_per_model = [
         "detection",
     ]
-    
+
     # create box plots across multiple models
     for setting in settings_per_model:
         combined_results = results_and_parameters.loc[
@@ -873,18 +872,16 @@ if __name__ == "__main__":
             plot_file_base_name=f"multiple_models_{setting}",
         )
 
-        
 
 ### code written with the help of Perplexity platform
-def get_nested_runs(experiment_id, filter_string = None, mlflow_uri= "mlflow"):
+def get_nested_runs(experiment_id, filter_string=None, mlflow_uri="mlflow"):
     client = MlflowClient(mlflow_uri)
-    
+
     # Get all runs for the experiment
     all_runs = client.search_runs(
-        experiment_ids=[experiment_id],
-        run_view_type=ViewType.ACTIVE_ONLY
+        experiment_ids=[experiment_id], run_view_type=ViewType.ACTIVE_ONLY
     )
-    
+
     # Create a dictionary to store the run hierarchy
     run_hierarchy = defaultdict(list)
     parent_runs = []
@@ -892,7 +889,7 @@ def get_nested_runs(experiment_id, filter_string = None, mlflow_uri= "mlflow"):
     # First pass: Identify parent-child relationships
     for run in all_runs:
         parent_run_id = run.data.tags.get("mlflow.parentRunId")
-        
+
         if parent_run_id:
             run_hierarchy[parent_run_id].append(run)
         else:
@@ -900,7 +897,6 @@ def get_nested_runs(experiment_id, filter_string = None, mlflow_uri= "mlflow"):
 
     # Function to create a nested dictionary for a run and its children
     def create_nested_dict(run):
-        
         run_dict = {
             "run": run,
             "run_id": run.info.run_id,
@@ -908,13 +904,21 @@ def get_nested_runs(experiment_id, filter_string = None, mlflow_uri= "mlflow"):
             "status": run.info.status,
             "start_time": run.info.start_time,
             "end_time": run.info.end_time,
-            "children": [create_nested_dict(child) for child in run_hierarchy[run.info.run_id]]
+            "children": [
+                create_nested_dict(child) for child in run_hierarchy[run.info.run_id]
+            ],
         }
         return run_dict
-     # Create the final nested structure
+
+    # Create the final nested structure
     if filter_string:
-        nested_runs = [create_nested_dict(parent_run) for parent_run in parent_runs if parent_run.data.tags.get("mlflow.runName", "Unnamed").find(filter_string) > -1]
+        nested_runs = [
+            create_nested_dict(parent_run)
+            for parent_run in parent_runs
+            if parent_run.data.tags.get("mlflow.runName", "Unnamed").find(filter_string)
+            > -1
+        ]
     else:
         nested_runs = [create_nested_dict(parent_run) for parent_run in parent_runs]
-    
+
     return nested_runs

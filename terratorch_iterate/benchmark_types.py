@@ -15,7 +15,6 @@ from terratorch.tasks import (
     ObjectDetectionTask,
 )
 from torchgeo.datamodules import BaseDataModule
-from geobench_v2.datamodules import GeoBenchDataModule
 
 valid_task_types = type[
     SemanticSegmentationTask

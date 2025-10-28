@@ -31,3 +31,7 @@ repos:
       # Run the formatter.
       - id: ruff-format
         types_or: [ python, pyi ]
+  - repo: https://github.com/mattlqx/pre-commit-sign
+    rev: v1.2.0
+    hooks:
+    - id: sign-commit

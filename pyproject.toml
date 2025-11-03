@@ -13,7 +13,7 @@ include = ["terratorch_iterate*"]
 [project]
 
 name = "terratorch-iterate"
-version = "0.2.2rc3"
+version = "0.2.3rc1"
 requires-python = ">= 3.11"
 description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [

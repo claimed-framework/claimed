@@ -246,7 +246,7 @@ def main():
         if config_path is None:
             msg = """
             Error: config argument has not been passed
-            usage: terratorch iterate [-h] [--hpo] [--repeat] [--summarize] [--config CONFIG] 
+            Usage: iterate [-h] [--hpo] [--repeat] [--summarize] [--config CONFIG] 
             """
             print(msg)
         else:

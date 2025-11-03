@@ -13,7 +13,7 @@ include = ["terratorch_iterate*"]
 [project]
 
 name = "terratorch-iterate"
-version = "0.2.2rc2"
+version = "0.2.2rc3"
 requires-python = ">= 3.11"
 description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
@@ -113,9 +113,6 @@ skip-string-normalization = true
 
 [project.scripts]
 iterate = "terratorch_iterate.main:main"
-# ray_benchmark = "benchmark.benchmark_ray:main"
-# repeat_experiments = "benchmark.main:main"
-
 
 [tool.isort]
 multi_line_output = 3

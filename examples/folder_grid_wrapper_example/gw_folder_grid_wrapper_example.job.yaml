@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gw-folder-grid-wrapper-example
+spec:
+  template:
+    spec:
+      containers:
+      - name: gw-folder-grid-wrapper-example
+        image: local/claimed-gw-folder-grid-wrapper-example:0.1
+        workingDir: /opt/app-root/src/
+        command: ["/opt/app-root/bin/python","examples/folder_grid_wrapper_example/claimed_gw_folder_grid_wrapper_example.py"]
+        env:
+        - name: log_level
+          value: value_of_log_level
+        - name: sgw_source_folder
+          value: value_of_sgw_source_folder
+        - name: sgw_target_folder
+          value: value_of_sgw_target_folder
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: image_pull_secret

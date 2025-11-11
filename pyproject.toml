@@ -3,11 +3,13 @@ requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-version_file = "src/_version.py"
+version_file = "src/c3/_version.py"
 
 [project]
-name="claimed"
-version = "0.2.1"
+name = "claimed-c3"
+dynamic = ["version"]
+# test pypi version:
+# version = "0.2.15"
 authors = [
   { name="The CLAIMED authors", email="claimed-framework@proton.me"},
 ]
@@ -15,29 +17,34 @@ maintainers = [
   { name="Romeo Kienzler", email="claimed-framework@proton.me"},
   { name="Benedikt Blumenstiel"},
 ]
-description = "The CLAIMED framework includes a library of reusable operators, a CLI and the CLAIMED Component Compiler (C3)."
+description = "The CLAIMED component compiler (C3) generates container images, KFP components, Kubernetes jobs, CWL Tasks, CLI applications"
 readme = "README.md"
-requires-python=">=3.9"
+requires-python = ">=3.7"
 license = {file = "LICENSE.txt"}
-keywords = ["CLAIMED", "component-library"]
+keywords = ["CLAIMED", "compiler", "KubeFlow", "Kubernetes"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-
 dependencies = [
-  "aiobotocore",
-  "botocore",
-  "s3fs",
-  "claimed-c3",
-  "claimed-cli",
+    'nbconvert >= 7.9.2',
+    'ipython >= 8.16.1',
+    'traitlets >= 5.11.2',
+    'pandas',
 ]
 
-[tool.setuptools.packages.find]
-include = ["claimed*"]
-
 [project.urls]
-"Homepage" = "https://github.com/claimed-framework/component-library"
-"Bug Tracker" = "https://github.com/claimed-framework/component-library/issues"
+"Homepage" = "https://github.com/claimed-framework/c3"
+"Bug Tracker" = "https://github.com/claimed-framework/c3/issues"
 
+[project.scripts]
+c3_create_operator = "c3.create_operator:main"
+c3_create_containerless_operator = "c3.create_containerless_operator:main"
+c3_create_gridwrapper = "c3.create_gridwrapper:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"c3.templates" = ["*"]

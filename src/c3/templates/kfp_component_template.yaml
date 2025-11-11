@@ -1,0 +1,18 @@
+name: ${name}
+description: ${description}
+
+inputs:
+${inputs}
+
+outputs:
+${outputs}
+
+implementation:
+    container:
+        image: ${repository}/claimed-${name}:${version}
+        command:
+        - sh
+        - -ec
+        - |
+          ${command} ./${target_dir}${target_code} ${parameter_list}
+${parameter_values}

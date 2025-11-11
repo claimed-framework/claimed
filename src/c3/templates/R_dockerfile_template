@@ -1,0 +1,11 @@
+FROM ${base_image}
+USER root
+RUN apt update
+${requirements_docker}
+ADD ${target_code} ${working_dir}${target_dir}
+${additional_files_docker}
+RUN chmod -R 777 ${working_dir}
+RUN chmod -R 777 /usr/local/lib/R/
+USER docker
+WORKDIR "${working_dir}"
+CMD ["${command}", "${target_dir}${target_code}"]

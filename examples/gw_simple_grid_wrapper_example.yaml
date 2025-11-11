@@ -1,0 +1,23 @@
+name: gw-simple-grid-wrapper-example
+description: "component_simple_grid_wrapper_example got wrapped by grid_wrapper, which wraps any CLAIMED component and implements the generic grid computing pattern https://romeokienzler.medium.com/the-generic-grid-computing-pattern-transforms-any-sequential-workflow-step-into-a-transient-grid-c7f3ca7459c8 This simple grid wrapper just scans a folder and for each file the grid_process function is called. Locking is achieved the following way: Given source file1.ext is processed, simple_grid_wrapper creates files in the target_directory following the pattern file1.{STATUS}.ext where STATUS in: LOCKED PROCESSED FAILED   CLAIMED component description: component-simple-grid-wrapper-example – CLAIMED V0.1"
+
+inputs:
+- {name: log_level, type: String, description: "update log level", default: "INFO"}
+- {name: sgw_source_folder, type: String, description: "folder containing input data in single files"}
+- {name: sgw_target_folder, type: String, description: "folder to store the output data in single files. Default: sgw_source_folder, in case sgw_source_folder==sgw_target_folder, files containing .LOCKED., .PROCESSED., .FAILED. are ignored", default: "sgw_source_folder"}
+
+
+outputs:
+
+
+implementation:
+    container:
+        image: local/claimed-gw-simple-grid-wrapper-example:0.1
+        command:
+        - sh
+        - -ec
+        - |
+          python ./claimed_gw_simple_grid_wrapper_example.py log_level="${0}" sgw_source_folder="${1}" sgw_target_folder="${2}" 
+        - {inputValue: log_level}
+        - {inputValue: sgw_source_folder}
+        - {inputValue: sgw_target_folder}

@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ${name}
+spec:
+  template:
+    spec:
+      containers:
+      - name: ${name}
+        image: ${repository}/claimed-${name}:${version}
+        workingDir: ${working_dir}
+        command: ["${command}","${target_dir}${target_code}"]
+        env:
+${env_entries}
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: image_pull_secret

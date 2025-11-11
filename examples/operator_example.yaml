@@ -1,0 +1,27 @@
+name: operator-example
+description: "TODO: Update the description of the operator in the first doc string. This is the operator description. The file name becomes the operator name. – CLAIMED V0.1"
+
+inputs:
+- {name: log_level, type: String, description: "update log level", default: "INFO"}
+- {name: input_path, type: String, description: "A comment one line above os.getenv is the description of this variable."}
+- {name: with_default, type: String, description: "If you specify a default value, this parameter gets marked as optional", default: "default_value"}
+- {name: num_values, type: Integer, description: "You can cast to a specific type with int(), float(), or bool() - this type information propagates down to the execution engines (e.g., Kubeflow)", default: "5"}
+- {name: output_path, type: String, description: "Output paths are starting with 'output_'.", default: "None"}
+
+
+outputs:
+
+
+implementation:
+    container:
+        image: us.ico.io/geodn/claimed-operator-example:0.2
+        command:
+        - sh
+        - -ec
+        - |
+          python ./claimed_operator_example.py log_level="${0}" input_path="${1}" with_default="${2}" num_values="${3}" output_path="${4}" 
+        - {inputValue: log_level}
+        - {inputValue: input_path}
+        - {inputValue: with_default}
+        - {inputValue: num_values}
+        - {inputValue: output_path}

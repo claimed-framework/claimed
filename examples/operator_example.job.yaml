@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: operator-example
+spec:
+  template:
+    spec:
+      containers:
+      - name: operator-example
+        image: us.ico.io/geodn/claimed-operator-example:0.2
+        workingDir: /opt/app-root/src/
+        command: ["/opt/app-root/bin/python","claimed_operator_example.py"]
+        env:
+        - name: log_level
+          value: value_of_log_level
+        - name: input_path
+          value: value_of_input_path
+        - name: with_default
+          value: value_of_with_default
+        - name: num_values
+          value: value_of_num_values
+        - name: output_path
+          value: value_of_output_path
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: image_pull_secret

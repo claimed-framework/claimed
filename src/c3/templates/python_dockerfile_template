@@ -1,0 +1,11 @@
+FROM ${base_image}
+USER root
+${additional_files_docker}
+RUN pip install --upgrade pip
+RUN pip install ipython nbformat
+${requirements_docker}
+ADD ${target_code} ${working_dir}${target_dir}
+RUN chmod -R 777 ${working_dir}
+USER default
+WORKDIR "${working_dir}"
+CMD ["${command}", "${target_dir}${target_code}"]

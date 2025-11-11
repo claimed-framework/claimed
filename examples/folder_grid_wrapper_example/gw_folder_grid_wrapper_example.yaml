@@ -1,0 +1,23 @@
+name: gw-folder-grid-wrapper-example
+description: "component_folder_grid_wrapper_example got wrapped by folder_grid_wrapper, which wraps any CLAIMED component and implements folder-level locking. This folder grid wrapper scans immediate subdirectories of sgw_source_folder and for each folder the grid_process function is called once. Locking is achieved by creating files in the target directory using the pattern <folder>.{STATUS} where STATUS in: LOCKED PROCESSED FAILED   CLAIMED component description: component-folder-grid-wrapper-example – CLAIMED V0.1"
+
+inputs:
+- {name: log_level, type: String, description: "update log level", default: "INFO"}
+- {name: sgw_source_folder, type: String, description: "folder containing input data in single files or subfolders"}
+- {name: sgw_target_folder, type: String, description: "Default: sgw_source_folder. If equal, entries containing LOCKED or PROCESSED or FAILED are ignored.", default: "sgw_source_folder"}
+
+
+outputs:
+
+
+implementation:
+    container:
+        image: local/claimed-gw-folder-grid-wrapper-example:0.1
+        command:
+        - sh
+        - -ec
+        - |
+          python ./examples/folder_grid_wrapper_example/claimed_gw_folder_grid_wrapper_example.py log_level="${0}" sgw_source_folder="${1}" sgw_target_folder="${2}" 
+        - {inputValue: log_level}
+        - {inputValue: sgw_source_folder}
+        - {inputValue: sgw_target_folder}

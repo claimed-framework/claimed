@@ -325,7 +325,7 @@ def rerun_best_from_backbone(
 
             # check if there are already results for this task and exp in the folder
             past_output_path = (
-                f"{output_path.split(experiment_name)[0]}{experiment_name}_*"
+                f"{str(output_path).split(experiment_name)[0]}{experiment_name}_*"
             )
             past_output_path = glob.glob(past_output_path)
             if len(sorted(past_output_path)) > 0:

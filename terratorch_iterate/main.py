@@ -384,6 +384,8 @@ def main():
                     run_repetitions=run_repetitions,
                     save_models=save_models,
                     logger=logger,
+                    parent_run_id=parent_run_id,
+                    report_on_best_val=report_on_best_val,
                 )
             else:
                 if not repeat and hpo:

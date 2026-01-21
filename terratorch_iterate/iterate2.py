@@ -32,6 +32,9 @@ def parse_args():
         default="none",
         help="Workload manager",
     )
+    parser.add_argument("--gpu-count", type=int, default=1, help="GPUs per trial")
+    parser.add_argument("--cpu-count", type=int, default=4, help="CPUs per trial")
+    parser.add_argument("--mem-gb", type=int, default=128, help="Memory (GB) per trial")
 
     # ------------------------
     # Optuna config
@@ -108,12 +111,15 @@ def build_launcher_command(
     trial_id: int,
     out_file: str,
     err_file: str,
+    gpu_count: int = 1,
+    cpu_count: int = 4,
+    mem_gb: int = 128,
 ):
     if wlm == "lsf":
         return (
-            f"bsub -gpu num=1 -K "
+            f"bsub -gpu num={gpu_count} -K "
             f"-o {out_file} -e {err_file} "
-            f"-R \"rusage[ngpus=1, cpu=4, mem=128GB]\" "
+            f"-R \"rusage[ngpus={gpu_count}, cpu={cpu_count}, mem={mem_gb}GB]\" "
             f"-J hpo_trial_{trial_id} "
             f"\"{cmd}\""
         )
@@ -329,6 +335,9 @@ def main():
             trial_id=trial.number,
             out_file=out_file,
             err_file=err_file,
+            gpu_count=args.gpu_count,
+            cpu_count=args.cpu_count,
+            mem_gb=args.mem_gb,
         )
 
         # Execute trial

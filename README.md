@@ -23,13 +23,13 @@ Slurm and LSF are supported, Kubernetes/OpenShift and PBS coming soon.
 From version 0.3 on the current iterate can be used using `iterate-classig`. Here are some usage examples
 
 #### Prerequisites
-mkdir deleteme.iterate 
-cd deleteme.iterate 
-python -m venv .venv 
-source ./venv/bin/activate 
-wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_function.py 
-wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_hpo.yaml 
-pip install terratorch-iterate==0.3 
+mkdir deleteme.iterate  
+cd deleteme.iterate  
+python -m venv .venv  
+source ./venv/bin/activate  
+wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_function.py  
+wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_hpo.yaml  
+pip install terratorch-iterate==0.3  
 
 #### Run locally
 ```

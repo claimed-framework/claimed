@@ -78,7 +78,7 @@ def test_main(
         abs_path = repo_home_dir / storage_uri
         storage_uri = str(abs_path.resolve())
     experiment_name = config_data["experiment_name"]
-    arguments = ["terratorch", "--config", str(config_file.resolve())]
+    arguments = ["iterate-classic", "--config", str(config_file.resolve())]
     if hpo:
         arguments.insert(1, "--hpo")
     sys.argv = arguments

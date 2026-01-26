@@ -1,0 +1,30 @@
+# =======================
+# Static parameters - passed to the underlying training script as is
+# =======================  
+  
+static:
+  global-mu: 23 42 66
+  
+# ========================
+# Training hyperparameters - evaluated by optuna and passed to the underlying training script
+# ========================
+
+hpo:
+  x:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  y:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  z:
+    type: float
+    low: 1
+    high: 100
+    log: true
+

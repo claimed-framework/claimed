@@ -171,6 +171,7 @@ def _convert_config(args: Namespace):
 
 
 def main():
+    print("DEPRECATED: iterate-classic is deprecated. Please use iterate instead.")
     parser = ArgumentParser()
 
     parser.add_argument("--defaults", type=Defaults)  # to ignore model

@@ -13,7 +13,7 @@ include = ["terratorch_iterate*"]
 [project]
 
 name = "terratorch-iterate"
-version = "0.3rc1"
+version = "0.3"
 requires-python = ">= 3.11"
 description = "A terratorch's plugin for benchmarking and hyperparameter optimization"
 authors = [
@@ -77,8 +77,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/IBM/terratorch-iterate"
-Issues = "https://github.com/IBM/terratorch-iterate/issues"
+Homepage = "https://github.com/terrastackai/iterate"
+Issues = "https://github.com/terrastackai/iterate/issues"
 
 [project.optional-dependencies]
 dev = [

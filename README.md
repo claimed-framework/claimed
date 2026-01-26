@@ -16,6 +16,49 @@ We recommend using python 3.10, 3.11 or 3.12 and also using a virtual environmen
 pip install terratorch-iterate
 ```
 
+### New instructions for iterate v0.3
+Iterate v0.3 can optimize over arbitrary code running on arbitrary workload managers. 
+Slurm and LSF are supported, Kubernetes/OpenShift and PBS coming soon.
+
+From version 0.3 on the current iterate can be used using `iterate-classig`. Here are some usage examples
+
+#### Prerequisites
+mkdir deleteme.iterate
+cd deleteme.iterate
+python -m venv .venv
+source ./venv/bin/activate
+wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_function.py
+wget https://raw.githubusercontent.com/terrastackai/iterate/refs/heads/main/examples/bumpy_hpo.yaml
+pip install terratorch-iterate==0.3
+
+#### Run locally
+```
+iterate \
+        --script bumpy_function.py \
+        --root-dir . \
+        --optuna-study-name terratorch_hpo_nas_2 \
+        --optuna-db-path "sqlite:///iterate_study.db" \
+        --hpo-yaml bumpy_hpo.yaml \
+        --wlm none \
+        --metric yval
+```
+#### Run on LSF
+```
+iterate \
+        --script bumpy_function.py \
+        --root-dir . \
+        --optuna-study-name terratorch_hpo_nas_2 \
+        --optuna-db-path "sqlite:///iterate_study.db" \
+        --hpo-yaml bumpy_hpo.yaml \
+        --wlm lsf \
+        --metric yval \
+        --gpu-count 0
+```
+#### Useful commands
+```
+pip install optuna-dashboard
+optuna-dashboard --host 0.0.0.0 sqlite:///iterate_study.db
+```
 ### Suggested setup for development
 
 ```sh

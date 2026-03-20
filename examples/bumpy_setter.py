@@ -80,18 +80,18 @@ def main():
     z = get_float("z", 50.0)
     trial_number = get_int("trial_number", 0)
 
-    global_mu_raw = params.get("global_mu", "23 42 66").split()
+    global_mu_raw = params.get("global_mu", "23_42_66").split("_")
     global_mu = tuple(float(v) for v in global_mu_raw)
     global_sigma = get_float("global_sigma", 0.7)
 
-    mu_rest_raw = params.get("mu_rest", "-2.0 0.0 0.0 2.0 0.0 0.0").split()
+    mu_rest_raw = params.get("mu_rest", "-2.0_0.0_0.0_2.0_0.0_0.0").split("_")
     mu_rest_flat = [float(v) for v in mu_rest_raw]
     mu_rest = [tuple(mu_rest_flat[i:i+3]) for i in range(0, len(mu_rest_flat), 3)]
 
-    sigma_rest_raw = params.get("sigma_rest", "0.6 0.6").split()
+    sigma_rest_raw = params.get("sigma_rest", "0.6_0.6").split("_")
     sigma_rest = [float(v) for v in sigma_rest_raw]
 
-    amps_rest_raw = params.get("amps_rest", "0.5 0.8").split()
+    amps_rest_raw = params.get("amps_rest", "0.5_0.8").split("_")
     amps_rest = [float(v) for v in amps_rest_raw]
 
     yval = bumpy_function_3d(

@@ -231,7 +231,11 @@ def build_shell_command(
             if bool_value is not None:
                 arg_list.append(f"--{param_setter} {key} {str(bool_value).lower()}")
             else:
-                arg_list.append(f"--{param_setter} {key} {value}")
+                str_value = str(value)
+                if " " in str_value:
+                    arg_list.append(f'--{param_setter} {key} "{str_value}"')
+                else:
+                    arg_list.append(f"--{param_setter} {key} {str_value}")
         else:
             # Default style: --key value
             arg_name = key.replace("_", "-")

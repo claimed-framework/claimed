@@ -3,7 +3,7 @@
 # =======================
 
 static:
-  global_mu: "23 42 66"
+  global_mu: "23_42_66"
 
 # ========================
 # Training hyperparameters - evaluated by optuna and passed as --set key value pairs

@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 import os
 import subprocess
 import re
@@ -10,6 +11,8 @@ from typing import Dict, Any, Optional, Literal, List
 
 import optuna
 import yaml
+
+logger = logging.getLogger("iterate2")
 
 # ============================================================
 # CLI
@@ -58,6 +61,16 @@ def parse_args():
         help="Comma-separated metric names to extract (e.g. score_linear_acc,score_modality_leak,score_combined)",
     )
 
+    # ------------------------
+    # Logging
+    # ------------------------
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging verbosity (default: INFO)",
+    )
+
     return parser.parse_args()
 
 
@@ -67,58 +80,80 @@ def parse_args():
 
 def resolve_paths(script: str, root_dir: Optional[str]):
     if root_dir is None: root_dir = '.'
-    return script, Path(root_dir).resolve()
+    resolved = Path(root_dir).resolve()
+    logger.debug("Resolved root_dir '%s' → '%s'", root_dir, resolved)
+    return script, resolved
 
 def build_launcher_command(wlm, cmd, trial_id, out_file, err_file, gpu_count, cpu_count, mem_gb, lsf_gpu_config_string):
+    logger.debug("Building launcher command: wlm=%s gpu_count=%d cpu_count=%d mem_gb=%d", wlm, gpu_count, cpu_count, mem_gb)
     if wlm == "lsf":
         gpu_fragment = f"-gpu \"{lsf_gpu_config_string}\"" if lsf_gpu_config_string else (f"-gpu num={gpu_count}" if gpu_count > 0 else "")
-        return f"bsub {gpu_fragment} -K -o {out_file} -e {err_file} -R \"rusage[ngpus={gpu_count}, cpu={cpu_count}, mem={mem_gb}GB]\" -J hpo_trial_{trial_id} \"{cmd}\""
-    if wlm == "slurm":
-        return f"srun --gres=gpu:{gpu_count} --cpus-per-task={cpu_count} --mem={mem_gb}G --job-name=hpo_trial_{trial_id} --output={out_file} --error={err_file} bash -c \"{cmd}\""
-    if wlm == "none":
-        return f'bash -c "{cmd} > {out_file} 2> {err_file}"'
-    raise ValueError(f"Unknown WLM: {wlm}")
+        launcher = f"bsub {gpu_fragment} -K -o {out_file} -e {err_file} -R \"rusage[ngpus={gpu_count}, cpu={cpu_count}, mem={mem_gb}GB]\" -J hpo_trial_{trial_id} \"{cmd}\""
+    elif wlm == "slurm":
+        launcher = f"srun --gres=gpu:{gpu_count} --cpus-per-task={cpu_count} --mem={mem_gb}G --job-name=hpo_trial_{trial_id} --output={out_file} --error={err_file} bash -c \"{cmd}\""
+    elif wlm == "none":
+        launcher = f'bash -c "{cmd} > {out_file} 2> {err_file}"'
+    else:
+        raise ValueError(f"Unknown WLM: {wlm}")
+    logger.debug("Launcher command: %s", launcher)
+    return launcher
 
 def build_shell_command(interpreter, root_dir, script_path, venv, script_args, param_setter):
     parts = [f"cd {root_dir}"]
-    if venv: parts.append(f"source {venv}/bin/activate")
+    if venv:
+        parts.append(f"source {venv}/bin/activate")
+        logger.debug("Activating venv: %s", venv)
     arg_list = [f"{interpreter} {script_path}"]
     for key, value in script_args.items():
         arg_name = key.replace("_", "-")
         if value is None:
-            continue  # None means "omit this flag" (e.g. compile: null disables --compile)
+            logger.debug("Skipping arg '%s': value is None (flag omitted)", key)
+            continue
         if param_setter:
             if isinstance(value, bool):
-                if value: arg_list.append(f"--{param_setter} {key}")
-                # False → omit entirely
+                if value:
+                    arg_list.append(f"--{param_setter} {key}")
+                    logger.debug("Setter flag: --%s %s (store_true)", param_setter, key)
+                else:
+                    logger.debug("Skipping flag '%s': False → omitted", key)
             else:
                 arg_list.append(f"--{param_setter} {key} {value}")
+                logger.debug("Setter arg: --%s %s %s", param_setter, key, value)
         else:
             if isinstance(value, bool):
-                if value: arg_list.append(f"--{arg_name}")
-                # False → flag is simply absent
+                if value:
+                    arg_list.append(f"--{arg_name}")
+                    logger.debug("Flag present: --%s", arg_name)
+                else:
+                    logger.debug("Skipping flag '--%s': False → omitted", arg_name)
             else:
                 arg_list.append(f"--{arg_name} {value}")
-    parts.append(" ".join(arg_list))
-    return " && ".join(parts)
+                logger.debug("Arg: --%s %s", arg_name, value)
+    cmd = " && ".join(parts + [" ".join(arg_list)])
+    logger.debug("Shell command: %s", cmd)
+    return cmd
 
 # ============================================================
 # MULTI-METRIC EXTRACTION
 # ============================================================
 
 def extract_metrics_from_log(path: str, metric_names: List[str]) -> List[float]:
+    logger.debug("Extracting metrics %s from '%s'", metric_names, path)
     results = []
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         text = f.read()
-    
+    logger.debug("Log file '%s': %d characters read", path, len(text))
+
     for metric in metric_names:
         pattern = re.compile(rf"{re.escape(metric)}\s*[:=]\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)")
         matches = pattern.findall(text)
         if not matches:
-            print(f"Warning: Metric '{metric}' not found in {path}. Defaulting to 0.0")
+            logger.warning("Metric '%s' not found in '%s' — defaulting to 0.0", metric, path)
             results.append(0.0)
         else:
-            results.append(float(matches[-1]))
+            value = float(matches[-1])
+            logger.debug("Metric '%s': found %d match(es), using last value %s", metric, len(matches), value)
+            results.append(value)
     return results
 
 # ============================================================
@@ -127,39 +162,71 @@ def extract_metrics_from_log(path: str, metric_names: List[str]) -> List[float]:
 
 def load_hpo_space(args):
     data = {}
-    if args.hpo_json: data = json.loads(args.hpo_json)
+    if args.hpo_json:
+        logger.debug("Loading HPO space from JSON string")
+        data = json.loads(args.hpo_json)
     elif args.hpo_yaml:
+        logger.debug("Loading HPO space from YAML file: %s", args.hpo_yaml)
         with open(args.hpo_yaml, "r") as f: data = yaml.safe_load(f)
-    return data.get("hpo", {})
+    space = data.get("hpo", {})
+    logger.info("HPO space loaded: %d parameter(s): %s", len(space), list(space.keys()))
+    return space
 
 def load_static_args(args):
     data = {}
-    if args.static_args_json: data = json.loads(args.static_args_json)
+    if args.static_args_json:
+        logger.debug("Loading static args from JSON string")
+        data = json.loads(args.static_args_json)
     elif args.static_args_yaml:
+        logger.debug("Loading static args from YAML file: %s", args.static_args_yaml)
         with open(args.static_args_yaml, "r") as f: data = yaml.safe_load(f)
     elif args.hpo_yaml:
+        logger.debug("Loading static args from HPO YAML file: %s", args.hpo_yaml)
         with open(args.hpo_yaml, "r") as f: data = yaml.safe_load(f)
-    return data.get("static", data if data else {})
+    static = data.get("static", data if data else {})
+    logger.info("Static args loaded: %d key(s): %s", len(static), list(static.keys()))
+    return static
 
 def suggest_from_spec(trial, name, spec):
     t = spec["type"]
-    if t == "float": return trial.suggest_float(name, float(spec["low"]), float(spec["high"]), log=spec.get("log", False))
-    if t == "int": return trial.suggest_int(name, int(spec["low"]), int(spec["high"]), log=spec.get("log", False))
-    if t == "categorical": return trial.suggest_categorical(name, spec["choices"])
-    if t == "flag":
-        # store_true style: True → --name present, False → flag omitted entirely
-        return trial.suggest_categorical(name, [True, False])
-    if t == "group":
-        # Suggests one of the named group keys; caller expands the key → dict of args
-        return trial.suggest_categorical(name, list(spec["choices"].keys()))
-    raise ValueError(f"Unknown param type: {t}")
+    if t == "float":
+        val = trial.suggest_float(name, float(spec["low"]), float(spec["high"]), log=spec.get("log", False))
+    elif t == "int":
+        val = trial.suggest_int(name, int(spec["low"]), int(spec["high"]), log=spec.get("log", False))
+    elif t == "categorical":
+        val = trial.suggest_categorical(name, spec["choices"])
+    elif t == "flag":
+        val = trial.suggest_categorical(name, [True, False])
+    elif t == "group":
+        val = trial.suggest_categorical(name, list(spec["choices"].keys()))
+    else:
+        raise ValueError(f"Unknown param type: {t}")
+    logger.debug("Suggested '%s' (%s) = %r", name, t, val)
+    return val
 
 def main():
     args = parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    # Suppress noisy optuna INFO logs unless user asked for DEBUG
+    logging.getLogger("optuna").setLevel(
+        logging.WARNING if args.log_level == "INFO" else getattr(logging, args.log_level)
+    )
+
+    logger.info("iterate2 starting")
+    logger.info("Log level: %s", args.log_level)
+    logger.info("WLM: %s | interpreter: %s | script: %s", args.wlm, args.interpreter, args.script)
+    logger.info("Optuna study: '%s' | db: %s | n_trials: %d", args.optuna_study_name, args.optuna_db_path, args.optuna_n_trials)
+
     hpo_space = load_hpo_space(args)
     static_args = load_static_args(args)
     metric_list = [m.strip() for m in args.metrics.split(",")]
-    
+    logger.info("Optimising metrics: %s", metric_list)
+
     script_path, root_dir = resolve_paths(args.script, args.root_dir)
 
     def objective(trial):
@@ -174,38 +241,47 @@ def main():
 
         # gpu_num in hpo/static overrides the CLI --gpu-count for this trial's launcher
         gpu_count = int(script_args.pop("gpu_num", args.gpu_count))
+        logger.debug("Trial %d: effective gpu_count=%d", trial.number, gpu_count)
+        logger.info("Trial %d: sampled parameters: %s", trial.number, script_args)
 
         out_file = f"trial_{trial.number}.out"
         err_file = f"trial_{trial.number}.err"
+        logger.debug("Trial %d: stdout → %s | stderr → %s", trial.number, out_file, err_file)
 
         shell_cmd = build_shell_command(args.interpreter, root_dir, script_path, args.venv, script_args, args.param_setter)
         launcher_cmd = build_launcher_command(args.wlm, shell_cmd, trial.number, out_file, err_file, gpu_count, args.cpu_count, args.mem_gb, args.lsf_gpu_config_string)
 
-        print(f"Trial {trial.number}: Running...")
+        logger.info("Trial %d: submitting → %s", trial.number, launcher_cmd)
         subprocess.run(launcher_cmd, shell=True, check=True)
+        logger.info("Trial %d: job finished", trial.number)
 
         values = extract_metrics_from_log(out_file, metric_list)
-        print(f"Trial {trial.number} results: {dict(zip(metric_list, values))}")
-        
+        logger.info("Trial %d: results %s", trial.number, dict(zip(metric_list, values)))
+
         return tuple(values)
 
     # Multi-objective direction
     directions = ["maximize"] * len(metric_list)
+    logger.info("Creating Optuna study (directions: %s)", directions)
+
+    storage = f"sqlite:///{args.optuna_db_path}" if "sqlite" not in args.optuna_db_path else args.optuna_db_path
+    logger.debug("Optuna storage: %s", storage)
 
     study = optuna.create_study(
         study_name=args.optuna_study_name,
-        storage=f"sqlite:///{args.optuna_db_path}" if "sqlite" not in args.optuna_db_path else args.optuna_db_path,
+        storage=storage,
         directions=directions,
         load_if_exists=True,
     )
+    logger.info("Study '%s' ready (existing trials: %d)", args.optuna_study_name, len(study.trials))
 
     study.optimize(objective, n_trials=args.optuna_n_trials)
 
-    print("\n" + "="*60)
-    print("OPTIMIZATION COMPLETE")
-    print(f"Pareto Front Trials: {len(study.best_trials)}")
+    logger.info("=" * 60)
+    logger.info("OPTIMIZATION COMPLETE")
+    logger.info("Pareto Front Trials: %d", len(study.best_trials))
     for t in study.best_trials:
-        print(f"Trial {t.number}: Values={t.values}")
+        logger.info("  Trial %d: Values=%s  Params=%s", t.number, t.values, t.params)
 
 if __name__ == "__main__":
     main()

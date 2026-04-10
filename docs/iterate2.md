@@ -48,7 +48,7 @@ iterate2 \
 | Option | Default | Description |
 |---|---|---|
 | `--optuna-study-name` | *(required)* | Name of the Optuna study |
-| `--optuna-db-path` | *(required)* | Storage URL for the Optuna database, e.g. `sqlite:///hpo.db` |
+| `--optuna-db-path` | *(required)* | Storage URL. `sqlite:///hpo.db` for SQLite, `js:///path/journal.log` for JournalStorage, or any Optuna-supported URL |
 | `--optuna-n-trials` | `100` | Number of trials to run |
 
 ### HPO search space
@@ -340,11 +340,17 @@ For WLM backends the local WLM tool output (bsub/srun status messages) is writte
 
 ### SQLite and parallelism
 
-Optuna retries on SQLite locking errors automatically. Values up to `--parallelism 4` work well with SQLite. For higher concurrency use a PostgreSQL storage URL:
+Optuna retries on SQLite locking errors automatically. Values up to `--parallelism 4` work well with SQLite. For higher concurrency use PostgreSQL or **JournalStorage**:
 
 ```sh
+# PostgreSQL
 --optuna-db-path postgresql://user:pass@host/dbname
+
+# JournalStorage (file-based, lock-free, safe for parallel workers on a shared filesystem)
+--optuna-db-path js:///path/to/study_journal.log
 ```
+
+`js:///` is a custom `iterate2` scheme. The path after `js:///` is passed to Optuna's `JournalFileStorage`. JournalStorage serialises trials to an append-only log and is well-suited for NFS/GPFS shared filesystems where SQLite locking is unreliable.
 
 ---
 

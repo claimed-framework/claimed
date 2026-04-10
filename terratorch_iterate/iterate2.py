@@ -144,15 +144,27 @@ def build_shell_command(interpreter, root_dir, script_path, venv, script_args, p
 # MULTI-METRIC EXTRACTION
 # ============================================================
 
-def extract_metrics_from_log(path: str, metric_names: List[str]) -> List[float]:
+def extract_metrics_from_log(path: str, metric_names: List[str], err_path: Optional[str] = None) -> List[float]:
     logger.debug("Extracting metrics %s from '%s'", metric_names, path)
     results = []
     with open(path, "r", encoding="utf-8", errors="ignore") as f:
         text = f.read()
     logger.debug("Log file '%s': %d characters read", path, len(text))
+    # Also read stderr — Lightning/rich writes test result tables there
+    if err_path:
+        try:
+            with open(err_path, "r", encoding="utf-8", errors="ignore") as f:
+                err_text = f.read()
+            logger.debug("Err file '%s': %d characters read", err_path, len(err_text))
+            text = text + "\n" + err_text
+        except FileNotFoundError:
+            logger.debug("Err file '%s' not found, skipping", err_path)
 
     for metric in metric_names:
-        pattern = re.compile(rf"{re.escape(metric)}\s*[:=]\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)")
+        # Matches: key: value | key=value | [performance] key : value | Lightning table │ key │ value │
+        pattern = re.compile(
+            rf"(?:\[\w+\]\s*)?{re.escape(metric)}\s*(?:[:=│])\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)"
+        )
         matches = pattern.findall(text)
         if not matches:
             logger.warning("Metric '%s' not found in '%s' — defaulting to 0.0", metric, path)
@@ -178,6 +190,22 @@ def load_hpo_space(args):
     space = data.get("hpo", {})
     logger.info("HPO space loaded: %d parameter(s): %s", len(space), list(space.keys()))
     return space
+
+def load_metrics_from_yaml(args):
+    """Return metrics list from YAML 'metrics:' key, or None if not present."""
+    data = {}
+    if args.hpo_json:
+        data = json.loads(args.hpo_json)
+    elif args.hpo_yaml:
+        with open(args.hpo_yaml, "r") as f: data = yaml.safe_load(f)
+    elif args.static_args_yaml:
+        with open(args.static_args_yaml, "r") as f: data = yaml.safe_load(f)
+    metrics = data.get("metrics", None)
+    if metrics is None:
+        return None
+    if isinstance(metrics, list):
+        return [m.strip() for m in metrics]
+    return [m.strip() for m in str(metrics).split(",")]
 
 def load_static_args(args):
     data = {}
@@ -231,8 +259,9 @@ def main():
 
     hpo_space = load_hpo_space(args)
     static_args = load_static_args(args)
-    metric_list = [m.strip() for m in args.metrics.split(",")]
-    logger.info("Optimising metrics: %s", metric_list)
+    yaml_metrics = load_metrics_from_yaml(args)
+    metric_list = yaml_metrics if yaml_metrics is not None else [m.strip() for m in args.metrics.split(",")]
+    logger.info("Optimising metrics: %s (source: %s)", metric_list, "yaml" if yaml_metrics else "cli")
 
     script_path, root_dir = resolve_paths(args.script, args.root_dir)
 
@@ -262,7 +291,7 @@ def main():
         subprocess.run(launcher_cmd, shell=True, check=True)
         logger.info("Trial %d: job finished", trial.number)
 
-        values = extract_metrics_from_log(out_file, metric_list)
+        values = extract_metrics_from_log(out_file, metric_list, err_path=err_file)
         logger.info("Trial %d: results %s", trial.number, dict(zip(metric_list, values)))
 
         return tuple(values)

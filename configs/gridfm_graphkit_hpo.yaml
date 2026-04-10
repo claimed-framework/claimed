@@ -1,4 +1,4 @@
-# HPO configuration for gridfm-graphkit HGNS PF case2000
+# HPO configuration for gridfm-graphkit HGNS PF case118
 #
 # Hyperparameters:
 #   gpu_num   – number of GPUs to request from the WLM (launcher-level)
@@ -9,6 +9,14 @@
 #
 # Static args:
 #   all other fixed CLI args
+#
+# Metrics:
+#   extracted from [performance] lines in trial output
+
+metrics:
+  - case118_ieee/layer_0_residual
+  - last epoch time
+  - last epoch it/s
 
 hpo:
   gpu_num:
@@ -29,19 +37,11 @@ hpo:
   dataset:
     type: group             # one choice selects all bundled args together
     choices:
-      case2000:
-        config: ./examples/config/HGNS_PF_datakit_case2000.yaml
-        data_path: /dccstor/gridfm/powermodels_data/v4/finetuning/pf/
-        exp_name: case2000
-      case1000:
-        config: ./examples/config/HGNS_PF_datakit_case1000.yaml
-        data_path: /dccstor/gridfm/powermodels_data/v4/finetuning/pf/
-        exp_name: case1000
+      case118:
+        config: ./examples/config/HGNS_PF_datakit_case118.yaml
+        data_path: /u/rkie/
 
 static:
   run_name: run1
   log_dir: logs
-  dataset_wrapper: SharedMemoryCacheDataset
-  plugins: gridfm_graphkit_ee
   num_workers: 32
-  dataset_wrapper_cache_dir: /dccstor/terratorch/case2000_ieeecache

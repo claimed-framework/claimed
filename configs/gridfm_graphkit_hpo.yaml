@@ -45,3 +45,4 @@ static:
   run_name: run1
   log_dir: logs
   num_workers: 32
+  report_performance: true

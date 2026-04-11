@@ -23,7 +23,7 @@ import re
 import s3fs
 import sys
 import glob
-from c3.operator_utils import explode_connection_string
+from claimed.c3.operator_utils import explode_connection_string
 
 # In[ ]:
 

@@ -7,7 +7,7 @@ version_file = "src/c3/_version.py"
 
 [project]
 name = "claimed"
-version = "0.2.3"
+version = "0.2.6"
 authors = [
   { name="The CLAIMED authors", email="claimed-framework@proton.me"},
 ]
@@ -31,6 +31,7 @@ dependencies = [
     'traitlets >= 5.11.2',
     'pandas',
     'boto3',
+    's3fs',
 ]
 
 [project.urls]

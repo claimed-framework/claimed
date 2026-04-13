@@ -2,3 +2,13 @@ venv/
 .venv/
 __pycache__
 .ipynb_checkpoints/
+build
+dist
+*.egg-info
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.bak
+*.swp
+.DS_Store

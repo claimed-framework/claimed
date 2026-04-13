@@ -1,0 +1,45 @@
+name: Publish Docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # full history needed for git-committers plugin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install doc dependencies
+        run: |
+          pip install \
+            mkdocs-material \
+            mkdocstrings[python] \
+            mkdocs-git-revision-date-localized-plugin \
+            griffe
+
+      - name: Install claimed package (for mkdocstrings introspection)
+        run: pip install -e .
+
+      - name: Build & deploy docs
+        run: mkdocs gh-deploy --force --clean --verbose

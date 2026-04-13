@@ -47,7 +47,23 @@ log_level = os.environ.get('log_level', 'INFO')
 # In[ ]:
 
 
-def run(cos_connection, local_path, operation, recursive = False, log_level = logging.INFO):
+def run(
+    cos_connection: str,
+    local_path: str,
+    operation: str,
+    recursive: bool = False,
+    log_level: str = 'INFO',
+) -> None:
+    """
+    Perform a COS/S3 file operation.
+
+    cos_connection: s3://access_key_id:secret_access_key@endpoint/bucket/path
+    operation:      one of mkdir | ls | find | get | put | rm | sync_to_cos | sync_to_local | glob
+    local_path:     local file or directory used for get / put / sync operations
+    recursive:      apply the operation recursively
+    log_level:      logging verbosity: DEBUG | INFO | WARNING | ERROR  (default: INFO)
+    """
+    logging.basicConfig(level=getattr(logging, log_level.upper(), logging.INFO))
     (access_key_id, secret_access_key, endpoint, cos_path) = explode_connection_string(cos_connection)
     s3 = s3fs.S3FileSystem(
         anon=False,

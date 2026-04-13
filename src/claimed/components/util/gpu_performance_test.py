@@ -205,83 +205,108 @@ def benchmark_gpu(matrix_size, iterations, device):
 # Main
 # =====================
 
-def main():
-    parser = argparse.ArgumentParser()
+def run(
+    mode: str = 'single_gpu',
+    batch_size: int = 256,
+    num_workers: int = 4,
+    dataset_size: int = 100000,
+    steps: int = 100,
+    input_dim: int = 1024,
+    hidden_dim: int = 2048,
+    num_classes: int = 10,
+    depth: int = 3,
+    materialize_dir: str = None,
+    cleanup: bool = False,
+    matrix_size: int = 2048,
+    iterations: int = 50,
+) -> None:
+    """
+    Run the PyTorch HPC benchmark.
 
-    parser.add_argument("--mode", choices=["cpu", "single_gpu", "ddp"], required=True)
-    parser.add_argument("--batch_size", type=int, default=256)
-    parser.add_argument("--num_workers", type=int, default=4)
-    parser.add_argument("--dataset_size", type=int, default=100000)
-    parser.add_argument("--steps", type=int, default=100)
-    parser.add_argument("--input_dim", type=int, default=1024)
-    parser.add_argument("--hidden_dim", type=int, default=2048)
-    parser.add_argument("--num_classes", type=int, default=10)
-    parser.add_argument("--depth", type=int, default=3)
-    parser.add_argument("--materialize_dir", type=str, default=None)
-    parser.add_argument("--cleanup", action="store_true")
-    parser.add_argument("--matrix_size", type=int, default=2048)
-    parser.add_argument("--iterations", type=int, default=50)
-
-    args = parser.parse_args()
-
-    if args.mode == "cpu":
-        print("CPU GFLOPS:", benchmark_cpu(args.matrix_size, args.iterations))
+    mode:            benchmark mode: cpu | single_gpu | ddp
+    batch_size:      dataloader batch size
+    num_workers:     dataloader worker processes
+    dataset_size:    total number of synthetic samples
+    steps:           number of batches per benchmark phase
+    input_dim:       input feature dimension of the MLP
+    hidden_dim:      hidden layer width of the MLP
+    num_classes:     number of output classes
+    depth:           number of hidden layers
+    materialize_dir: directory to cache synthetic dataset on disk (None = lazy)
+    cleanup:         remove materialize_dir after the benchmark
+    matrix_size:     square matrix edge length for compute benchmarks
+    iterations:      number of matrix-multiply iterations for compute benchmarks
+    """
+    if mode == 'cpu':
+        print('CPU GFLOPS:', benchmark_cpu(matrix_size, iterations))
         return
 
-    if args.mode == "single_gpu":
-        device = torch.device("cuda:0")
-    elif args.mode == "ddp":
+    if mode == 'single_gpu':
+        device = torch.device('cuda:0')
+    elif mode == 'ddp':
         local_rank = setup_ddp()
-        device = torch.device(f"cuda:{local_rank}")
+        device = torch.device(f'cuda:{local_rank}')
+    else:
+        raise ValueError(f"Unknown mode '{mode}'. Choose from: cpu | single_gpu | ddp")
 
     dataset = SyntheticDataset(
-        args.dataset_size,
-        args.input_dim,
-        args.num_classes,
-        materialize_dir=args.materialize_dir
+        dataset_size,
+        input_dim,
+        num_classes,
+        materialize_dir=materialize_dir,
     )
 
     loader = DataLoader(
         dataset,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
+        batch_size=batch_size,
+        num_workers=num_workers,
         pin_memory=True,
-        shuffle=True
+        shuffle=True,
     )
 
-    model = SimpleMLP(
-        args.input_dim,
-        args.hidden_dim,
-        args.num_classes,
-        args.depth
-    ).to(device)
+    model = SimpleMLP(input_dim, hidden_dim, num_classes, depth).to(device)
 
-    if args.mode == "ddp":
+    if mode == 'ddp':
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[device.index])
 
-    print("\n--- DataLoader throughput ---")
-    dl_tp = benchmark_dataloader(loader, device, args.steps)
-    print(f"Samples/sec: {dl_tp:.2f}")
+    print('\n--- DataLoader throughput ---')
+    print(f'Samples/sec: {benchmark_dataloader(loader, device, steps):.2f}')
 
-    print("\n--- Training throughput ---")
-    train_tp = benchmark_training(model, loader, device, args.steps)
-    print(f"Samples/sec: {train_tp:.2f}")
+    print('\n--- Training throughput ---')
+    print(f'Samples/sec: {benchmark_training(model, loader, device, steps):.2f}')
 
-    print("\n--- Inference throughput ---")
-    infer_tp = benchmark_inference(model, loader, device, args.steps)
-    print(f"Samples/sec: {infer_tp:.2f}")
+    print('\n--- Inference throughput ---')
+    print(f'Samples/sec: {benchmark_inference(model, loader, device, steps):.2f}')
 
-    print("\n--- GPU compute ---")
-    gpu_gflops = benchmark_gpu(args.matrix_size, args.iterations, device)
-    print(f"GFLOPS: {gpu_gflops:.2f}")
+    print('\n--- GPU compute ---')
+    print(f'GFLOPS: {benchmark_gpu(matrix_size, iterations, device):.2f}')
 
-    if args.cleanup and args.materialize_dir:
-        shutil.rmtree(args.materialize_dir, ignore_errors=True)
-        print("Materialized dataset removed.")
+    if cleanup and materialize_dir:
+        shutil.rmtree(materialize_dir, ignore_errors=True)
+        print('Materialized dataset removed.')
 
-    if args.mode == "ddp":
+    if mode == 'ddp':
         cleanup_ddp()
 
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', choices=['cpu', 'single_gpu', 'ddp'], required=True)
+    parser.add_argument('--batch_size', type=int, default=256)
+    parser.add_argument('--num_workers', type=int, default=4)
+    parser.add_argument('--dataset_size', type=int, default=100000)
+    parser.add_argument('--steps', type=int, default=100)
+    parser.add_argument('--input_dim', type=int, default=1024)
+    parser.add_argument('--hidden_dim', type=int, default=2048)
+    parser.add_argument('--num_classes', type=int, default=10)
+    parser.add_argument('--depth', type=int, default=3)
+    parser.add_argument('--materialize_dir', type=str, default=None)
+    parser.add_argument('--cleanup', action='store_true')
+    parser.add_argument('--matrix_size', type=int, default=2048)
+    parser.add_argument('--iterations', type=int, default=50)
+    args = parser.parse_args()
+    run(**vars(args))
+
+
+if __name__ == '__main__':
     main()

@@ -12,14 +12,22 @@ def _parse_kwargs(rest, sig):
     while i < len(rest):
         token = rest[i]
         if token.startswith('--'):
-            key = token[2:].replace('-', '_')
-            if i + 1 < len(rest) and not rest[i + 1].startswith('--'):
-                kwargs[key] = rest[i + 1]
-                i += 2
-            else:
-                # bare flag → True
-                kwargs[key] = True
+            body = token[2:]
+            # support both --key=value and --key value
+            if '=' in body:
+                raw_key, value = body.split('=', 1)
+                key = raw_key.replace('-', '_')
+                kwargs[key] = value
                 i += 1
+            else:
+                key = body.replace('-', '_')
+                if i + 1 < len(rest) and not rest[i + 1].startswith('--'):
+                    kwargs[key] = rest[i + 1]
+                    i += 2
+                else:
+                    # bare flag → True
+                    kwargs[key] = True
+                    i += 1
         else:
             i += 1
 

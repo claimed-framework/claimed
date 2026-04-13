@@ -1,0 +1,80 @@
+site_name: CLAIMED Framework
+site_url: https://claimed-framework.github.io/claimed/
+site_description: >-
+  The CLAIMED framework – C3 Component Compiler, MLX backend,
+  and a library of ready-to-use AI components.
+site_author: The CLAIMED authors
+repo_name: claimed-framework/claimed
+repo_url: https://github.com/claimed-framework/claimed
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: assets/logo.png
+  favicon: assets/logo.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            merge_init_into_class: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - CLI Reference: cli.md
+  - C3 – Component Compiler:
+      - Overview: c3/index.md
+      - create_operator: c3/create-operator.md
+      - create_gridwrapper: c3/create-gridwrapper.md
+      - operator_utils: c3/operator-utils.md
+  - MLX Backend:
+      - Overview: mlx/index.md
+      - cos_backend: mlx/cos-backend.md
+      - s3_kv_store: mlx/s3-kv-store.md
+  - Components:
+      - util/cosutils: components/util/cosutils.md
+      - util/gpu_performance_test: components/util/gpu-benchmark.md
+  - Contributing: contributing.md

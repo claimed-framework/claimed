@@ -1,0 +1,1940 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The CLAIMED framework – C3 Component Compiler, MLX backend, and a library of ready-to-use AI components.">
+      
+      
+        <meta name="author" content="The CLAIMED authors">
+      
+      
+        <link rel="canonical" href="https://claimed-framework.github.io/claimed/c3/create-operator/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../create-gridwrapper/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>create_operator - CLAIMED Framework</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#create_operator" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CLAIMED Framework" class="md-header__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CLAIMED Framework
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              create_operator
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/claimed-framework/claimed" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    claimed-framework/claimed
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  C3 – Component Compiler
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mlx/" class="md-tabs__link">
+          
+  
+  
+  MLX Backend
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../components/util/cosutils/" class="md-tabs__link">
+          
+  
+  
+  Components
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CLAIMED Framework" class="md-nav__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    CLAIMED Framework
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/claimed-framework/claimed" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    claimed-framework/claimed
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C3 – Component Compiler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    C3 – Component Compiler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    create_operator
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    create_operator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_operator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="create_operator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator.create_operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_operator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator.create_dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create-gridwrapper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    create_gridwrapper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operator-utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    operator_utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLX Backend
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MLX Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mlx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mlx/cos-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    cos_backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mlx/s3-kv-store/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    s3_kv_store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/util/cosutils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    util/cosutils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/util/gpu-benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    util/gpu_performance_test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_operator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="create_operator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator.create_operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_operator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claimed.c3.create_operator.create_dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/claimed-framework/claimed/edit/main/docs/c3/create-operator.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="create_operator">create_operator<a class="headerlink" href="#create_operator" title="Permanent link">&para;</a></h1>
+<p>Builds a Docker image and generates KFP, CWL, and Kubernetes descriptors
+from a Jupyter notebook, Python script, or R script.</p>
+<h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>c3_create_operator<span class="w"> </span>&lt;source_file&gt;<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>source_file</code></td>
+<td>path</td>
+<td><em>required</em></td>
+<td><code>.ipynb</code>, <code>.py</code>, or <code>.R</code> file</td>
+</tr>
+<tr>
+<td><code>--repository</code></td>
+<td>str</td>
+<td><em>required</em></td>
+<td>Container registry namespace, e.g. <code>docker.io/myuser</code></td>
+</tr>
+<tr>
+<td><code>--version</code></td>
+<td>str</td>
+<td>auto</td>
+<td>Image tag; auto-detected from <code>image_version</code> variable in source</td>
+</tr>
+<tr>
+<td><code>--additional-files</code></td>
+<td>list</td>
+<td><code>[]</code></td>
+<td>Extra files to <code>ADD</code> into the image</td>
+</tr>
+<tr>
+<td><code>--dockerfile</code></td>
+<td>path</td>
+<td>auto</td>
+<td>Custom Dockerfile template</td>
+</tr>
+<tr>
+<td><code>--log-level</code></td>
+<td>str</td>
+<td><code>WARNING</code></td>
+<td>Python logging level</td>
+</tr>
+</tbody>
+</table>
+<h2 id="python-api">Python API<a class="headerlink" href="#python-api" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="claimed.c3.create_operator" class="doc doc-heading">
+            <code>claimed.c3.create_operator</code>
+
+
+<a href="#claimed.c3.create_operator" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="claimed.c3.create_operator.create_operator" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_operator</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">custom_dockerfile_template</span><span class="p">,</span> <span class="n">additional_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="n">local_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rename_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite_files</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_logging</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">keep_generated_files</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="s1">&#39;linux/amd64&#39;</span><span class="p">,</span> <span class="n">dockerfile</span><span class="o">=</span><span class="s1">&#39;Dockerfile.generated&#39;</span><span class="p">,</span> <span class="n">image_version</span><span class="o">=</span><span class="s1">&#39;python3.12&#39;</span><span class="p">,</span> <span class="n">skip_docker_build</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#claimed.c3.create_operator.create_operator" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/claimed/c3/create_operator.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span>
+<span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span>
+<span class="normal"><a href="#__codelineno-0-268">268</a></span>
+<span class="normal"><a href="#__codelineno-0-269">269</a></span>
+<span class="normal"><a href="#__codelineno-0-270">270</a></span>
+<span class="normal"><a href="#__codelineno-0-271">271</a></span>
+<span class="normal"><a href="#__codelineno-0-272">272</a></span>
+<span class="normal"><a href="#__codelineno-0-273">273</a></span>
+<span class="normal"><a href="#__codelineno-0-274">274</a></span>
+<span class="normal"><a href="#__codelineno-0-275">275</a></span>
+<span class="normal"><a href="#__codelineno-0-276">276</a></span>
+<span class="normal"><a href="#__codelineno-0-277">277</a></span>
+<span class="normal"><a href="#__codelineno-0-278">278</a></span>
+<span class="normal"><a href="#__codelineno-0-279">279</a></span>
+<span class="normal"><a href="#__codelineno-0-280">280</a></span>
+<span class="normal"><a href="#__codelineno-0-281">281</a></span>
+<span class="normal"><a href="#__codelineno-0-282">282</a></span>
+<span class="normal"><a href="#__codelineno-0-283">283</a></span>
+<span class="normal"><a href="#__codelineno-0-284">284</a></span>
+<span class="normal"><a href="#__codelineno-0-285">285</a></span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span>
+<span class="normal"><a href="#__codelineno-0-287">287</a></span>
+<span class="normal"><a href="#__codelineno-0-288">288</a></span>
+<span class="normal"><a href="#__codelineno-0-289">289</a></span>
+<span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span>
+<span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span>
+<span class="normal"><a href="#__codelineno-0-306">306</a></span>
+<span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span>
+<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+<span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span>
+<span class="normal"><a href="#__codelineno-0-323">323</a></span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span>
+<span class="normal"><a href="#__codelineno-0-333">333</a></span>
+<span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span>
+<span class="normal"><a href="#__codelineno-0-339">339</a></span>
+<span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+<span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span>
+<span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span>
+<span class="normal"><a href="#__codelineno-0-401">401</a></span>
+<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+<span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span>
+<span class="normal"><a href="#__codelineno-0-413">413</a></span>
+<span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span>
+<span class="normal"><a href="#__codelineno-0-420">420</a></span>
+<span class="normal"><a href="#__codelineno-0-421">421</a></span>
+<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span>
+<span class="normal"><a href="#__codelineno-0-424">424</a></span>
+<span class="normal"><a href="#__codelineno-0-425">425</a></span>
+<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+<span class="normal"><a href="#__codelineno-0-427">427</a></span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span>
+<span class="normal"><a href="#__codelineno-0-439">439</a></span>
+<span class="normal"><a href="#__codelineno-0-440">440</a></span>
+<span class="normal"><a href="#__codelineno-0-441">441</a></span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_operator</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>                    <span class="n">repository</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>                    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>                    <span class="n">custom_dockerfile_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Template</span><span class="p">],</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>                    <span class="n">additional_files</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>                    <span class="n">log_level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>                    <span class="n">local_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>                    <span class="n">no_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>                    <span class="n">rename_files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>                    <span class="n">overwrite_files</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>                    <span class="n">skip_logging</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>                    <span class="n">keep_generated_files</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>                    <span class="n">platform</span><span class="o">=</span><span class="s1">&#39;linux/amd64&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>                    <span class="n">dockerfile</span><span class="o">=</span><span class="s1">&#39;Dockerfile.generated&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>                    <span class="n">image_version</span><span class="o">=</span><span class="s1">&#39;python3.12&#39;</span><span class="p">,</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>                    <span class="n">skip_docker_build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>                    <span class="p">):</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Parameters: &#39;</span><span class="p">)</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;file_path: &#39;</span> <span class="o">+</span> <span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;repository: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">repository</span><span class="p">))</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;version: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;additional_files: &#39;</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">additional_files</span><span class="p">))</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.py&#39;</span><span class="p">):</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="c1"># use temp file for processing</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">target_code</span> <span class="o">=</span> <span class="s1">&#39;claimed_&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="c1"># Copy file to current working directory</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="c1"># Add code for logging and cli parameters to the beginning of the script</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="n">script</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>        <span class="k">if</span> <span class="n">skip_logging</span><span class="p">:</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="n">script</span> <span class="o">=</span> <span class="n">component_setup_code_wo_logging</span> <span class="o">+</span> <span class="n">script</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="n">script</span> <span class="o">=</span> <span class="n">python_component_setup_code</span> <span class="o">+</span> <span class="n">script</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="c1"># getting parameter from the script</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">script_data</span> <span class="o">=</span> <span class="n">Pythonscript</span><span class="p">(</span><span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="n">dockerfile_template</span> <span class="o">=</span> <span class="n">custom_dockerfile_template</span> <span class="ow">or</span> <span class="n">python_dockerfile_template</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;/opt/app-root/bin/python&#39;</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">working_dir</span> <span class="o">=</span> <span class="s1">&#39;/opt/app-root/src/&#39;</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="k">elif</span> <span class="n">file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ipynb&#39;</span><span class="p">):</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="c1"># use temp file for processing</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">target_code</span> <span class="o">=</span> <span class="s1">&#39;claimed_&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="c1"># Copy file to current working directory</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">notebook</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="c1"># Add code for logging and cli parameters to the beginning of the notebook</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">notebook</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">{</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="s1">&#39;cell_type&#39;</span><span class="p">:</span> <span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;execution_count&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;outputs&#39;</span><span class="p">:</span> <span class="p">[],</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">component_setup_code_wo_logging</span> <span class="k">if</span> <span class="n">skip_logging</span> <span class="k">else</span> <span class="n">python_component_setup_code</span><span class="p">})</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">notebook</span><span class="p">,</span> <span class="n">json_file</span><span class="p">)</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="c1"># getting parameter from the script</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">script_data</span> <span class="o">=</span> <span class="n">Notebook</span><span class="p">(</span><span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">dockerfile_template</span> <span class="o">=</span> <span class="n">custom_dockerfile_template</span> <span class="ow">or</span> <span class="n">python_dockerfile_template</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;/opt/app-root/bin/ipython&#39;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="n">working_dir</span> <span class="o">=</span> <span class="s1">&#39;/opt/app-root/src/&#39;</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">elif</span> <span class="n">file_path</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.r&#39;</span><span class="p">):</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>        <span class="c1"># use temp file for processing</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="n">target_code</span> <span class="o">=</span> <span class="s1">&#39;claimed_&#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="c1"># Copy file to current working directory</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="c1"># Add code for logging and cli parameters to the beginning of the script</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>            <span class="n">script</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="n">script</span> <span class="o">=</span> <span class="n">r_component_setup_code</span> <span class="o">+</span> <span class="n">script</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_code</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">script</span><span class="p">)</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="c1"># getting parameter from the script</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="n">script_data</span> <span class="o">=</span> <span class="n">Rscript</span><span class="p">(</span><span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">dockerfile_template</span> <span class="o">=</span> <span class="n">custom_dockerfile_template</span> <span class="ow">or</span> <span class="n">r_dockerfile_template</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;Rscript&#39;</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">working_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/docker/&#39;</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Please provide a file_path to a jupyter notebook, python script, or R script.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">script_data</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="c1"># convert description into a string with a single line</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">script_data</span><span class="o">.</span><span class="n">get_description</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>                   <span class="s1">&#39; – CLAIMED &#39;</span> <span class="o">+</span> <span class="n">CLAIMED_VERSION</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="n">inputs</span> <span class="o">=</span> <span class="n">script_data</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="n">outputs</span> <span class="o">=</span> <span class="n">script_data</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">()</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">requirements</span> <span class="o">=</span> <span class="n">script_data</span><span class="o">.</span><span class="n">get_requirements</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="c1"># Strip &#39;claimed-&#39; from name of copied temp file</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;claimed-&#39;</span><span class="p">):</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">target_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># Check that the main file is within the cwd</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="k">if</span> <span class="s1">&#39;../&#39;</span> <span class="ow">in</span> <span class="n">target_dir</span><span class="p">:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forbidden path outside the docker build context: </span><span class="si">{</span><span class="n">target_dir</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                              <span class="sa">f</span><span class="s2">&quot;Change the current working directory to include the file.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">elif</span> <span class="n">target_dir</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">target_dir</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Operator name: &#39;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Description: &#39;</span> <span class="o">+</span> <span class="n">description</span><span class="p">)</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Inputs:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inputs</span><span class="o">.</span><span class="n">items</span><span class="p">()])))</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Outputs:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">.</span><span class="n">items</span><span class="p">()])))</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Requirements: &#39;</span> <span class="o">+</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">requirements</span><span class="p">))</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Target code: </span><span class="si">{</span><span class="n">target_code</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Target directory: </span><span class="si">{</span><span class="n">target_dir</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="c1"># Load all additional files</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for additional files:&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">additional_files_found</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="k">for</span> <span class="n">file_pattern</span> <span class="ow">in</span> <span class="n">additional_files</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">if</span> <span class="s1">&#39;../&#39;</span> <span class="ow">in</span> <span class="n">file_pattern</span><span class="p">:</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="c1"># Check that additional file are within the cwd</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Forbidden path outside the docker build context: </span><span class="si">{</span><span class="n">file_pattern</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                                  <span class="sa">f</span><span class="s2">&quot;Change the current working directory to include all additional files.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="c1"># Include files based on wildcards</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">files_found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">file_pattern</span><span class="p">)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_found</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No additional files for path </span><span class="si">{</span><span class="n">file_pattern</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">additional_files_found</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">files_found</span><span class="p">)</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Searched for &quot;</span><span class="si">{</span><span class="n">file_pattern</span><span class="si">}</span><span class="s1">&quot;. Found </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">files_found</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">additional_files_found</span><span class="p">)</span><span class="si">}</span><span class="s1"> additional files and directories</span><span class="se">\n</span><span class="s1">&#39;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">additional_files_found</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">create_dockerfile</span><span class="p">(</span><span class="n">dockerfile_template</span><span class="p">,</span> <span class="n">dockerfile</span><span class="p">,</span> <span class="n">requirements</span><span class="p">,</span> <span class="n">target_code</span><span class="p">,</span> <span class="n">target_dir</span><span class="p">,</span> <span class="n">additional_files_found</span><span class="p">,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                      <span class="n">working_dir</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">image_version</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="c1"># auto increase version based on registered images</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">version</span> <span class="o">=</span> <span class="n">get_image_version</span><span class="p">(</span><span class="n">repository</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">if</span> <span class="n">repository</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">local_mode</span><span class="p">:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No repository provided. The container image is only saved locally. Add `-r &lt;repository&gt;` &#39;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                            <span class="s1">&#39;to push the image to a container registry or run `--local_mode` to suppress this warning.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">local_mode</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">repository</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_docker_build</span><span class="p">:</span>                   
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">if</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;docker buildx&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="c1"># Using docker buildx</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using docker buildx&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="n">build_command</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;docker buildx build -f </span><span class="si">{</span><span class="n">dockerfile</span><span class="si">}</span><span class="s1">&#39;</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Using docker build. Consider installing docker-buildx.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="n">build_command</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;docker build -f </span><span class="si">{</span><span class="n">dockerfile</span><span class="si">}</span><span class="s1">&#39;</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Building container image claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="c1"># Run docker build</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">build_command</span><span class="si">}</span><span class="s2"> --platform </span><span class="si">{</span><span class="n">platform</span><span class="si">}</span><span class="s2"> -t claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> . </span><span class="si">{</span><span class="s1">&#39;--no-cache&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">no_cache</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span> <span class="k">else</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="k">if</span> <span class="n">repository</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>                <span class="c1"># Run docker tag</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Tagging images with &quot;latest&quot; and &quot;</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>                    <span class="sa">f</span><span class="s2">&quot;docker tag claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>                    <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span> <span class="k">else</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>                <span class="p">)</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>                    <span class="sa">f</span><span class="s2">&quot;docker tag claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:latest&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>                    <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span> <span class="k">else</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>                <span class="p">)</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Docker build failed. Consider running C3 with `--log_level DEBUG` to see the docker build logs.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_generated_files</span><span class="p">:</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>                <span class="n">remove_temporary_files</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="k">raise</span> <span class="n">err</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Successfully built image claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="k">if</span> <span class="n">local_mode</span><span class="p">:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No repository provided, skip docker push.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Pushing images to registry </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                <span class="c1"># Run docker push</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                    <span class="sa">f</span><span class="s2">&quot;docker push </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:latest&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>                    <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span> <span class="k">else</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="p">)</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                    <span class="sa">f</span><span class="s2">&quot;docker push </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/claimed-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                    <span class="n">stdout</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">log_level</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span> <span class="k">else</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>                <span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Successfully pushed image to registry&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not push images to namespace </span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s1">. &#39;</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                              <span class="sa">f</span><span class="s1">&#39;Please check if docker is logged in or select a namespace with access.&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_generated_files</span><span class="p">:</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                    <span class="n">remove_temporary_files</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="k">raise</span> <span class="n">err</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="c1"># Check for existing files and optionally modify them before overwriting</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">check_existing_files</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">rename_files</span><span class="p">,</span> <span class="n">overwrite_files</span><span class="p">)</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_generated_files</span><span class="p">:</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="n">remove_temporary_files</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">raise</span> <span class="n">err</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="c1"># Create application scripts</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>    <span class="n">create_kfp_component</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">target_code</span><span class="p">,</span> <span class="n">target_dir</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>                         <span class="n">outputs</span><span class="p">)</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>    <span class="n">create_kubernetes_job</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">target_code</span><span class="p">,</span> <span class="n">target_dir</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="n">create_cwl_component</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="n">print_claimed_command</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="c1"># Remove temp files</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_generated_files</span><span class="p">:</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="n">remove_temporary_files</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">target_code</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="claimed.c3.create_operator.create_dockerfile" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_dockerfile</span><span class="p">(</span><span class="n">dockerfile_template</span><span class="p">,</span> <span class="n">dockerfile</span><span class="p">,</span> <span class="n">requirements</span><span class="p">,</span> <span class="n">target_code</span><span class="p">,</span> <span class="n">target_dir</span><span class="p">,</span> <span class="n">additional_files</span><span class="p">,</span> <span class="n">working_dir</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">image_version</span><span class="p">)</span></code>
+
+<a href="#claimed.c3.create_operator.create_dockerfile" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/claimed/c3/create_operator.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#__codelineno-0-60">60</a></span>
+<span class="normal"><a href="#__codelineno-0-61">61</a></span>
+<span class="normal"><a href="#__codelineno-0-62">62</a></span>
+<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+<span class="normal"><a href="#__codelineno-0-64">64</a></span>
+<span class="normal"><a href="#__codelineno-0-65">65</a></span>
+<span class="normal"><a href="#__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-25" name="__codelineno-0-25"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_dockerfile</span><span class="p">(</span><span class="n">dockerfile_template</span><span class="p">,</span> <span class="n">dockerfile</span><span class="p">,</span> <span class="n">requirements</span><span class="p">,</span> <span class="n">target_code</span><span class="p">,</span> <span class="n">target_dir</span><span class="p">,</span> <span class="n">additional_files</span><span class="p">,</span>
+<a id="__codelineno-0-26" name="__codelineno-0-26"></a>                      <span class="n">working_dir</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">image_version</span><span class="p">):</span>
+<a id="__codelineno-0-27" name="__codelineno-0-27"></a>    <span class="c1"># Check for requirements file</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">requirements</span><span class="p">)):</span>
+<a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="k">if</span> <span class="s1">&#39;-r &#39;</span> <span class="ow">in</span> <span class="n">requirements</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+<a id="__codelineno-0-30" name="__codelineno-0-30"></a>            <span class="n">r_file_search</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;-r ~?\/?([^\s]*\.txt)&#39;</span><span class="p">,</span> <span class="n">requirements</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<a id="__codelineno-0-31" name="__codelineno-0-31"></a>            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r_file_search</span><span class="o">.</span><span class="n">groups</span><span class="p">()):</span>
+<a id="__codelineno-0-32" name="__codelineno-0-32"></a>                <span class="c1"># Get file from regex</span>
+<a id="__codelineno-0-33" name="__codelineno-0-33"></a>                <span class="n">requirements_file</span> <span class="o">=</span> <span class="n">r_file_search</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-34" name="__codelineno-0-34"></a>                <span class="k">if</span> <span class="n">requirements_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">additional_files</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">requirements_file</span><span class="p">):</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>                    <span class="c1"># Add missing requirements text file to additional files</span>
+<a id="__codelineno-0-36" name="__codelineno-0-36"></a>                    <span class="n">additional_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r_file_search</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<a id="__codelineno-0-37" name="__codelineno-0-37"></a>            <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">requirements</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+<a id="__codelineno-0-38" name="__codelineno-0-38"></a>                <span class="c1"># Add missing home directory to the command `pip install -r ~/requirements.txt`</span>
+<a id="__codelineno-0-39" name="__codelineno-0-39"></a>                <span class="n">requirements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">requirements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-r &#39;</span><span class="p">,</span> <span class="s1">&#39;-r ~/&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-40" name="__codelineno-0-40"></a>
+<a id="__codelineno-0-41" name="__codelineno-0-41"></a>    <span class="n">requirements_docker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="s1">&#39;RUN &#39;</span> <span class="o">+</span> <span class="n">s</span><span class="p">,</span> <span class="n">requirements</span><span class="p">))</span>
+<a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="n">requirements_docker</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">requirements_docker</span><span class="p">)</span>
+<a id="__codelineno-0-43" name="__codelineno-0-43"></a>    <span class="n">additional_files_docker</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;ADD </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">working_dir</span><span class="si">}{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">additional_files</span><span class="p">))</span>
+<a id="__codelineno-0-44" name="__codelineno-0-44"></a>    <span class="n">additional_files_docker</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">additional_files_docker</span><span class="p">)</span>
+<a id="__codelineno-0-45" name="__codelineno-0-45"></a>
+<a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="c1"># Select base image</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="k">if</span> <span class="s1">&#39;python&#39;</span> <span class="ow">in</span> <span class="n">command</span><span class="p">:</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="n">base_image</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;registry.access.redhat.com/ubi8/python-</span><span class="si">{</span><span class="n">image_version</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;python&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;Rscript&#39;</span><span class="p">:</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a>        <span class="k">if</span> <span class="s1">&#39;python&#39;</span> <span class="ow">in</span> <span class="n">image_version</span><span class="p">:</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a>            <span class="c1"># Using default R version</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a>            <span class="n">image_version</span> <span class="o">=</span> <span class="s1">&#39;R4.3.2&#39;</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a>        <span class="n">base_image</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;r-base:</span><span class="si">{</span><span class="n">image_version</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;Rr:&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unrecognized command </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using base image </span><span class="si">{</span><span class="n">base_image</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a>    <span class="n">docker_file</span> <span class="o">=</span> <span class="n">dockerfile_template</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>        <span class="n">base_image</span><span class="o">=</span><span class="n">base_image</span><span class="p">,</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>        <span class="n">requirements_docker</span><span class="o">=</span><span class="n">requirements_docker</span><span class="p">,</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a>        <span class="n">target_code</span><span class="o">=</span><span class="n">target_code</span><span class="p">,</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a>        <span class="n">target_dir</span><span class="o">=</span><span class="n">target_dir</span><span class="p">,</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a>        <span class="n">additional_files_docker</span><span class="o">=</span><span class="n">additional_files_docker</span><span class="p">,</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>        <span class="n">working_dir</span><span class="o">=</span><span class="n">working_dir</span><span class="p">,</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>        <span class="n">command</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">command</span><span class="p">),</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a>    <span class="p">)</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Create Dockerfile&#39;</span><span class="p">)</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dockerfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">text_file</span><span class="p">:</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>        <span class="n">text_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">docker_file</span><span class="p">)</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dockerfile</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">docker_file</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="output-files">Output Files<a class="headerlink" href="#output-files" title="Permanent link">&para;</a></h2>
+<p>After a successful run you will find:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;name&gt;.dockerfile</code></td>
+<td>Generated Dockerfile</td>
+</tr>
+<tr>
+<td><code>&lt;name&gt;.yaml</code></td>
+<td>KubeFlow Pipelines component spec</td>
+</tr>
+<tr>
+<td><code>&lt;name&gt;.job.yaml</code></td>
+<td>Kubernetes Job spec</td>
+</tr>
+<tr>
+<td><code>&lt;name&gt;.cwl</code></td>
+<td>CWL component descriptor</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -7,7 +7,7 @@ version_file = "src/c3/_version.py"
 
 [project]
 name = "claimed"
-version = "0.2.6"
+version = "0.2.7"
 authors = [
   { name="The CLAIMED authors", email="claimed-framework@proton.me"},
 ]

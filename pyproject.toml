@@ -32,6 +32,7 @@ dependencies = [
     'pandas',
     'boto3',
     's3fs',
+    'tqdm',
 ]
 
 [project.urls]

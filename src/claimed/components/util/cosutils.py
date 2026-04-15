@@ -26,21 +26,29 @@ import glob
 from tqdm import tqdm
 from claimed.c3.operator_utils import explode_connection_string
 
-CHUNK_SIZE = 8 * 1024 * 1024  # 8 MiB
+MIN_CHUNK_SIZE = 8 * 1024 * 1024   # 8 MiB
+MAX_PARTS      = 9500               # S3 hard limit is 10 000; stay safely below
 
 
 def _upload(s3, local_file, cos_file):
-    """Upload a single file to S3/COS with a byte-level progress bar."""
+    """Upload a single file to S3/COS with a byte-level progress bar.
+
+    Chunk size is computed dynamically so the number of multipart parts
+    never exceeds the S3/COS limit of 10 000.
+    """
     # If cos_file is a bucket root or ends with '/', treat it as a directory prefix
     if cos_file == '' or cos_file.endswith('/') or '/' not in cos_file:
         cos_file = cos_file.rstrip('/') + '/' + os.path.basename(local_file)
     size = os.path.getsize(local_file)
+    # Ensure chunk size is large enough to stay within the 10 000-part limit
+    chunk_size = max(MIN_CHUNK_SIZE, math.ceil(size / MAX_PARTS))
     desc = os.path.basename(local_file)
     with tqdm(total=size, unit='B', unit_scale=True, unit_divisor=1024,
               desc=f'↑ {desc}', leave=True) as pbar:
-        with open(local_file, 'rb') as f_in, s3.open(cos_file, 'wb') as f_out:
+        with open(local_file, 'rb') as f_in, \
+             s3.open(cos_file, 'wb', block_size=chunk_size) as f_out:
             while True:
-                chunk = f_in.read(CHUNK_SIZE)
+                chunk = f_in.read(chunk_size)
                 if not chunk:
                     break
                 f_out.write(chunk)

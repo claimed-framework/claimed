@@ -31,6 +31,9 @@ CHUNK_SIZE = 8 * 1024 * 1024  # 8 MiB
 
 def _upload(s3, local_file, cos_file):
     """Upload a single file to S3/COS with a byte-level progress bar."""
+    # If cos_file is a bucket root or ends with '/', treat it as a directory prefix
+    if cos_file == '' or cos_file.endswith('/') or '/' not in cos_file:
+        cos_file = cos_file.rstrip('/') + '/' + os.path.basename(local_file)
     size = os.path.getsize(local_file)
     desc = os.path.basename(local_file)
     with tqdm(total=size, unit='B', unit_scale=True, unit_divisor=1024,

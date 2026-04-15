@@ -34,6 +34,10 @@ hpo:
     choices: ["max-autotune", "default", "reduce-overhead", null]
     # null → --compile flag is omitted entirely
 
+  num_workers:
+    type: categorical
+    choices: [8, 16, 24, 32]
+
   dataset:
     type: group             # one choice selects all bundled args together
     choices:
@@ -44,5 +48,4 @@ hpo:
 static:
   run_name: run1
   log_dir: logs
-  num_workers: 32
   report-performance: true

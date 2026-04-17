@@ -32,10 +32,17 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 # Adjust to match your cluster's GPU model and scheduling policy.
 LSF_GPU_CONFIG="${LSF_GPU_CONFIG:-num=2:mode=exclusive_process:mps=no:gmodel=NVIDIAA100_SXM4_80GB}"
 
+# Commands to run inside the bsub job before launching the training script.
+# source ~/.bashrc ensures module / mamba initialisation is available;
+# micromamba activate gridfm switches to the correct conda environment.
+PRE_RUN="${PRE_RUN_COMMANDS:-source ~/.bashrc && micromamba activate gridfm}"
+
 iterate \
   --script            "gridfm_graphkit train"                       \
   --interpreter       ""                                            \
+  --root-dir          "${GRIDFM_ROOT:-${HOME}/gitco/gridfm-graphkit}" \
   --wlm               lsf                                           \
+  --pre-run-commands  "${PRE_RUN}"                                  \
   --no-underscore-to-hyphen                                         \
   --gpu-count         2                                             \
   --cpu-count         32                                            \

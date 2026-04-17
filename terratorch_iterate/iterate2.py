@@ -33,7 +33,17 @@ def parse_args():
     # ------------------------
     parser.add_argument("--script", required=True, help="Training script to execute")
     parser.add_argument("--root-dir", default=None, help="Root dir (derived if omitted)")
-    parser.add_argument("--venv", default=".venv", help="Virtualenv dir")
+    parser.add_argument("--venv", default=".venv", help="Virtualenv dir (shortcut for source <venv>/bin/activate)")
+    parser.add_argument(
+        "--pre-run-commands",
+        default=None,
+        help=(
+            "Shell commands to run before the training script, joined with ' && '. "
+            "Useful for sourcing bashrc, activating conda/mamba envs, loading modules, etc. "
+            "Example: 'source ~/.bashrc && micromamba activate gridfm'. "
+            "When set, --venv is ignored."
+        ),
+    )
     parser.add_argument("--interpreter", default="python", help="Interpreter to use")
     parser.add_argument("--param-setter", type=str, default=None)
     parser.add_argument("--wlm", choices=["lsf", "slurm", "openshift", "vela", "none"], default="none")
@@ -164,9 +174,12 @@ def build_launcher_command(wlm, cmd, trial_id, out_file, err_file, gpu_count, cp
     logger.debug("Launcher command: %s", launcher)
     return launcher
 
-def build_shell_command(interpreter, root_dir, script_path, venv, script_args, param_setter, underscore_to_hyphen=True):
+def build_shell_command(interpreter, root_dir, script_path, venv, script_args, param_setter, underscore_to_hyphen=True, pre_run_commands=None):
     parts = [f"cd {root_dir}"]
-    if venv:
+    if pre_run_commands:
+        parts.append(pre_run_commands)
+        logger.debug("Pre-run commands: %s", pre_run_commands)
+    elif venv:
         parts.append(f"source {venv}/bin/activate")
         logger.debug("Activating venv: %s", venv)
     arg_list = [f"{interpreter} {script_path}"]
@@ -774,7 +787,7 @@ def main():
             )
         else:
             # ── Standard WLM path (lsf / slurm / none) ────────────────────
-            shell_cmd = build_shell_command(args.interpreter, root_dir, script_path, args.venv, script_args, args.param_setter, args.underscore_to_hyphen)
+            shell_cmd = build_shell_command(args.interpreter, root_dir, script_path, args.venv, script_args, args.param_setter, args.underscore_to_hyphen, pre_run_commands=args.pre_run_commands)
             launcher_cmd = build_launcher_command(args.wlm, shell_cmd, trial.number, out_file, err_file, gpu_count, args.cpu_count, args.mem_gb, args.lsf_gpu_config_string)
             logger.info("Trial %d: submitting → %s", trial.number, launcher_cmd)
             run_and_stream(launcher_cmd, trial.number, out_file, err_file, args.wlm)

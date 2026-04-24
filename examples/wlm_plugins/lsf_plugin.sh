@@ -64,10 +64,13 @@ ${TRAIN_CMD}"
 # -- Submit via bsub -----------------------------------------------------------
 # -K  blocks until the job finishes (iterate2 runs each trial in a thread).
 # -o/-e redirect LSF job stdout/stderr to the files iterate2 will read.
+MEM_MB=$(( MEM_GB * 1024 ))
+
 bsub \
   -K \
   -gpu  "${GPU_STRING}" \
-  -R    "rusage[ngpus_physical=${GPU_COUNT},cpus=${CPU_COUNT},mem=${MEM_GB}GB]" \
+  -n    "${CPU_COUNT}" \
+  -R    "rusage[mem=${MEM_MB}]" \
   -o    "${OUT_FILE}" \
   -e    "${ERR_FILE}" \
   -J    "hpo_trial_${TRIAL_NUMBER}" \

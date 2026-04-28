@@ -45,11 +45,14 @@ MEM_GB=32
 # -- Build training command from ITERATE_PARAM_* vars -------------------------
 # --gpu_num is NOT a gridfm_graphkit flag; GPU count is controlled via bsub -gpu.
 TRAIN_CMD="gridfm_graphkit train"
-TRAIN_CMD+=" --batch_size ${ITERATE_PARAM_BATCH_SIZE}"
+TRAIN_CMD+=" --batch_size  ${ITERATE_PARAM_BATCH_SIZE}"
 TRAIN_CMD+=" --num_workers ${ITERATE_PARAM_NUM_WORKERS}"
-TRAIN_CMD+=" --config     ${ITERATE_PARAM_CONFIG}"
-TRAIN_CMD+=" --data_path  ${ITERATE_PARAM_DATA_PATH}"
+TRAIN_CMD+=" --config      ${ITERATE_PARAM_CONFIG}"
+TRAIN_CMD+=" --data_path   ${ITERATE_PARAM_DATA_PATH}"
 # [[ -n "${ITERATE_PARAM_COMPILE:-}" ]] && TRAIN_CMD+=" --compile ${ITERATE_PARAM_COMPILE}"
+[[ -n "${ITERATE_PARAM_RUN_NAME:-}"  ]] && TRAIN_CMD+=" --run_name ${ITERATE_PARAM_RUN_NAME}"
+[[ -n "${ITERATE_PARAM_LOG_DIR:-}"   ]] && TRAIN_CMD+=" --log_dir ${ITERATE_PARAM_LOG_DIR}"
+[[ "${ITERATE_PARAM_REPORT_PERFORMANCE:-}" == "True" ]] && TRAIN_CMD+=" --report-performance"
 
 # -- Compose full job shell command -------------------------------------------
 # source ~/.bashrc to initialise micromamba shell hooks

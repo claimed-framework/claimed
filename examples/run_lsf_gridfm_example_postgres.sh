@@ -27,7 +27,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 : "${POSTGRES_URL:?Please set POSTGRES_URL=postgresql://user:password@host:port/dbname}"
 
-iterate2 \
+iterate \
   --script            "${SCRIPT_DIR}/wlm_plugins/lsf_plugin.sh" \
   --optuna-study-name gridfm_lsf_postgres_hpo                    \
   --optuna-db-path    "${POSTGRES_URL}"                          \

@@ -10,8 +10,8 @@
 #   * bsub / bjobs available on PATH
 #   * gridfm-graphkit installed in the "gridfm" micromamba env
 #   * configs/gridfm_graphkit_hpo.yaml present
-#   * A study storage backend available (SQLite shown; switch to PostgreSQL
-#     for high-parallelism runs: export POSTGRES_URL=... and use it below)
+#   * psycopg2-binary:  pip install 'terratorch-iterate[postgresql]'
+#   * POSTGRES_URL set:  export POSTGRES_URL="postgresql://user:password@host:5432/optuna_studies"
 # =============================================================================
 
 set -euo pipefail

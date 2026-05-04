@@ -24,7 +24,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-iterate2 \
+iterate \
   --script            "${SCRIPT_DIR}/wlm_plugins/vela_plugin.py" \
   --optuna-study-name gridfm_vela_hpo                             \
   --optuna-db-path    "js:///gridfm_vela_hpo.journal"             \

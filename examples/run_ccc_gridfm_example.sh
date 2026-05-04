@@ -28,7 +28,7 @@ export GRIDFM_ROOT="${GRIDFM_ROOT:-/dccstor/terratorch/users/rkie/gitco/gridfm-g
 export GRIDFM_VENV="${GRIDFM_VENV:-/u/rkie/venvs/venv_gridfm-graphkit}"
 export CUDA_BASE="${CUDA_BASE:-/opt/share/cuda-12.8.1}"
 
-iterate2 \
+iterate \
   --script            "${SCRIPT_DIR}/wlm_plugins/ccc_plugin.sh" \
   --optuna-study-name gridfm_ccc_hpo                             \
   --optuna-db-path    "${POSTGRES_URL}"                          \

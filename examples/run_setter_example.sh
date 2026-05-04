@@ -16,7 +16,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-iterate2 \
+iterate \
   --script            "${SCRIPT_DIR}/bumpy_function.py"  \
   --optuna-study-name bumpy_local_study                   \
   --optuna-db-path    "sqlite:///bumpy_local_hpo.db"      \

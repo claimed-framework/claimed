@@ -41,7 +41,7 @@ iterate2 \
 |---|---|---|
 | `--script` | *(required)* | Training script to execute |
 | `--root-dir` | `.` | Working directory; derived from `--script` if omitted |
-| `--venv` | `.venv` | Virtual-environment directory to activate. Set to empty string to disable |
+| `--venv` | *(none)* | Virtual-environment directory to activate. Omit to skip venv activation entirely |
 | `--interpreter` | `python` | Python interpreter to invoke |
 | `--param-setter` | `None` | Use setter-style argument passing (see [Setter-style arguments](#setter-style-arguments)) |
 | `--wlm-plugin` | *(local)* | Path to an executable WLM plugin script. When omitted, trials run locally in the current process |

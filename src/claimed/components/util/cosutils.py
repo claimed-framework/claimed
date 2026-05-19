@@ -142,21 +142,26 @@ def run(
             _upload(s3, local_path, cos_path)
 
     elif operation == 'sync_to_cos':
-        files = glob.glob(local_path, recursive=recursive)
+        if recursive or os.path.isdir(local_path):
+            raw = glob.glob(os.path.join(local_path, '**'), recursive=True)
+        else:
+            raw = glob.glob(local_path, recursive=False)
+        files = [f for f in raw if os.path.isfile(f)]
         with tqdm(files, unit='file', desc='Syncing → COS') as pbar:
             for file in pbar:
                 pbar.set_postfix_str(file)
                 logging.info(f'processing {file}')
-                if s3.exists(cos_path + file):
-                    logging.debug(f's3.info {s3.info(cos_path + file)}')
-                    if s3.info(cos_path + file)['size'] != os.path.getsize(file):
+                remote_key = cos_path.rstrip('/') + '/' + file
+                if s3.exists(remote_key):
+                    logging.debug(f's3.info {s3.info(remote_key)}')
+                    if s3.info(remote_key)['size'] != os.path.getsize(file):
                         logging.info(f'uploading {file}')
-                        _upload(s3, file, cos_path + file)
+                        _upload(s3, file, remote_key)
                     else:
                         logging.info(f'skipping {file}')
                 else:
                     logging.info(f'uploading {file}')
-                    _upload(s3, file, cos_path + file)
+                    _upload(s3, file, remote_key)
 
     elif operation == 'sync_to_local':
         remote_files = [p for p in s3.glob(cos_path)

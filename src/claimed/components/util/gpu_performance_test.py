@@ -27,11 +27,11 @@ CPU only:
     python pytorch_hpc_benchmark.py --mode cpu
 """
 
+import math
 import os
 import time
 import argparse
 import shutil
-import math
 import random
 
 import torch
@@ -39,6 +39,21 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.distributed as dist
 from torch.utils.data import Dataset, DataLoader
+
+# =====================
+# Helpers
+# =====================
+
+def _parse_dim(val):
+    """Parse an int or comma-separated ints into an int or tuple.
+
+    Examples:  '1024' -> 1024,  '3,224,224' -> (3, 224, 224)
+    """
+    if isinstance(val, (int, tuple)):
+        return val
+    parts = [int(p) for p in str(val).split(',')]
+    return parts[0] if len(parts) == 1 else tuple(parts)
+
 
 # =====================
 # Synthetic Dataset
@@ -58,7 +73,8 @@ class SyntheticDataset(Dataset):
         return self.size
 
     def _generate(self, idx):
-        x = torch.randn(self.input_dim)
+        shape = (self.input_dim,) if isinstance(self.input_dim, int) else self.input_dim
+        x = torch.randn(*shape)
         y = torch.randint(0, self.num_classes, (1,)).item()
         return x, y
 
@@ -81,8 +97,11 @@ class SyntheticDataset(Dataset):
 class SimpleMLP(nn.Module):
     def __init__(self, input_dim, hidden_dim, num_classes, depth=3):
         super().__init__()
+        flat = input_dim if isinstance(input_dim, int) else math.prod(input_dim)
         layers = []
-        dim = input_dim
+        if not isinstance(input_dim, int):
+            layers.append(nn.Flatten())
+        dim = flat
         for _ in range(depth):
             layers.append(nn.Linear(dim, hidden_dim))
             layers.append(nn.ReLU())
@@ -211,7 +230,7 @@ def run(
     num_workers: int = 4,
     dataset_size: int = 100000,
     steps: int = 100,
-    input_dim: int = 1024,
+    input_dim: str = '1024',
     hidden_dim: int = 2048,
     num_classes: int = 10,
     depth: int = 3,
@@ -228,7 +247,7 @@ def run(
     num_workers:     dataloader worker processes
     dataset_size:    total number of synthetic samples
     steps:           number of batches per benchmark phase
-    input_dim:       input feature dimension of the MLP
+    input_dim:       input feature dimension – single int or C,H,W tuple (e.g. '1024' or '3,224,224')
     hidden_dim:      hidden layer width of the MLP
     num_classes:     number of output classes
     depth:           number of hidden layers
@@ -237,6 +256,7 @@ def run(
     matrix_size:     square matrix edge length for compute benchmarks
     iterations:      number of matrix-multiply iterations for compute benchmarks
     """
+    input_dim = _parse_dim(input_dim)
     if mode == 'cpu':
         print('CPU GFLOPS:', benchmark_cpu(matrix_size, iterations))
         return
@@ -296,7 +316,7 @@ def main():
     parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--dataset_size', type=int, default=100000)
     parser.add_argument('--steps', type=int, default=100)
-    parser.add_argument('--input_dim', type=int, default=1024)
+    parser.add_argument('--input_dim', type=str, default='1024')
     parser.add_argument('--hidden_dim', type=int, default=2048)
     parser.add_argument('--num_classes', type=int, default=10)
     parser.add_argument('--depth', type=int, default=3)

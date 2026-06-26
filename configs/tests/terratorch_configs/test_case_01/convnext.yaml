@@ -1,0 +1,156 @@
+# lightning.pytorch==2.1.1
+seed_everything: 0
+trainer:
+  accelerator: auto
+  strategy: auto
+  devices: auto
+  num_nodes: 1
+  precision: 16-mixed
+               
+  callbacks:
+    - class_path: RichProgressBar
+    - class_path: LearningRateMonitor
+      init_args:
+        logging_interval: epoch
+    # - class_path: ModelCheckpoint
+    #   init_args:
+    #       mode: min
+    #       monitor: val/loss
+    #       filename: best-{epoch:02d}
+    - class_path: EarlyStopping
+      init_args:
+        monitor: val/loss
+        patience: 20
+    # ---- Early stop if ----
+    # ---- Early stop endif ----
+  max_epochs: 50
+  check_val_every_n_epoch: 1
+  log_every_n_steps: 5
+  enable_checkpointing: false
+  default_root_dir: logs/
+
+data:
+  class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule
+  init_args:
+    batch_size: 16
+    num_workers: 16
+    no_label_replace: -1
+    no_data_replace: 0
+    constant_scale: 1.0
+    dataset_bands:
+      - 'RED'
+      - 'GREEN'
+      - 'BLUE'
+
+    output_bands:
+      - 'RED'
+      - 'GREEN'
+      - 'BLUE'
+
+    rgb_indices:
+      - 0
+      - 1
+      - 2
+
+    train_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    train_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    val_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    val_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    test_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    test_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+    img_grep: "*train.tif"
+    label_grep: "*label.tif"
+    train_split: train.txt
+    val_split: val.txt
+    test_split: test.txt
+    # constant_scale: 0.0039
+    # means: [0.485, 0.456, 0.406]
+    # stds: [0.229, 0.224, 0.225]
+    means: 
+      - 104.24203383423682
+      - 109.92963788132441
+      - 100.98120642006803
+
+    stds: 
+      - 51.593745217159935
+      - 47.218880227273814
+      - 45.45813303733705
+    
+    check_stackability: false
+
+    num_classes: 2
+
+    train_transform:
+      - class_path: albumentations.D4
+      - class_path: ToTensorV2
+    val_transform:
+      - class_path: ToTensorV2
+    test_transform:
+      - class_path: ToTensorV2
+model:
+  class_path: terratorch.tasks.SemanticSegmentationTask
+  init_args:
+    model_factory: EncoderDecoderFactory
+    model_args:
+      backbone: timm_convnext_large.fb_in22k
+      num_classes: 2
+      backbone_pretrained: true
+      necks:
+      # - name: SelectIndices
+      #   indices: [1,2,3,4]
+      decoder: UNetDecoder
+      decoder_channels: [512, 256, 128, 64]
+      head_channel_list: [256]
+      head_dropout: 0.1
+    loss: dice
+    # loss: ce
+    plot_on_val: 2
+    ignore_index: -1
+    freeze_backbone: false
+    freeze_decoder: false
+        
+    # tiled_inference_parameters: 
+    #   h_crop: 224
+    #   h_stride: 198
+    #   w_crop: 224
+    #   w_stride: 198
+    #   average_patches: True
+    
+optimizer:
+  class_path: torch.optim.AdamW
+  init_args:
+    lr: 5.0e-05
+    # betas:
+    # - 0.9
+    # - 0.999
+    # eps: 1.0e-08
+    # weight_decay: 0.05
+    # amsgrad: false
+    # maximize: false
+    # capturable: false
+    # differentiable: false
+    # ---- Optimizer stop if ----
+# lr_scheduler:
+#   class_path: CosineAnnealingLR
+#   init_args:
+#     T_max: 20
+
+# lr_scheduler_interval: step
+# lr_scheduler:
+#   class_path: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
+#   init_args:
+#     T_0: 1000   # first cycle: 1000 steps
+#     T_mult: 2   # cycles: 1000, 2000, 4000, ... (fits well in 10k)
+#     eta_min: 1.0e-6
+lr_scheduler:
+  class_path: lightning.pytorch.cli.ReduceLROnPlateau
+  init_args:
+    monitor: val/loss
+    mode: min
+    factor: 0.5
+    patience: 5
+    threshold: 0.0001
+    threshold_mode: rel
+    cooldown: 0
+    min_lr: 0.0
+    eps: 1.0e-08

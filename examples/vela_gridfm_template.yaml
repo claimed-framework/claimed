@@ -1,0 +1,34 @@
+####################
+# Job Metadata
+# NOTE: iterate2 appends "-trial-<N>" to jobName for each HPO trial so
+#       every trial creates a unique Kubernetes resource.
+####################
+jobName: "romeokienzler-gridfm-hpo"
+containerImage: "us.icr.io/geodn/gridfm-graphkit:0.5"
+imagePullPolicy: "IfNotPresent"
+imagePullSecrets:
+  - name: "pullsecret-gridfm-geodn"
+
+##################################
+# Resource Requirements
+# NOTE: numGpusPerPod is overridden per-trial by the gpu_num HPO parameter.
+##################################
+numPods: 1
+numCpusPerPod: 64
+numGpusPerPod: 2          # placeholder – iterate overrides this with gpu_num
+totalMemoryPerPod: "64Gi"
+
+volumes:
+  - name: "gridfm-storage"
+    claimName: "gridfm"
+    mountPath: "/mnt/data"
+
+########################
+# Workload Specification
+########################
+setupCommands:
+  - "pip install -U git+https://github.com/gridfm/gridfm-graphkit.git@fix_multi_gpu_training"
+  - "wget https://raw.githubusercontent.com/gridfm/gridfm-graphkit/refs/heads/main/examples/config/HGNS_PF_datakit_case118.yaml"
+#  - "sed -i 's/epochs: 200/epochs: 5/g' HGNS_PF_datakit_case118.yaml"
+  # iterate replaces the placeholder below with the HPO-parametrised CLI call.
+  - "{{HPO_COMMAND}}"

@@ -1,0 +1,54 @@
+# HPO configuration for gridfm-graphkit HGNS PF case118
+#
+# Hyperparameters:
+#   compute   – group: selects gpu_num + num_workers + batch_size together
+#                  so that data-loading and batch sizes scale with GPU count
+#   bfloat16  – boolean flag (presence = --bfloat16, absence = flag omitted)
+#   tf32      – boolean flag (presence = --tf32, absence = flag omitted)
+#   compile   – torch.compile mode; null disables the flag entirely
+#   dataset   – group: selects config + data_path + exp_name together
+#
+# Static args:
+#   all other fixed CLI args
+#
+# Metrics:
+#   extracted from [performance] lines in trial output
+
+metrics:
+  - Validation loss
+  - last epoch time
+  - last epoch it/s
+
+hpo:
+  compute:
+    type: group             # one choice co-selects gpu_num, num_workers and batch_size
+    choices:
+      small:                # single GPU – conservative resources
+        gpu_num:     1
+        num_workers: 32
+        batch_size:  64
+      medium:               # two GPUs – doubled throughput
+        gpu_num:     2
+        num_workers: 16
+        batch_size:  32
+      large:                # four GPUs – full-node run
+        gpu_num:     4
+        num_workers: 8
+        batch_size:  16
+
+  compile:
+    type: categorical
+    choices: ["max-autotune", "default", "reduce-overhead", null]
+    # null → --compile flag is omitted entirely
+
+  dataset:
+    type: group             # one choice selects all bundled args together
+    choices:
+      case118:
+        config: ./examples/config/HGNS_PF_datakit_case118.yaml
+        data_path: /u/rki/
+
+static:
+  run_name: run1
+  log_dir: logs
+  report-performance: true

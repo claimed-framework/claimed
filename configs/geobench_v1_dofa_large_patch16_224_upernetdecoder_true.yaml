@@ -1,0 +1,401 @@
+experiment_name: dofa_large_patch16_224_upernetdecoder_true
+defaults:
+  trainer_args:
+    max_epochs: 11
+    precision: bf16-mixed
+    log_every_n_steps: 1
+  terratorch_task:
+    model_args:
+      backbone_pretrained: True
+      backbone: dofa_large_patch16_224
+      backbone_out_indices:
+        - 5
+        - 11
+        - 17
+        - 23
+    model_factory: EncoderDecoderFactory
+    optimizer: AdamW
+    
+tasks:
+  - name: chesapeake
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        backbone_model_bands:
+        - RED
+        - GREEN
+        - BLUE
+        - NIR_NARROW
+        num_classes: 7
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.MChesapeakeLandcoverNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+          - "NIR"
+  - name: cashew
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        num_classes: 7
+        backbone_model_bands:
+        - "COASTAL_AEROSOL"
+        - "BLUE"
+        - "GREEN"
+        - "RED"
+        - "RED_EDGE_1"
+        - "RED_EDGE_2"
+        - "RED_EDGE_3"
+        - "NIR_BROAD"
+        - "NIR_NARROW"
+        - "WATER_VAPOR"
+        - "SWIR_1"
+        - "SWIR_2"
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.MBeninSmallHolderCashewsNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+        - "COASTAL_AEROSOL"
+        - "BLUE"
+        - "GREEN"
+        - "RED"
+        - "RED_EDGE_1"
+        - "RED_EDGE_2"
+        - "RED_EDGE_3"
+        - "NIR_BROAD"
+        - "NIR_NARROW"
+        - "WATER_VAPOR"
+        - "SWIR_1"
+        - "SWIR_2"
+  - name: neontree
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        num_classes: 2
+        backbone_model_bands:
+          - RED
+          - GREEN
+          - BLUE
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.MNeonTreeNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 8
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+  - name: nz_cattle
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        backbone_model_bands:
+          - RED
+          - GREEN
+          - BLUE
+        num_classes: 2
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.MNzCattleNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+  - name: pv4ger_seg
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        backbone_model_bands:
+          - RED
+          - GREEN
+          - BLUE
+        num_classes: 2
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.MPv4gerSegNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+          - "RED"
+          - "GREEN"
+          - "BLUE"
+  - name: sa_crop_type
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 5
+    terratorch_task:
+      loss: ce
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        backbone_model_bands:
+        - "COASTAL_AEROSOL"
+        - "BLUE"
+        - "GREEN"
+        - "RED"
+        - "RED_EDGE_1"
+        - "RED_EDGE_2"
+        - "RED_EDGE_3"
+        - "NIR_BROAD"
+        - "NIR_NARROW"
+        - "WATER_VAPOR"
+        - "SWIR_1"
+        - "SWIR_2"
+        num_classes: 10
+        necks:
+        - name: ReshapeTokensToImage
+    datamodule:
+      class_path: terratorch.datamodules.m_SA_crop_type.MSACropTypeNonGeoDataModule
+      init_args:
+        partition: "0.01x_train"
+        train_transform:
+          - class_path: albumentations.HorizontalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.VerticalFlip
+            init_args:
+              p: 0.5
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        val_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        test_transform:
+          - class_path: albumentations.Resize
+            init_args:
+              height: 224
+              width: 224
+          - class_path: ToTensorV2
+        batch_size: 16
+        num_workers: 4
+        data_root: "/dccstor/geofm-finetuning/datasets/geobench/segmentation_v1.0"
+        bands:
+        - "COASTAL_AEROSOL"
+        - "BLUE"
+        - "GREEN"
+        - "RED"
+        - "RED_EDGE_1"
+        - "RED_EDGE_2"
+        - "RED_EDGE_3"
+        - "NIR_BROAD"
+        - "NIR_NARROW"
+        - "WATER_VAPOR"
+        - "SWIR_1"
+        - "SWIR_2"
+
+n_trials: 1
+save_models: False
+storage_uri: /nsimumba/test_terratorch/output/hpo_results
+ray_storage_path: /nsimumba/test_terratorch/output/ray_storage_results
+optimization_space:
+  batch_size:
+    - 8
+    - 16
+    - 32
+  lr:
+    min: 6e-5
+    max: 1e-3
+    type: real
+    log: true
+  optimizer_hparams:
+    weight_decay:
+      min: 0
+      max: 0.4
+      type: real
+  model_args:
+    decoder_channels:
+      - 64
+      - 128
+      - 256
+      - 512

@@ -1,0 +1,103 @@
+experiment_name: terramind
+run_name: terramind_v1_base
+defaults:
+  trainer_args:
+    max_epochs: 100
+    log_every_n_steps: 10
+    enable_progress_bar: false
+    precision: 16-mixed
+
+  terratorch_task:
+    model_factory: EncoderDecoderFactory
+    model_args:
+      backbone: terramind_v1_base
+      backbone_pretrained: true
+      backbone_modalities:
+        - S2L2A
+      necks:
+        - name: ReshapeTokensToImage
+          remove_cls_token: False
+        - name: SelectIndices
+          indices: [2, 5, 8, 11]
+        - name: LearnedInterpolateToPyramidal
+      decoder: UNetDecoder
+      decoder_channels: [512, 256, 128, 64]
+      head_dropout: 0.1
+      num_classes: 5
+
+    loss:  ce
+    ignore_index: -1
+    optimizer: AdamW
+    scheduler: ReduceLROnPlateau
+    scheduler_hparams:
+      patience: 5
+      factor: 0.5
+    freeze_backbone: false
+
+tasks:
+  - name: marida_l2a
+    type: segmentation
+    datamodule:
+      class_path: GenericNonGeoSegmentationDataModule
+      init_args:
+        batch_size: 8
+        num_workers: 8
+        rgb_indices:
+          - 3
+          - 2
+          - 1
+        train_data_root: /dccstor/geofm-datasets/datasets/MARIDA/train
+        val_data_root: /dccstor/geofm-datasets/datasets/MARIDA/val
+        test_data_root: /dccstor/geofm-datasets/datasets/MARIDA/test
+        img_grep: "*_S2L2A.tif"
+        label_grep: "*_anno_selected.tif"
+        no_label_replace: -1
+        no_data_replace: 0
+        # Dataset stats
+        means:
+          - 505.5957607472958
+          - 463.4307132297092
+          - 428.86480391421185
+          - 300.9230531854891
+          - 328.4032755269633
+          - 351.15934658738615
+          - 373.6413722182765
+          - 349.822435519396
+          - 366.4330199490722
+          - 543.122492538386
+          - 253.72425007785725
+          - 200.3231284181449
+        stds:
+          - 652.9342712897248
+          - 638.788736042046
+          - 622.2402580382433
+          - 612.0869420804295
+          - 664.1388970977658
+          - 786.4024693236674
+          - 856.1242725264373
+          - 850.4483988346144
+          - 892.9077818175117
+          - 1377.414410967748
+          - 583.1455503507592
+          - 453.7784762468789
+        num_classes: 5
+        train_transform:
+          - class_path: albumentations.D4
+          - class_path: ToTensorV2
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 20
+    early_prune: false
+
+n_trials: 10
+save_models: false
+# test_models: true
+storage_uri: /dccstor/geofm-pre/benediktblumenstiel/Think/output/mlflow
+optimization_space:
+  batch_size:
+    - 8
+  lr:
+    max: 1e-3
+    min: 1e-6
+    type: real
+    log: true

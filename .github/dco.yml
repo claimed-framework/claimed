@@ -1,0 +1,7 @@
+# This enables DCO bot for you, please take a look https://github.com/probot/dco
+# for more details.
+require:
+  members: false
+allowRemediationCommits:
+  individual: true
+  thirdParty: true

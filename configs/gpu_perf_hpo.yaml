@@ -1,0 +1,59 @@
+# HPO configuration for GPU performance benchmarking with the CLAIMED
+# gpu_performance_test component on Vela (OpenShift / MLBatch).
+#
+# Hyperparameters:
+#   batch_size    – DataLoader / training batch size
+#   num_workers   – DataLoader worker count
+#   hidden_dim    – MLP hidden layer width (training/inference cost)
+#   depth         – MLP depth (training/inference cost)
+#   matrix_size   – Matrix multiplication size (raw GPU compute)
+#   gpu_num       – Number of GPUs to request per pod (launcher-level)
+#
+# Static args:
+#   All remaining fixed CLI flags for gpu_performance_test.py
+#
+# Metrics:
+#   The gpu_performance_test script prints "Samples/sec:" three times (DataLoader,
+#   Training, Inference) and "GFLOPS:" once. iterate2 uses the  name#N  syntax
+#   to select the Nth occurrence (0-based) of a repeated metric name.
+
+metrics:
+  - "Samples/sec#0"   # DataLoader throughput (1st occurrence)
+  - "Samples/sec#1"   # Training throughput   (2nd occurrence)
+  - "Samples/sec#2"   # Inference throughput  (3rd occurrence)
+  - GFLOPS
+
+hpo:
+  gpu_num:
+    type: categorical
+    choices: [1, 2]
+
+  batch_size:
+    type: categorical
+    choices: [32, 64, 128]
+
+  num_workers:
+    type: categorical
+    choices: [8, 16, 32]
+
+  hidden_dim:
+    type: categorical
+    choices: [500, 1000, 2000]
+
+  depth:
+    type: categorical
+    choices: [500, 1000, 2000]
+
+  matrix_size:
+    type: categorical
+    choices: [5000, 10000, 20000]
+
+static:
+  mode: single_gpu
+  dataset_size: 100000
+  steps: 1
+  input_dim: 1000000
+  num_classes: 100
+  materialize_dir: "."
+  cleanup: true      # flag – generates --cleanup (store_true)
+  iterations: 100

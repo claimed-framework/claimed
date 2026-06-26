@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+"""
+A script external to the package.
+"""
+
+__copyright__ = """
+LICENSED INTERNAL CODE. PROPERTY OF IBM.
+IBM Research Licensed Internal Code
+(C) Copyright IBM Corp. 2024
+ALL RIGHTS RESERVED
+"""
+
+import click
+from benchmark.complex_module.core import salutation
+
+
+@click.command()
+@click.argument("name")
+@click.option("--surname", default="", help="Write your surname")
+def main(name: str, surname: str):
+    """Introduce yourself and salute."""
+    introduction = "My name is {} {}".format(name, surname)
+    print(salutation())
+    print(introduction.strip())
+
+
+if __name__ == "__main__":
+    main()

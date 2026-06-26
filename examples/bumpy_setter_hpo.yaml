@@ -1,0 +1,29 @@
+# =======================
+# Static parameters - passed to the script as --set key value pairs
+# =======================
+
+static:
+  global_mu: "23_42_66"
+
+# ========================
+# Training hyperparameters - evaluated by optuna and passed as --set key value pairs
+# ========================
+
+hpo:
+  x:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  y:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  z:
+    type: float
+    low: 1
+    high: 100
+    log: true

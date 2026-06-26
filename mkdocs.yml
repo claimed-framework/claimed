@@ -2,7 +2,7 @@ site_name: CLAIMED Framework
 site_url: https://claimed-framework.github.io/claimed/
 site_description: >-
   The CLAIMED framework – C3 Component Compiler, MLX backend,
-  and a library of ready-to-use AI components.
+  terratorch-iterate HPO launcher, and a library of ready-to-use AI components.
 site_author: The CLAIMED authors
 repo_name: claimed-framework/claimed
 repo_url: https://github.com/claimed-framework/claimed
@@ -32,13 +32,16 @@ theme:
     - navigation.top
     - search.highlight
     - content.code.copy
+    - content.code.select
     - content.action.edit
 
 plugins:
   - search
+  - autorefs
   - mkdocstrings:
       handlers:
         python:
+          paths: [src, .]
           options:
             docstring_style: google
             show_source: true
@@ -52,6 +55,8 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.tabbed:
@@ -77,4 +82,14 @@ nav:
   - Components:
       - util/cosutils: components/util/cosutils.md
       - util/gpu_performance_test: components/util/gpu-benchmark.md
+  - terratorch-iterate:
+      - iterate2: iterate2.md
+      - MLflow: mlflow.md
+      - New backbone: new_backbone.md
+      - Ray: ray.md
+      - Plotting: plotting.md
+      - Repeating experiments: repeating_experiments.md
+      - Troubleshooting: troubleshooting.md
+      - For developers: for_developers.md
+      - Handover: handover.md
   - Contributing: contributing.md

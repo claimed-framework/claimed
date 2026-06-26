@@ -1,5 +1,12 @@
+# Merged pyproject.toml for the unified `claimed` + `terratorch-iterate` repo.
+#
+# Project identity stays `claimed` (this repo is the umbrella). The
+# `terratorch_iterate` package is added alongside the existing `c3` and
+# `claimed` packages, and the `iterate` / `iterate-classic` console scripts
+# are exposed in addition to the existing `c3_*` / `claimed` ones.
+
 [build-system]
-requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=77.0.3", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -8,47 +15,135 @@ version_file = "src/c3/_version.py"
 [project]
 name = "claimed"
 version = "0.2.7"
+description = "The CLAIMED framework (now bundling terratorch-iterate)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+keywords = ["CLAIMED", "compiler", "KubeFlow", "Kubernetes", "terratorch", "iterate", "Optuna", "HPO"]
 authors = [
-  { name="The CLAIMED authors", email="claimed-framework@proton.me"},
+  { name = "The CLAIMED authors", email = "claimed-framework@proton.me" },
+  { name = "Carlos Gomes" },
+  { name = "Daniela Szwarcman" },
+  { name = "Francesc Marti Escofet" },
+  { name = "Leonardo Pondian Tizzei", email = "ltizzei@br.ibm.com" },
+  { name = "Naomi Simumba" },
+  { name = "Paolo Fraccaro" },
+  { name = "Romeo Kienzler" },
 ]
 maintainers = [
-  { name="Romeo Kienzler", email="claimed-framework@proton.me"},
-  { name="Benedikt Blumenstiel"},
+  { name = "Romeo Kienzler", email = "claimed-framework@proton.me" },
+  { name = "Benedikt Blumenstiel" },
 ]
-description = "The CLAIMED framework"
-readme = "README.md"
-requires-python = ">=3.7"
-license = {file = "LICENSE"}
-keywords = ["CLAIMED", "compiler", "KubeFlow", "Kubernetes"]
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
 ]
 dependencies = [
-    'nbconvert >= 7.9.2',
-    'ipython >= 8.16.1',
-    'traitlets >= 5.11.2',
-    'pandas',
-    'boto3',
-    's3fs',
-    'tqdm',
+  # ── claimed core ────────────────────────────────────────────────────────
+  "nbconvert>=7.9.2",
+  "ipython>=8.16.1",
+  "traitlets>=5.11.2",
+  "pandas",
+  "boto3",
+  "s3fs",
+  "tqdm>=4.66.3",
+  # ── terratorch-iterate core ─────────────────────────────────────────────
+  "terratorch>=1.1.0",
+  "requests>=2.32.0",
+  "Jinja2>=3.1.5",
+  "urllib3>=2.2.2",
+  "sqlparse>=0.5.0",
+  "scikit-learn>=1.5.0",
+  "pillow>=10.3.0",
+  "aiohttp>=3.9.4",
+  "werkzeug>=3.0.3",
+  "pytorch-lightning>=2.3.3",
+  "more-itertools",
+  "importlib-metadata",
+  "numpy",
+  "mlflow",
+  "optuna",
+  "types-tabulate",
+  "gputil",
+  "asyncio",
+  "opencv-python-headless",
+  "configspace",
+  "optuna-integration",
+  "psutil",
+  "tabulate>=0.9.0",
+  "torch",
+  "seaborn",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/claimed-framework/c3"
-"Bug Tracker" = "https://github.com/claimed-framework/c3/issues"
+Homepage      = "https://github.com/claimed-framework/claimed"
+"Bug Tracker" = "https://github.com/claimed-framework/claimed/issues"
+
+[project.optional-dependencies]
+dev = [
+  "ruff",
+  "flake8",
+  "mkdocs-material",
+  "mkdocstrings[python]",
+  "mike",
+  "tox",
+  "pre-commit",
+]
+test = [
+  "coverage",
+  "pytest",
+  "pytest-cov",
+  "deepdiff",
+]
+utility    = ["geobench"]
+nvidia     = ["pynvml"]
+postgresql = ["psycopg2-binary>=2.9"]
+amd        = ["pyrsmi"]
 
 [project.scripts]
-c3_create_operator = "c3.create_operator:main"
+# claimed
+c3_create_operator               = "c3.create_operator:main"
 c3_create_containerless_operator = "c3.create_containerless_operator:main"
-c3_create_gridwrapper = "c3.create_gridwrapper:main"
-claimed = "claimed.claimed:main"
+c3_create_gridwrapper            = "c3.create_gridwrapper:main"
+claimed                          = "claimed.claimed:main"
+# terratorch-iterate
+iterate-classic = "terratorch_iterate.main:main"
+iterate         = "terratorch_iterate.iterate2:main"
 
-
+# Pick up packages from both layouts:
+#   src/c3*, src/claimed*       — claimed sources
+#   terratorch_iterate*         — iterate sources (top-level)
 [tool.setuptools.packages.find]
-where = ["src"]
+where   = ["src", "."]
+include = ["c3*", "claimed*", "terratorch_iterate*"]
 
 [tool.setuptools.package-data]
 "c3.templates" = ["*"]
-"scripts" = ["*"]
+"scripts"      = ["*"]
+
+[tool.black]
+target-version = ["py312"]
+line-length = 88
+skip-string-normalization = true
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+force_to_top = ["rdkit", "scikit-learn"]
+
+[tool.mypy]
+check_untyped_defs = true
+disable_error_code = ["import-untyped"]
+
+[[tool.mypy.overrides]]
+module = "pytest.*"
+ignore_missing_imports = true

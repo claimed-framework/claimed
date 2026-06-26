@@ -1,0 +1,32 @@
+# HPO search space for the bumpy 3-D multimodal function.
+#
+# Only three sections are recognised by iterate2:
+#   metrics: – names to extract from the trial script output
+#   static:  – fixed parameters passed to every trial
+#   hpo:     – parameters Optuna will optimise
+
+metrics:
+  - yval
+
+static:
+  global-mu: "23 42 66"
+
+hpo:
+  x:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  y:
+    type: float
+    low: 1
+    high: 100
+    log: true
+
+  z:
+    type: float
+    low: 1
+    high: 100
+    log: true
+

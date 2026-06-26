@@ -1,0 +1,105 @@
+defaults:
+  terratorch_task:
+    model_args:
+      backbone: timm_convnext_large.fb_in22k
+      backbone_pretrained: true
+    model_factory: EncoderDecoderFactory
+    optimizer: AdamW
+    scheduler: ReduceLROnPlateau
+    scheduler_hparams:
+      cooldown: 0
+      eps: 1.0e-08
+      factor: 0.5
+      min_lr: 0.0
+      mode: min
+      patience: 5
+      threshold: 0.0001
+      threshold_mode: rel
+  trainer_args:
+    log_every_n_steps: 1
+    max_epochs: 5
+experiment_name: convnext_LM
+n_trials: 1
+optimization_space:
+  lr:
+    log: true
+    max: 1e-3
+    min: 1e-6
+    type: real
+run_repetitions: 5
+save_models: false
+storage_uri: ./mlflow
+tasks:
+- datamodule:
+    class_path: terratorch.datamodules.GenericNonGeoSegmentationDataModule
+    init_args:
+      batch_size: 16
+      check_stackability: false
+      constant_scale: 1.0
+      dataset_bands:
+      - RED
+      - GREEN
+      - BLUE
+      img_grep: '*train.tif'
+      label_grep: '*label.tif'
+      means:
+      - 104.24203383423682
+      - 109.92963788132441
+      - 100.98120642006803
+      no_data_replace: 0
+      no_label_replace: -1
+      num_classes: 2
+      num_workers: 16
+      output_bands:
+      - RED
+      - GREEN
+      - BLUE
+      rgb_indices:
+      - 0
+      - 1
+      - 2
+      stds:
+      - 51.593745217159935
+      - 47.218880227273814
+      - 45.45813303733705
+      test_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      test_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      test_split: test.txt
+      test_transform:
+      - class_path: ToTensorV2
+      train_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      train_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      train_split: train.txt
+      train_transform:
+      - class_path: albumentations.D4
+      - class_path: ToTensorV2
+      val_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      val_label_data_root: AerialImageDatasetTiledMergedFixedLabels_sample/
+      val_split: val.txt
+      val_transform:
+      - class_path: ToTensorV2
+  direction: max
+  metric: val/loss
+  name: LM
+  terratorch_task:
+    freeze_backbone: false
+    freeze_decoder: false
+    ignore_index: -1
+    loss: dice
+    model_args:
+      backbone: timm_convnext_large.fb_in22k
+      backbone_pretrained: true
+      decoder: UNetDecoder
+      decoder_channels:
+      - 512
+      - 256
+      - 128
+      - 64
+      head_channel_list:
+      - 256
+      head_dropout: 0.1
+      necks: null
+      num_classes: 2
+    model_factory: EncoderDecoderFactory
+    plot_on_val: 2
+  type: segmentation

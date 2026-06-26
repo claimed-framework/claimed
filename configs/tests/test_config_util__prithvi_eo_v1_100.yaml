@@ -1,0 +1,182 @@
+defaults:
+  terratorch_task:
+    model_args:
+      backbone: terramind_v1_large
+      backbone_pretrained: true
+    model_factory: ObjectDetectionModelFactory
+    optimizer: AdamW
+  trainer_args:
+    log_every_n_steps: 1
+    max_epochs: 1
+experiment_name: test_config_util__prithvi_eo_v1_100
+n_trials: 1
+optimization_space:
+  lr:
+    log: true
+    max: 1e-3
+    min: 1e-6
+    type: real
+run_repetitions: 1
+save_models: false
+storage_uri: /opt/app-root/src/fm-geospatial/pf/logs/geobench/mlflow
+tasks:
+- datamodule:
+    class_path: GenericNonGeoPixelwiseRegressionDataModule
+    init_args:
+      batch_size: 2
+      dataset_bands:
+      - 0
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      - 1
+      - 2
+      - 3
+      - 4
+      img_grep: regression*input*.tif
+      label_grep: regression*label*.tif
+      means:
+      - 547.36707
+      - 898.5121
+      - 1020.9082
+      - 2665.5352
+      - 2340.584
+      - 1610.1407
+      no_data_replace: 0
+      no_label_replace: -1
+      num_workers: 4
+      output_bands:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      rgb_indices:
+      - 2
+      - 1
+      - 0
+      stds:
+      - 411.4701
+      - 558.54065
+      - 815.94025
+      - 812.4403
+      - 1113.7145
+      - 1067.641
+      test_data_root: tests/resources/inputs
+      test_label_data_root: tests/resources/inputs
+      train_data_root: tests/resources/inputs
+      train_label_data_root: tests/resources/inputs
+      train_transform:
+      - class_path: ToTensorV2
+      val_data_root: tests/resources/inputs
+      val_label_data_root: tests/resources/inputs
+  direction: max
+  early_prune: false
+  early_stop_patience: null
+  max_run_duration: null
+  metric: val_segm_map
+  name: manufactured-finetune
+  terratorch_task:
+    freeze_backbone: true
+    freeze_decoder: false
+    ignore_index: -1
+    loss: rmse
+    model_args:
+      backbone: prithvi_eo_v1_100
+      backbone_drop_path_rate: 0.3
+      bands:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      decoder: UperNetDecoder
+      decoder_channels: 64
+      head_dropout: 0.5708022831486758
+      head_final_act: torch.nn.ReLU
+      head_learned_upscale_layers: 2
+      in_channels: 6
+      num_frames: 1
+      pretrained: false
+    model_factory: PrithviModelFactory
+    tiled_inference_parameters:
+      average_patches: true
+      h_crop: 56
+      h_stride: 48
+      w_crop: 56
+      w_stride: 48
+  type: object_detection
+- datamodule:
+    class_path: GenericNonGeoPixelwiseRegressionDataModule
+    init_args:
+      batch_size: 2
+      dataset_bands:
+      - 0
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      - 1
+      - 2
+      - 3
+      - 4
+      img_grep: regression*input*.tif
+      label_grep: regression*label*.tif
+      means:
+      - 547.36707
+      - 898.5121
+      - 1020.9082
+      - 2665.5352
+      - 2340.584
+      - 1610.1407
+      no_data_replace: 0
+      no_label_replace: -1
+      num_workers: 0
+      output_bands:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      rgb_indices:
+      - 2
+      - 1
+      - 0
+      stds:
+      - 411.4701
+      - 558.54065
+      - 815.94025
+      - 812.4403
+      - 1113.7145
+      - 1067.641
+      test_data_root: tests/resources/inputs
+      test_label_data_root: tests/resources/inputs
+      train_data_root: tests/resources/inputs
+      train_label_data_root: tests/resources/inputs
+      val_data_root: tests/resources/inputs
+      val_label_data_root: tests/resources/inputs
+  direction: max
+  early_prune: false
+  early_stop_patience: null
+  max_run_duration: null
+  metric: val_segm_map
+  name: manufactured-reconstruction
+  terratorch_task:
+    freeze_decoder: false
+    freeze_encoder: true
+    ignore_index: -1
+    loss: mse
+    model_args:
+      model: prithvi_eo_v1_100_mae
+      pretrained: false
+    model_factory: FullModelFactory
+    plot_on_val: false
+  type: object_detection

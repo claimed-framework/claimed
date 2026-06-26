@@ -1,0 +1,41 @@
+experiment_name: X
+defaults:
+  trainer_args:
+    max_epochs: 5
+    log_every_n_steps: 1
+  terratorch_task:
+    model_factory: EncoderDecoderFactory
+    model_args:
+      backbone: X  
+      backbone_pretrained: true
+    optimizer: AdamW
+    scheduler: ReduceLROnPlateau
+    scheduler_hparams:
+      mode: min
+      factor: 0.5
+      patience: 5
+      threshold: 0.0001
+      threshold_mode: rel
+      cooldown: 0
+      min_lr: 0.0
+      eps: 1.0e-08
+    
+    
+tasks:
+  - name: X
+    type: segmentation
+    direction: max
+    metric: X
+    terratorch_task:
+    datamodule:
+
+n_trials: 1
+save_models: False
+storage_uri: ./mlflow
+run_repetitions: 5
+optimization_space:
+  lr:
+    max: 1e-3
+    min: 1e-6
+    type: real
+    log: true

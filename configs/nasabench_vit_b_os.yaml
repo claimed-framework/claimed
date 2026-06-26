@@ -1,0 +1,129 @@
+experiment_name: nasabench_vit_b_os
+run_name: nasabench_vit_b_os
+description: "ckpt path: Prithvi OS v1"
+defaults:
+  trainer_args:
+    max_epochs: 200
+    precision: bf16-mixed # for these new models pretrained with bf16-mixed we should probably finetune with bf16-mixed
+  terratorch_task:
+    model_args:
+      pretrained: True
+      backbone: prithvi_vit_100
+      backbone_out_indices:
+          # - 5
+          # - 11
+          # - 17
+          # - 23
+          - 2
+          - 5
+          - 8
+          - 11
+    model_factory: PrithviModelFactory
+    optimizer: AdamW
+tasks:
+  - name: sen1floods11
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 50
+    terratorch_task:
+      loss: ce
+      ignore_index: -1
+      # class_weights:
+      #   - 0.3
+      #   - 0.7
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        bands:
+         - BLUE
+         - GREEN
+         - RED
+         - NIR_NARROW
+         - SWIR_1
+         - SWIR_2
+        num_classes: 2
+    datamodule: <path_to_benchmark>/benchmark/resources/dataset_specifications/sen1floods11_transforms.yaml
+  - name: firescars
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 20
+    terratorch_task:
+      loss: ce
+      ignore_index: -1
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        bands:
+          - BLUE
+          - GREEN
+          - RED
+          - NIR_NARROW
+          - SWIR_1
+          - SWIR_2
+        num_classes: 2
+    datamodule: <path_to_benchmark>/benchmark/resources/dataset_specifications/fire_scars.yaml
+  - name: multi_temporal_crop
+    type: segmentation
+    direction: max
+    metric: val/Multiclass_Jaccard_Index
+    early_stop_patience: 50
+    terratorch_task:
+      loss: ce
+      ignore_index: -1
+      class_weights:
+        - 0.386375
+        - 0.661126
+        - 0.548184
+        - 0.640482
+        - 0.876862
+        - 0.925186
+        - 3.249462
+        - 1.542289
+        - 2.175141
+        - 2.272419
+        - 3.062762
+        - 3.626097
+        - 1.198702
+      model_args:
+        decoder: UperNetDecoder
+        decoder_channels: 128
+        decoder_scale_modules: true
+        bands:
+          - BLUE
+          - GREEN
+          - RED
+          - NIR_NARROW
+          - SWIR_1
+          - SWIR_2
+        num_classes: 13
+        num_frames: 3
+    datamodule: <path_to_benchmark>/benchmark/resources/dataset_specifications/multi_temporal_crop.yaml
+
+n_trials: 16
+save_models: False
+storage_uri: <path/to/storage_uri>
+ray_storage_path: <path/to/ray_storage>
+optimization_space:
+  batch_size:
+      - 8
+      - 16
+      - 32
+  lr:
+    max: 1e-3
+    min: 1e-6
+    type: real
+    log: true
+  optimizer_hparams:
+    weight_decay:
+      min: 0
+      max: 0.4
+      type: real
+  model_args:
+    decoder_channels:
+      - 64
+      - 128
+      - 256

@@ -234,11 +234,36 @@ The **last** occurrence of the pattern `<metric_name>: <value>` or `<metric_name
 --metrics score_linear_acc,score_modality_leak,score_combined
 ```
 
-All objectives are maximised. `iterate2` prints the Pareto-front trials at the end:
+`iterate2` prints the Pareto-front trials at the end:
 
 ```
 Trial 12: Values=[0.873, 0.041, 0.791]
 Trial 17: Values=[0.901, 0.038, 0.812]
+```
+
+#### Metric directions (minimize / maximize)
+
+By default the direction per metric is inferred from its name: any metric whose name contains `loss`, `error`, `err`, `mse`, `mae`, or `rmse` is **minimized**; all others are **maximized**.
+
+To override the direction explicitly, use the extended form in the `metrics:` section of the HPO YAML:
+
+```yaml
+metrics:
+  - name: val_loss       # minimize (also inferred automatically)
+    direction: minimize
+  - name: accuracy       # maximize (also inferred automatically)
+    direction: maximize
+  - name: f1_score       # maximize (explicit override)
+    direction: maximize
+```
+
+A mix of simple strings and extended objects is allowed:
+
+```yaml
+metrics:
+  - val_loss             # direction inferred → minimize
+  - name: my_custom_score
+    direction: maximize  # direction explicit
 ```
 
 ---

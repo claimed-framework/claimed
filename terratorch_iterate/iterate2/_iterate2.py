@@ -24,8 +24,15 @@ Environment variables passed to the script
 HPO YAML format
 ---------------
   metrics:              # list of metric names to extract from ITERATE_OUT_FILE
-    - val_loss
-    - accuracy
+    - val_loss          # simple form – direction defaults to "minimize" when
+    - accuracy          # the name contains "loss" or "error", else "maximize"
+
+  # Extended form: specify direction explicitly per metric
+  metrics:
+    - name: val_loss
+      direction: minimize
+    - name: accuracy
+      direction: maximize
 
   static:               # fixed parameters, forwarded as-is every trial
     epochs: 50
@@ -97,14 +104,64 @@ def load_static(data: dict) -> dict:
     logger.info("Static params: %d key(s): %s", len(static), list(static.keys()))
     return static
 
-def load_metrics(data: dict, fallback: str = "score") -> List[str]:
+_MINIMIZE_KEYWORDS = ("loss", "error", "err", "mse", "mae", "rmse")
+
+def _default_direction(metric_name: str) -> str:
+    """Heuristic: metrics whose name contains a loss/error keyword are minimized."""
+    lower = metric_name.lower()
+    if any(kw in lower for kw in _MINIMIZE_KEYWORDS):
+        return "minimize"
+    return "maximize"
+
+def load_metrics(data: dict, fallback: str = "score") -> tuple[List[str], List[str]]:
+    """Return (metric_names, directions).
+
+    The YAML ``metrics:`` section accepts two forms:
+
+    Simple (direction inferred from name)::
+
+        metrics:
+          - val_loss    # → minimize  (contains "loss")
+          - accuracy    # → maximize
+
+    Extended (direction explicit)::
+
+        metrics:
+          - name: val_loss
+            direction: minimize
+          - name: accuracy
+            direction: maximize
+
+    A mix of both forms is allowed.
+    """
     raw = data.get("metrics", None)
     if raw is None:
         logger.warning("No 'metrics:' key in YAML – defaulting to '%s'", fallback)
-        return [fallback]
-    if isinstance(raw, list):
-        return [str(m).strip() for m in raw]
-    return [m.strip() for m in str(raw).split(",")]
+        return [fallback], [_default_direction(fallback)]
+
+    if not isinstance(raw, list):
+        # comma-separated string fallback
+        names = [m.strip() for m in str(raw).split(",")]
+        directions = [_default_direction(n) for n in names]
+        return names, directions
+
+    names: List[str] = []
+    directions: List[str] = []
+    for item in raw:
+        if isinstance(item, dict):
+            name = str(item["name"]).strip()
+            direction = str(item.get("direction", _default_direction(name))).strip().lower()
+            if direction not in ("minimize", "maximize"):
+                raise ValueError(
+                    f"Invalid direction '{direction}' for metric '{name}'. "
+                    "Must be 'minimize' or 'maximize'."
+                )
+        else:
+            name = str(item).strip()
+            direction = _default_direction(name)
+        names.append(name)
+        directions.append(direction)
+    return names, directions
 
 
 # ─── OPTUNA PARAM SAMPLING ───────────────────────────────────────────────────
@@ -216,12 +273,12 @@ def main():
                 args.optuna_study_name, args.optuna_db_path,
                 args.optuna_n_trials, args.parallelism)
 
-    data       = load_yaml(args.hpo_yaml)
-    hpo_space  = load_hpo_space(data)
-    static     = load_static(data)
-    metrics    = load_metrics(data)
-    directions = ["maximize"] * len(metrics)
+    data            = load_yaml(args.hpo_yaml)
+    hpo_space       = load_hpo_space(data)
+    static          = load_static(data)
+    metrics, directions = load_metrics(data)
     logger.info("Metrics: %s", metrics)
+    logger.info("Directions: %s", directions)
 
     storage = resolve_storage(args.optuna_db_path)
     study = optuna.create_study(

@@ -3,12 +3,9 @@ name: Publish Docs to GitHub Pages
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'docs/**'
-      - 'mkdocs.yml'
-      - 'src/**'
-      - '.github/workflows/docs.yml'
+      - main          # publishes the in-development 'dev' docs
+    tags:
+      - 'v*'          # release tags publish a versioned snapshot + 'latest'
   workflow_dispatch:
 
 permissions:
@@ -22,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0       # full history needed for git-committers plugin
+          fetch-depth: 0       # full history needed for mike + git-committers plugin
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,6 +30,7 @@ jobs:
       - name: Install doc dependencies
         run: |
           pip install \
+            mike \
             mkdocs-material \
             mkdocstrings[python] \
             mkdocs-git-revision-date-localized-plugin \
@@ -41,5 +39,22 @@ jobs:
       - name: Install claimed package (for mkdocstrings introspection)
         run: pip install -e .
 
-      - name: Build & deploy docs
-        run: mkdocs gh-deploy --force --clean --verbose
+      - name: Configure git identity for mike
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy versioned docs
+        run: |
+          set -euo pipefail
+          # mike commits to the gh-pages branch; make sure we have it locally.
+          git fetch origin gh-pages --depth=1 || true
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"      # v0.2.7 -> 0.2.7
+            echo "Publishing released version ${VERSION} (alias: latest)"
+            mike deploy --push --update-aliases "${VERSION}" latest
+            mike set-default --push latest
+          else
+            echo "Publishing in-development docs as 'dev'"
+            mike deploy --push dev
+          fi

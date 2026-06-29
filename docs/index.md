@@ -10,13 +10,39 @@
 
 ## What is CLAIMED?
 
-CLAIMED has three interlocking layers:
+CLAIMED began life as a **library of reusable AI and data components** — ready-made,
+shareable building blocks for the recurring chores of machine learning: reading and
+writing data from COS/S3, NLP preprocessing, model training, and benchmarking. That
+component library is still here (`claimed.components.*`) and still the foundation
+everything else builds on.
+
+What turned CLAIMED from a handy library into a genuinely powerful framework is the
+**C3 Component Compiler**. C3 takes *any* notebook, Python script, or R script and
+compiles it into a fully containerised, runnable, composable component — complete with
+a CLI, a Docker image, and KubeFlow Pipelines / CWL / Kubernetes descriptors — with
+zero boilerplate. Suddenly every piece of code you write becomes a first-class,
+reusable CLAIMED component, not just the ones someone hand-packaged in advance. C3 is
+the heart of the framework today.
+
+From there, CLAIMED grew outward by **integrating two complementary projects** rather
+than reinventing them:
+
+- **MLX** (`claimed.mlx`) brings **experiment and asset tracking** — full provenance
+  for every dataset, model, and job — and powers the grid-compute backend that
+  distributes component runs across heterogeneous clusters.
+- **terratorch-iterate** (the `iterate2` engine, shipped inside `claimed`) adds
+  **hyperparameter optimisation (HPO) and neural architecture search (NAS)** on top of
+  your components, with MLflow logging, Optuna-driven search, and Ray parallelisation.
+
+Put together, CLAIMED lets you go from a single script all the way to a tracked,
+optimised, cluster-scale AI pipeline — without ever leaving the framework.
 
 | Layer | Package / module | Purpose |
 |---|---|---|
-| **C3** – Component Compiler | `claimed.c3` | Turns notebooks, Python scripts, and R scripts into fully containerised, executable AI components |
+| **C3** – Component Compiler | `claimed.c3` | Turns notebooks, Python scripts, and R scripts into fully containerised, executable, composable AI components |
+| **Component Library** | `claimed.components.*` | The original ready-to-use components for COS/S3 I/O, benchmarking, NLP, training, and more |
 | **MLX** – ML eXchange backend | `claimed.mlx` | Tracks datasets, models, jobs and other assets; powers the grid-compute backend |
-| **Component Library** | `claimed.components.*` | Ready-to-use components for COS/S3 I/O, benchmarking, NLP, training, and more |
+| **iterate** – HPO / NAS | `claimed` (`iterate2`) | Hyperparameter optimisation and neural architecture search via MLflow, Optuna, and Ray |
 
 ---
 

@@ -66,6 +66,11 @@ markdown_extensions:
   - toc:
       permalink: true
 
+extra:
+  version:
+    provider: mike
+    default: latest
+
 nav:
   - Home: index.md
   - Roadmap: roadmap.md

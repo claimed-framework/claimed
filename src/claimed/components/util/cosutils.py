@@ -65,7 +65,7 @@ def _download(s3, cos_file, local_file):
               desc=f'↓ {desc}', leave=True) as pbar:
         with s3.open(cos_file, 'rb') as f_in, open(local_file, 'wb') as f_out:
             while True:
-                chunk = f_in.read(CHUNK_SIZE)
+                chunk = f_in.read(MIN_CHUNK_SIZE)
                 if not chunk:
                     break
                 f_out.write(chunk)

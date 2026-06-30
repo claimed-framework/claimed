@@ -172,3 +172,8 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 *.err
 *.out
+
+# iterate2 local run artifacts
+experiment_logs/
+iterate_study.db
+*.db

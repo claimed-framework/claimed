@@ -1,3 +1,6 @@
+import os
+
+
 def fib(b):
     n = int(b)
     if n == 0: 

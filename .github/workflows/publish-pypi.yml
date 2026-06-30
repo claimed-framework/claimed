@@ -34,4 +34,6 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           python -m twine check dist/*
-          python -m twine upload dist/* --non-interactive
+          # --skip-existing so re-triggered tag pushes (e.g. moving a tag to
+          # pick up a docs fix) don't fail when the version is already on PyPI.
+          python -m twine upload dist/* --non-interactive --skip-existing

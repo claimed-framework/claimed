@@ -1,0 +1,48 @@
+name: Check Docs Build
+
+# Builds the documentation on pull requests so broken mkdocstrings
+# references, dead nav links, and other docs errors are caught before
+# merge instead of during a release deploy.
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/**'
+      - 'terratorch_iterate/**'
+      - '.github/workflows/docs-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install doc dependencies
+        run: |
+          pip install \
+            mkdocs-material \
+            mkdocstrings[python] \
+            mkdocs-git-revision-date-localized-plugin \
+            griffe
+
+      - name: Install claimed package (for mkdocstrings introspection)
+        run: pip install -e .
+
+      - name: Build docs (strict)
+        run: mkdocs build --strict

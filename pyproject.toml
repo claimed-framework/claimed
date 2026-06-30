@@ -7,7 +7,7 @@ version_file = "src/c3/_version.py"
 
 [project]
 name = "claimed"
-version = "0.2.7"
+version = "0.5.0"
 description = "The CLAIMED framework (now bundling terratorch-iterate)"
 readme = "README.md"
 requires-python = ">=3.11"

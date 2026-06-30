@@ -1,0 +1,13 @@
+---
+title: State of the art
+---
+stateDiagram-v2
+    Researcher&nbsp;or&nbsp;Data&nbsp;Scientist --> Python: write prototype
+    Researcher&nbsp;or&nbsp;Data&nbsp;Scientist --> Notebooks: write prototype
+    Researcher&nbsp;or&nbsp;Data&nbsp;Scientist --> R: write prototype
+    Python --> Software&nbsp;Engineer
+    R --> Software&nbsp;Engineer
+    Notebooks --> Software&nbsp;Engineer
+    Software&nbsp;Engineer --> Container: productize
+    Software&nbsp;Engineer --> Kubeflow&nbsp;Component: productize
+    Software&nbsp;Engineer --> Kubernetes&nbsp;Job: productize

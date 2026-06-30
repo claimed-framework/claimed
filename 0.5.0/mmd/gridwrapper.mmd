@@ -1,0 +1,9 @@
+---
+title: The CLAIMED framework
+---
+stateDiagram-v2
+    Component_Compiler_(c3)
+    Component_Library --> Component_Compiler_(c3)
+    Component_Compiler_(c3) --> Kubeflow
+    Component_Compiler_(c3) --> Kubernetes_Jobs
+    Component_Compiler_(c3) --> CLI

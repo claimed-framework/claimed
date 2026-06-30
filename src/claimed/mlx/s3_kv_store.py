@@ -232,7 +232,7 @@ def main():
     sp.add_argument("--filter", type=json.loads, required=True)
 
     args = parser.parse_args()
-    store = MLX(bucket=args.bucket, store_name=args.store, endpoint_url=args.endpoint)
+    store = S3KVStore(bucket=args.bucket, store_name=args.store, endpoint_url=args.endpoint)
 
     if args.cmd == "put":
         if args.value_file:

@@ -1,6 +1,9 @@
 import contextlib
 import logging
 import os
+import re
+import subprocess
+import time
 
 # converts string in form [cos|s3]://access_key_id:secret_access_key@endpoint/bucket/path to
 # access_key_id, secret_access_key, endpoint, path - path includes bucket name

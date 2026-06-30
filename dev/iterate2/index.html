@@ -1,0 +1,2900 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The CLAIMED framework – C3 Component Compiler, MLX backend, terratorch-iterate HPO launcher, and a library of ready-to-use AI components.">
+      
+      
+        <meta name="author" content="The CLAIMED authors">
+      
+      
+        <link rel="canonical" href="https://claimed-framework.github.io/claimed/dev/iterate2/">
+      
+      
+        <link rel="prev" href="../components/util/gpu-benchmark/">
+      
+      
+        <link rel="next" href="../mlflow/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>iterate2 - CLAIMED Framework</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#iterate2-hpo-launcher" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="CLAIMED Framework" class="md-header__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CLAIMED Framework
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              iterate2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/claimed-framework/claimed" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    claimed-framework/claimed
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../c3/" class="md-tabs__link">
+          
+  
+  
+  C3 – Component Compiler
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../mlx/" class="md-tabs__link">
+          
+  
+  
+  MLX Backend
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../components/util/cosutils/" class="md-tabs__link">
+          
+  
+  
+  Components
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  terratorch-iterate
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="CLAIMED Framework" class="md-nav__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    CLAIMED Framework
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/claimed-framework/claimed" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    claimed-framework/claimed
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    C3 – Component Compiler
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    C3 – Component Compiler
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../c3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../c3/create-operator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    create_operator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../c3/create-gridwrapper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    create_gridwrapper
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../c3/operator-utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    operator_utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLX Backend
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MLX Backend
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlx/cos-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    cos_backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlx/s3-kv-store/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    s3_kv_store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../components/util/cosutils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    util/cosutils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../components/util/gpu-benchmark/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    util/gpu_performance_test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    terratorch-iterate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    terratorch-iterate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iterate2
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    iterate2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#execution-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optuna-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optuna options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hpo-search-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HPO search space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HPO search space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search-space-yaml-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search space YAML format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameter-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#categorical" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        categorical
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu_num-dynamic-gpu-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gpu_num — dynamic GPU count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metric extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metric-directions-minimize-maximize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric directions (minimize / maximize)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setter-style-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setter-style arguments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wlm-plugin-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WLM plugin system
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WLM plugin system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wlm-configuration-in-the-hpo-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WLM configuration in the HPO YAML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parallel execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite-and-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite and parallelism
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload-managers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload managers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workload managers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lsf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSF
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slurm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slurm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        none
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vela-openshift-mlbatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vela (OpenShift / MLBatch)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vela (OpenShift / MLBatch)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#submission-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submission flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Job template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-invocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example invocation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-hpo-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example HPO YAML
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../new_backbone/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    New backbone
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ray/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ray
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repeating_experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repeating experiments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../for_developers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    For developers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quick-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#execution-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Execution options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optuna-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optuna options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hpo-search-space" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HPO search space
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HPO search space">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#search-space-yaml-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search space YAML format
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameter-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter types
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameter types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#categorical" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        categorical
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        flag
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu_num-dynamic-gpu-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gpu_num — dynamic GPU count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static arguments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metric-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metric extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metric-directions-minimize-maximize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric directions (minimize / maximize)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setter-style-arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setter-style arguments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wlm-plugin-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WLM plugin system
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="WLM plugin system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugin-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin interface
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wlm-configuration-in-the-hpo-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WLM configuration in the HPO YAML
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reference-plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference plugins
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parallel-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parallel execution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parallel execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sqlite-and-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite and parallelism
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload-managers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workload managers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workload managers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lsf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSF
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slurm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slurm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        none
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vela-openshift-mlbatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vela (OpenShift / MLBatch)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Vela (OpenShift / MLBatch)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#submission-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submission flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#job-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Job template
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-invocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example invocation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-hpo-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example HPO YAML
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/claimed-framework/claimed/edit/main/docs/iterate2.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="iterate2-hpo-launcher">iterate2 – HPO Launcher<a class="headerlink" href="#iterate2-hpo-launcher" title="Permanent link">&para;</a></h1>
+<p><code>iterate2</code> is a generic Optuna-based hyperparameter optimisation (HPO) launcher with a pluggable workload-manager backend. It submits one trial per Optuna suggestion, waits for the job to finish, extracts one or more metrics from the job's log file, and returns them to Optuna.</p>
+<p>Key capabilities:</p>
+<ul>
+<li><strong>Multi-objective optimisation</strong> — extract and optimise several metrics simultaneously (Pareto front)</li>
+<li><strong>Five HPO parameter types</strong> — <code>float</code>, <code>int</code>, <code>categorical</code>, <code>flag</code> (store-true), <code>group</code> (bundled arg sets)</li>
+<li><strong>Dynamic GPU count per trial</strong> — <code>gpu_num</code> in the HPO space is passed to the WLM plugin via <code>ITERATE_WLM_GPU_COUNT</code></li>
+<li><strong>Null-omission</strong> — <code>null</code> in a <code>categorical</code> choice causes the flag to be completely absent from the command line</li>
+<li><strong>WLM plugin system</strong> — any executable (bash, Python, …) can be used as a workload-manager backend; reference implementations for LSF and Vela/OpenShift are in <code>examples/wlm_plugins/</code></li>
+</ul>
+<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span>--script<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span>--wlm-plugin<span class="w"> </span>examples/wlm_plugins/lsf_plugin.sh<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>--optuna-study-name<span class="w"> </span>my_study<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span>--optuna-db-path<span class="w"> </span>sqlite:///hpo.db<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span>--optuna-n-trials<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span>--hpo-yaml<span class="w"> </span>hpo_space.yaml<span class="w">   </span><span class="c1"># wlm: section sets gpu-count, cpu-count, …</span>
+</span></code></pre></div>
+<p>For local execution (no cluster) simply omit <code>--wlm-plugin</code>:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>--script<span class="w"> </span>train.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>--optuna-study-name<span class="w"> </span>my_study<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>--optuna-db-path<span class="w"> </span>sqlite:///hpo.db<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>--optuna-n-trials<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span>--hpo-yaml<span class="w"> </span>hpo_space.yaml
+</span></code></pre></div>
+<h2 id="cli-reference">CLI reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h2>
+<h3 id="execution-options">Execution options<a class="headerlink" href="#execution-options" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--script</code></td>
+<td><em>(required)</em></td>
+<td>Training script to execute</td>
+</tr>
+<tr>
+<td><code>--root-dir</code></td>
+<td><code>.</code></td>
+<td>Working directory; derived from <code>--script</code> if omitted</td>
+</tr>
+<tr>
+<td><code>--venv</code></td>
+<td><em>(none)</em></td>
+<td>Virtual-environment directory to activate. Omit to skip venv activation entirely</td>
+</tr>
+<tr>
+<td><code>--interpreter</code></td>
+<td><code>python</code></td>
+<td>Python interpreter to invoke</td>
+</tr>
+<tr>
+<td><code>--param-setter</code></td>
+<td><code>None</code></td>
+<td>Use setter-style argument passing (see <a href="#setter-style-arguments">Setter-style arguments</a>)</td>
+</tr>
+<tr>
+<td><code>--wlm-plugin</code></td>
+<td><em>(local)</em></td>
+<td>Path to an executable WLM plugin script. When omitted, trials run locally in the current process</td>
+</tr>
+<tr>
+<td><code>--parallelism</code></td>
+<td><code>1</code></td>
+<td>Number of trials to run in parallel (see <a href="#parallel-execution">Parallel execution</a>)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="optuna-options">Optuna options<a class="headerlink" href="#optuna-options" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--optuna-study-name</code></td>
+<td><em>(required)</em></td>
+<td>Name of the Optuna study</td>
+</tr>
+<tr>
+<td><code>--optuna-db-path</code></td>
+<td><em>(required)</em></td>
+<td>Storage URL. <code>sqlite:///hpo.db</code> for SQLite, <code>js:///path/journal.log</code> for JournalStorage, or any Optuna-supported URL</td>
+</tr>
+<tr>
+<td><code>--optuna-n-trials</code></td>
+<td><code>100</code></td>
+<td>Number of trials to run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hpo-search-space">HPO search space<a class="headerlink" href="#hpo-search-space" title="Permanent link">&para;</a></h3>
+<p>Provide either a JSON string or a YAML file that defines the search space under the key <code>hpo</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--hpo-json</code></td>
+<td>HPO search space as a JSON string</td>
+</tr>
+<tr>
+<td><code>--hpo-yaml</code></td>
+<td>Path to a YAML file containing the search space (and optionally static args)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="search-space-yaml-format">Search space YAML format<a class="headerlink" href="#search-space-yaml-format" title="Permanent link">&para;</a></h4>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">hpo</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">learning_rate</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-5</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-2</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">16</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">64</span><span class="p p-Indicator">]</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nt">encoder_depth</span><span class="p">:</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="nt">static</span><span class="p">:</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="nt">dataset_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/my_dataset</span>
+</span></code></pre></div>
+<p>Supported parameter types: <code>float</code>, <code>int</code>, <code>categorical</code>, <code>flag</code>, <code>group</code>.</p>
+<h4 id="parameter-types">Parameter types<a class="headerlink" href="#parameter-types" title="Permanent link">&para;</a></h4>
+<h5 id="float"><code>float</code><a class="headerlink" href="#float" title="Permanent link">&para;</a></h5>
+<p>Suggests a floating-point value between <code>low</code> and <code>high</code>. Set <code>log: true</code> for log-uniform sampling.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">learning_rate</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-5</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-2</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></code></pre></div>
+<p>Generates: <code>--learning-rate 0.0003</code></p>
+<h5 id="int"><code>int</code><a class="headerlink" href="#int" title="Permanent link">&para;</a></h5>
+<p>Suggests an integer between <code>low</code> and <code>high</code> (inclusive).</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">encoder_depth</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+</span></code></pre></div>
+<p>Generates: <code>--encoder-depth 4</code></p>
+<h5 id="categorical"><code>categorical</code><a class="headerlink" href="#categorical" title="Permanent link">&para;</a></h5>
+<p>Suggests one value from a list of choices. Choices can be strings, numbers, or <code>null</code>.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">batch_size</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">16</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">64</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<p>Generates: <code>--batch-size 32</code></p>
+<p><strong><code>null</code> omits the flag entirely.</strong> Useful for optional flags like <code>--compile</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">compile</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;max-autotune&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="c1"># null → --compile is completely absent from the command</span>
+</span></code></pre></div>
+<h5 id="flag"><code>flag</code><a class="headerlink" href="#flag" title="Permanent link">&para;</a></h5>
+<p>Models a <code>store_true</code>-style flag that takes no value — its presence or absence is the parameter. <code>true</code> adds the flag; <code>false</code> omits it.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">bfloat16</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flag</span><span class="w">   </span><span class="c1"># true → --bfloat16   false → (omitted)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">tf32</span><span class="p">:</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flag</span><span class="w">   </span><span class="c1"># true → --tf32       false → (omitted)</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use unquoted YAML <code>true</code>/<code>false</code> for <code>flag</code> and for boolean values in <code>categorical.choices</code>.
+Use <strong>quoted</strong> <code>"true"</code>/<code>"false"</code> when the wrapped script expects the literal string as a value (e.g. <code>--amp true</code>).</p>
+</div>
+<h5 id="group"><code>group</code><a class="headerlink" href="#group" title="Permanent link">&para;</a></h5>
+<p>Bundles several CLI arguments together under a single Optuna categorical parameter. Optuna picks one group name; <code>iterate2</code> then injects all key/value pairs from that group into the trial's argument list. This is useful when multiple arguments are co-dependent (e.g. config file + dataset path + experiment name).</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">dataset</span><span class="p">:</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">group</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nt">case2000</span><span class="p">:</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./examples/config/model_case2000.yaml</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="nt">data_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/pf/</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nt">exp_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">case2000</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nt">case1000</span><span class="p">:</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">      </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./examples/config/model_case1000.yaml</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nt">data_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/pf/</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="nt">exp_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">case1000</span>
+</span></code></pre></div>
+<p>Optuna tracks the choice as a single categorical (<code>dataset = "case2000"</code>), but the wrapped script receives:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>--config ./examples/config/model_case2000.yaml --data-path /data/pf/ --exp-name case2000
+</span></code></pre></div>
+<h5 id="gpu_num-dynamic-gpu-count"><code>gpu_num</code> — dynamic GPU count<a class="headerlink" href="#gpu_num-dynamic-gpu-count" title="Permanent link">&para;</a></h5>
+<p>The special key <code>gpu_num</code> (as <code>categorical</code> or <code>int</code>) is automatically extracted
+from the sampled parameters and forwarded to the WLM plugin as
+<code>ITERATE_WLM_GPU_COUNT</code>.  It does <strong>not</strong> appear in the wrapped script's command
+line.  The WLM plugin uses it to set the cluster resource request for the trial.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">gpu_num</span><span class="p">:</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+</span></code></pre></div>
+<p>Alternatively, set a fixed <code>gpu-count</code> in the <code>wlm:</code> section of the HPO YAML
+when all trials use the same number of GPUs.</p>
+<h3 id="static-arguments">Static arguments<a class="headerlink" href="#static-arguments" title="Permanent link">&para;</a></h3>
+<p>Arguments passed unchanged to every trial. Can be supplied inline or via file:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--static-args-json</code></td>
+<td>Static arguments as a JSON string</td>
+</tr>
+<tr>
+<td><code>--static-args-yaml</code></td>
+<td>Path to a YAML file with static arguments</td>
+</tr>
+</tbody>
+</table>
+<p>If neither is provided, <code>iterate2</code> falls back to the <code>static</code> section of <code>--hpo-yaml</code>.</p>
+<p>Static boolean values follow the same rule as HPO values: unquoted <code>true</code> produces a bare flag (<code>--flag</code>), unquoted <code>false</code> omits it.</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">static</span><span class="p">:</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">tf32</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">      </span><span class="c1"># → --tf32  (store_true flag, always present)</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">    </span><span class="c1"># → (omitted)</span>
+</span></code></pre></div>
+<h3 id="metric-extraction">Metric extraction<a class="headerlink" href="#metric-extraction" title="Permanent link">&para;</a></h3>
+<p>| Option | Default | Description |
+|---|---|
+| <code>--metrics</code> | <code>score_combined</code> | Comma-separated list of metric names to extract from the trial's stdout log |</p>
+<p>The <strong>last</strong> occurrence of the pattern <code>&lt;metric_name&gt;: &lt;value&gt;</code> or <code>&lt;metric_name&gt;= &lt;value&gt;</code> is used for each metric. If a metric is not found, it defaults to <code>0.0</code> with a warning.</p>
+<p><strong>Single metric (single-objective):</strong></p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>--metrics<span class="w"> </span>val_loss
+</span></code></pre></div>
+<p><strong>Multiple metrics (multi-objective, Pareto front):</strong></p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>--metrics<span class="w"> </span>score_linear_acc,score_modality_leak,score_combined
+</span></code></pre></div>
+<p><code>iterate2</code> prints the Pareto-front trials at the end:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Trial 12: Values=[0.873, 0.041, 0.791]
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Trial 17: Values=[0.901, 0.038, 0.812]
+</span></code></pre></div>
+<h4 id="metric-directions-minimize-maximize">Metric directions (minimize / maximize)<a class="headerlink" href="#metric-directions-minimize-maximize" title="Permanent link">&para;</a></h4>
+<p>By default the direction per metric is inferred from its name: any metric whose name contains <code>loss</code>, <code>error</code>, <code>err</code>, <code>mse</code>, <code>mae</code>, or <code>rmse</code> is <strong>minimized</strong>; all others are <strong>maximized</strong>.</p>
+<p>To override the direction explicitly, use the extended form in the <code>metrics:</code> section of the HPO YAML:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">metrics</span><span class="p">:</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_loss</span><span class="w">       </span><span class="c1"># minimize (also inferred automatically)</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minimize</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">accuracy</span><span class="w">       </span><span class="c1"># maximize (also inferred automatically)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximize</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">f1_score</span><span class="w">       </span><span class="c1"># maximize (explicit override)</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximize</span>
+</span></code></pre></div>
+<p>A mix of simple strings and extended objects is allowed:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">metrics</span><span class="p">:</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">val_loss</span><span class="w">             </span><span class="c1"># direction inferred → minimize</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_custom_score</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">maximize</span><span class="w">  </span><span class="c1"># direction explicit</span>
+</span></code></pre></div>
+<hr />
+<h2 id="setter-style-arguments">Setter-style arguments<a class="headerlink" href="#setter-style-arguments" title="Permanent link">&para;</a></h2>
+<p>Some scripts (e.g. those using <a href="https://hydra.cc/">Hydra</a> overrides or custom key-value CLIs) do not accept named flags like <code>--learning-rate 0.001</code>. Instead they expect:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>--set<span class="w"> </span>learning_rate<span class="w"> </span><span class="m">0</span>.001<span class="w"> </span>--set<span class="w"> </span>batch_size<span class="w"> </span><span class="m">32</span>
+</span></code></pre></div>
+<p>Pass <code>--param-setter set</code> (or whatever flag name the target script uses) to switch <code>iterate2</code> to this style:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>iterate2<span class="w"> </span>--param-setter<span class="w"> </span><span class="nb">set</span><span class="w"> </span>...
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Generated argument style</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>default (<code>--param-setter</code> omitted)</td>
+<td><code>--learning-rate 0.001 --batch-size 32</code></td>
+</tr>
+<tr>
+<td><code>--param-setter set</code></td>
+<td><code>--set learning_rate 0.001 --set batch_size 32</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In setter style, <code>flag</code> parameters are passed as <code>--set flag</code> (key only, no value) when <code>true</code>, and omitted when <code>false</code>.</p>
+</div>
+<hr />
+<h2 id="wlm-plugin-system">WLM plugin system<a class="headerlink" href="#wlm-plugin-system" title="Permanent link">&para;</a></h2>
+<p>iteate2 has no built-in knowledge of any workload manager.  Instead it calls a
+user-supplied <strong>plugin script</strong> once per trial.  The plugin can be any
+executable (bash, Python, …).</p>
+<h3 id="plugin-interface">Plugin interface<a class="headerlink" href="#plugin-interface" title="Permanent link">&para;</a></h3>
+<p>iterate2 calls the plugin with no positional arguments.  All information is
+delivered through environment variables:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ITERATE_TRIAL_NUMBER</code></td>
+<td>Integer trial ID</td>
+</tr>
+<tr>
+<td><code>ITERATE_TRIAL_CMD</code></td>
+<td>Full shell command (with <code>cd</code>, <code>source venv</code>) – suited for HPC WLMs</td>
+</tr>
+<tr>
+<td><code>ITERATE_TRIAL_CONTAINER_CMD</code></td>
+<td>Bare CLI invocation (no <code>cd</code>/<code>source</code>) – suited for container-based systems</td>
+</tr>
+<tr>
+<td><code>ITERATE_OUT_FILE</code></td>
+<td>File where <strong>stdout</strong> must be written</td>
+</tr>
+<tr>
+<td><code>ITERATE_ERR_FILE</code></td>
+<td>File where <strong>stderr</strong> must be written</td>
+</tr>
+<tr>
+<td><code>ITERATE_WLM_&lt;KEY&gt;</code></td>
+<td>Every key from the YAML <code>wlm:</code> section (uppercased, hyphens → underscores)</td>
+</tr>
+</tbody>
+</table>
+<p>The plugin must exit <strong>0</strong> on success; any other exit code marks the trial as
+failed in Optuna.</p>
+<h3 id="wlm-configuration-in-the-hpo-yaml">WLM configuration in the HPO YAML<a class="headerlink" href="#wlm-configuration-in-the-hpo-yaml" title="Permanent link">&para;</a></h3>
+<p>All WLM-specific parameters (GPU count, memory, queue, job template path, …)
+live in an optional <code>wlm:</code> section of the HPO YAML:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nt">hpo</span><span class="p">:</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">float</span><span class="p p-Indicator">,</span><span class="nt"> low</span><span class="p">:</span><span class="w"> </span><span class="nv">1e-5</span><span class="p p-Indicator">,</span><span class="nt"> high</span><span class="p">:</span><span class="w"> </span><span class="nv">1e-2</span><span class="p p-Indicator">,</span><span class="nt"> log</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="w"> </span><span class="p p-Indicator">}</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="nt">static</span><span class="p">:</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nt">epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="c1"># WLM config – forwarded as ITERATE_WLM_* env vars to the plugin</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="nt">wlm</span><span class="p">:</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="nt">gpu-count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="nt">cpu-count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="nt">mem-gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="nt">lsf-gpu-config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num=1:mode=exclusive_process:mps=no:gmodel=NVIDIAA100_SXM4_80GB&quot;</span>
+</span></code></pre></div>
+<h3 id="reference-plugins">Reference plugins<a class="headerlink" href="#reference-plugins" title="Permanent link">&para;</a></h3>
+<p>See <code>examples/wlm_plugins/</code> for fully documented reference implementations:</p>
+<table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>WLM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lsf_plugin.sh</code></td>
+<td>IBM Spectrum LSF (<code>bsub -K</code>)</td>
+</tr>
+<tr>
+<td><code>vela_plugin.py</code></td>
+<td>OpenShift / MLBatch PyTorchJob (<code>helm template \| oc create</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>Writing a SLURM plugin follows the same pattern as <code>lsf_plugin.sh</code>.</p>
+<hr />
+<h2 id="parallel-execution">Parallel execution<a class="headerlink" href="#parallel-execution" title="Permanent link">&para;</a></h2>
+<p>By default <code>iterate2</code> runs one trial at a time. Pass <code>--parallelism N</code> to run up to <code>N</code> trials simultaneously, each in its own thread.</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span>--parallelism<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span>--wlm-plugin<span class="w"> </span>examples/wlm_plugins/lsf_plugin.sh<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span>...
+</span></code></pre></div>
+<h3 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<p>Each thread independently:</p>
+<ol>
+<li>Asks Optuna for a new set of hyperparameters (<code>study.ask()</code>)</li>
+<li>Builds and submits the launcher command (e.g. <code>bsub -K …</code>)</li>
+<li>Streams every output line to the main process stdout/stderr, prefixed with <code>[trial-N]</code></li>
+<li>Reports the extracted metrics back to Optuna (<code>study.tell()</code>)</li>
+</ol>
+<p>Output from concurrent trials is prefixed so you can follow individual workers:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>[trial-3] Epoch 1/10  ━━━━━━━━━━ 100/100 0:01:12
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>[trial-5] Using bfloat16 precision
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>[trial-3] [performance] val_loss : 0.0421
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>[trial-5] Epoch 1/10  ━━━━━━━━━━ 100/100 0:01:15
+</span></code></pre></div>
+<h3 id="output-files">Output files<a class="headerlink" href="#output-files" title="Permanent link">&para;</a></h3>
+<p>iteate2 tells the plugin where to write output via <code>ITERATE_OUT_FILE</code> /
+<code>ITERATE_ERR_FILE</code>.  The plugin is responsible for directing its job's
+stdout/stderr to those files.  iterate2 extracts metrics from them after the
+plugin exits.</p>
+<p>For local execution (no plugin) iterate2 writes them directly:</p>
+<h3 id="sqlite-and-parallelism">SQLite and parallelism<a class="headerlink" href="#sqlite-and-parallelism" title="Permanent link">&para;</a></h3>
+<p>Optuna retries on SQLite locking errors automatically. Values up to <code>--parallelism 4</code> work well with SQLite. For higher concurrency use PostgreSQL or <strong>JournalStorage</strong>:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># PostgreSQL</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>--optuna-db-path<span class="w"> </span>postgresql://user:pass@host/dbname
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1"># JournalStorage (file-based, lock-free, safe for parallel workers on a shared filesystem)</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>--optuna-db-path<span class="w"> </span>js:///path/to/study_journal.log
+</span></code></pre></div>
+<p><code>js:///</code> is a custom <code>iterate2</code> scheme. The path after <code>js:///</code> is passed to Optuna's <code>JournalFileStorage</code>. JournalStorage serialises trials to an append-only log and is well-suited for NFS/GPFS shared filesystems where SQLite locking is unreliable.</p>
+<hr />
+<h2 id="workload-managers">Workload managers<a class="headerlink" href="#workload-managers" title="Permanent link">&para;</a></h2>
+<h3 id="lsf">LSF<a class="headerlink" href="#lsf" title="Permanent link">&para;</a></h3>
+<p><code>iterate2</code> waits for each <code>bsub</code> job synchronously (<code>-K</code> flag). Output is written to <code>trial_&lt;N&gt;.out</code> / <code>trial_&lt;N&gt;.err</code> in the working directory.</p>
+<h3 id="slurm">Slurm<a class="headerlink" href="#slurm" title="Permanent link">&para;</a></h3>
+<p>Uses <code>srun</code> with <code>--gres=gpu:&lt;N&gt;</code>, <code>--cpus-per-task</code>, and <code>--mem</code> flags.</p>
+<h3 id="none">none<a class="headerlink" href="#none" title="Permanent link">&para;</a></h3>
+<p>Runs the command directly in a local shell, redirecting stdout/stderr to <code>trial_&lt;N&gt;.out</code> / <code>trial_&lt;N&gt;.err</code>.</p>
+<h3 id="vela-openshift-mlbatch">Vela (OpenShift / MLBatch)<a class="headerlink" href="#vela-openshift-mlbatch" title="Permanent link">&para;</a></h3>
+<p><code>--wlm vela</code> submits each trial as a <a href="https://www.kubeflow.org/docs/components/training/pytorch/">PyTorchJob</a> via the <a href="https://github.com/project-codeflare/mlbatch">MLBatch <code>pytorchjob-generator</code></a> helm chart.</p>
+<h4 id="submission-flow">Submission flow<a class="headerlink" href="#submission-flow" title="Permanent link">&para;</a></h4>
+<ol>
+<li>For each Optuna trial iterate2:<ul>
+<li>Builds the CLI invocation from sampled + static args.</li>
+<li>Patches the <strong>job template YAML</strong>:<ul>
+<li>appends <code>-trial-&lt;N&gt;</code> to <code>jobName</code> (unique resource per trial)</li>
+<li>sets <code>numGpusPerPod</code> from <code>gpu_num</code> (HPO or CLI <code>--gpu-count</code>)</li>
+<li>replaces the <code>{{HPO_COMMAND}}</code> placeholder in <code>setupCommands</code> with the generated CLI call</li>
+</ul>
+</li>
+<li>Runs <code>helm template -f &lt;patched.yaml&gt; &lt;chart&gt; | oc create [-n &lt;ns&gt;] -f-</code></li>
+</ul>
+</li>
+<li>Polls until <code>&lt;jobName&gt;-master-0</code> pod appears, then streams <code>oc logs -f &lt;pod&gt;</code> — <strong>this call blocks until the container exits</strong>, so the trial behaves the same as other WLM backends.</li>
+<li>Pod exit code is checked; non-zero raises an error.</li>
+<li>The <code>PyTorchJob</code> resource is deleted.</li>
+</ol>
+<h4 id="job-template">Job template<a class="headerlink" href="#job-template" title="Permanent link">&para;</a></h4>
+<p>Create a YAML file modelled on <code>examples/vela_gridfm_template.yaml</code>.  The only special requirement is the <code>{{HPO_COMMAND}}</code> placeholder somewhere in <code>setupCommands</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nt">jobName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-project-hpo&quot;</span><span class="w">       </span><span class="c1"># iterate2 appends -trial-N</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="nt">numGpusPerPod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                </span><span class="c1"># iterate2 overwrites with gpu_num</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="nt">numCpusPerPod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="nt">totalMemoryPerPod</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;32Gi&quot;</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="nt">volumes</span><span class="p">:</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;data-vol&quot;</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">    </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-pvc&quot;</span>
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">    </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/mnt/data&quot;</span>
+</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
+</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="nt">setupCommands</span><span class="p">:</span>
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;wget</span><span class="nv"> </span><span class="s">-q</span><span class="nv"> </span><span class="s">https://example.com/config.yaml&quot;</span>
+</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{HPO_COMMAND}}&quot;</span><span class="w">           </span><span class="c1"># ← iterate2 fills this in</span>
+</span></code></pre></div>
+<h4 id="example-invocation">Example invocation<a class="headerlink" href="#example-invocation" title="Permanent link">&para;</a></h4>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--script<span class="w">            </span><span class="s2">&quot;gridfm_graphkit train&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--interpreter<span class="w">       </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--wlm<span class="w">               </span>vela<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span>--vela-job-template<span class="w"> </span>examples/vela_gridfm_template.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span>--vela-chart-path<span class="w">   </span>../mlbatch/tools/pytorchjob-generator/chart<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">  </span>--vela-namespace<span class="w">    </span>my-namespace<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span>--gpu-count<span class="w">         </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">  </span>--optuna-study-name<span class="w"> </span>gridfm_vela_hpo<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">  </span>--optuna-db-path<span class="w">    </span>sqlite:///gridfm_vela_hpo.db<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">  </span>--optuna-n-trials<span class="w">   </span><span class="m">20</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-12"><a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a><span class="w">  </span>--hpo-yaml<span class="w">          </span>configs/gridfm_graphkit_hpo.yaml
+</span></code></pre></div>
+<p>See <code>examples/run_vela_example.sh</code> for a complete ready-to-run script.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>--script</code> is the bare CLI entry-point (<code>gridfm_graphkit train</code>).  Set <code>--interpreter ""</code> to suppress the default <code>python</code> prefix.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code>gpu_num</code> in the HPO space controls both <code>numGpusPerPod</code> in the job YAML <strong>and</strong> the WLM resource request, just like with LSF/Slurm.</p>
+</div>
+<hr />
+<h2 id="example-hpo-yaml">Example HPO YAML<a class="headerlink" href="#example-hpo-yaml" title="Permanent link">&para;</a></h2>
+<p>Full example combining all parameter types:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># hpo_space.yaml</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="nt">hpo</span><span class="p">:</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">  </span><span class="c1"># float – log-uniform over [1e-5, 1e-2]</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">  </span><span class="nt">learning_rate</span><span class="p">:</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-5</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-2</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span><span class="nt">log</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">  </span><span class="c1"># int – encoder depth</span>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">  </span><span class="nt">encoder_depth</span><span class="p">:</span>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">    </span><span class="nt">low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">    </span><span class="nt">high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a>
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">  </span><span class="c1"># categorical – batch size</span>
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a><span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span>
+</span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-25-19"><a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">16</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">64</span><span class="p p-Indicator">]</span>
+</span><span id="__span-25-20"><a id="__codelineno-25-20" name="__codelineno-25-20" href="#__codelineno-25-20"></a>
+</span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">  </span><span class="c1"># categorical with null – compile mode (null omits --compile entirely)</span>
+</span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">  </span><span class="nt">compile</span><span class="p">:</span>
+</span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;max-autotune&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
+</span><span id="__span-25-25"><a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>
+</span><span id="__span-25-26"><a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">  </span><span class="c1"># flag – store_true style (--bfloat16 present or absent)</span>
+</span><span id="__span-25-27"><a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a><span class="w">  </span><span class="nt">bfloat16</span><span class="p">:</span>
+</span><span id="__span-25-28"><a id="__codelineno-25-28" name="__codelineno-25-28" href="#__codelineno-25-28"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flag</span>
+</span><span id="__span-25-29"><a id="__codelineno-25-29" name="__codelineno-25-29" href="#__codelineno-25-29"></a>
+</span><span id="__span-25-30"><a id="__codelineno-25-30" name="__codelineno-25-30" href="#__codelineno-25-30"></a><span class="w">  </span><span class="c1"># flag – store_true style (--tf32 present or absent)</span>
+</span><span id="__span-25-31"><a id="__codelineno-25-31" name="__codelineno-25-31" href="#__codelineno-25-31"></a><span class="w">  </span><span class="nt">tf32</span><span class="p">:</span>
+</span><span id="__span-25-32"><a id="__codelineno-25-32" name="__codelineno-25-32" href="#__codelineno-25-32"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flag</span>
+</span><span id="__span-25-33"><a id="__codelineno-25-33" name="__codelineno-25-33" href="#__codelineno-25-33"></a>
+</span><span id="__span-25-34"><a id="__codelineno-25-34" name="__codelineno-25-34" href="#__codelineno-25-34"></a><span class="w">  </span><span class="c1"># gpu_num – controls WLM resource request per trial (not forwarded to script)</span>
+</span><span id="__span-25-35"><a id="__codelineno-25-35" name="__codelineno-25-35" href="#__codelineno-25-35"></a><span class="w">  </span><span class="nt">gpu_num</span><span class="p">:</span>
+</span><span id="__span-25-36"><a id="__codelineno-25-36" name="__codelineno-25-36" href="#__codelineno-25-36"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
+</span><span id="__span-25-37"><a id="__codelineno-25-37" name="__codelineno-25-37" href="#__codelineno-25-37"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span>
+</span><span id="__span-25-38"><a id="__codelineno-25-38" name="__codelineno-25-38" href="#__codelineno-25-38"></a>
+</span><span id="__span-25-39"><a id="__codelineno-25-39" name="__codelineno-25-39" href="#__codelineno-25-39"></a><span class="w">  </span><span class="c1"># group – bundles co-dependent args; Optuna picks one group by name</span>
+</span><span id="__span-25-40"><a id="__codelineno-25-40" name="__codelineno-25-40" href="#__codelineno-25-40"></a><span class="w">  </span><span class="nt">dataset</span><span class="p">:</span>
+</span><span id="__span-25-41"><a id="__codelineno-25-41" name="__codelineno-25-41" href="#__codelineno-25-41"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">group</span>
+</span><span id="__span-25-42"><a id="__codelineno-25-42" name="__codelineno-25-42" href="#__codelineno-25-42"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-25-43"><a id="__codelineno-25-43" name="__codelineno-25-43" href="#__codelineno-25-43"></a><span class="w">      </span><span class="nt">case2000</span><span class="p">:</span>
+</span><span id="__span-25-44"><a id="__codelineno-25-44" name="__codelineno-25-44" href="#__codelineno-25-44"></a><span class="w">        </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./examples/config/model_case2000.yaml</span>
+</span><span id="__span-25-45"><a id="__codelineno-25-45" name="__codelineno-25-45" href="#__codelineno-25-45"></a><span class="w">        </span><span class="nt">data_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/pf/</span>
+</span><span id="__span-25-46"><a id="__codelineno-25-46" name="__codelineno-25-46" href="#__codelineno-25-46"></a><span class="w">        </span><span class="nt">exp_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">case2000</span>
+</span><span id="__span-25-47"><a id="__codelineno-25-47" name="__codelineno-25-47" href="#__codelineno-25-47"></a><span class="w">      </span><span class="nt">case1000</span><span class="p">:</span>
+</span><span id="__span-25-48"><a id="__codelineno-25-48" name="__codelineno-25-48" href="#__codelineno-25-48"></a><span class="w">        </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./examples/config/model_case1000.yaml</span>
+</span><span id="__span-25-49"><a id="__codelineno-25-49" name="__codelineno-25-49" href="#__codelineno-25-49"></a><span class="w">        </span><span class="nt">data_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/data/pf/</span>
+</span><span id="__span-25-50"><a id="__codelineno-25-50" name="__codelineno-25-50" href="#__codelineno-25-50"></a><span class="w">        </span><span class="nt">exp_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">case1000</span>
+</span><span id="__span-25-51"><a id="__codelineno-25-51" name="__codelineno-25-51" href="#__codelineno-25-51"></a>
+</span><span id="__span-25-52"><a id="__codelineno-25-52" name="__codelineno-25-52" href="#__codelineno-25-52"></a><span class="nt">static</span><span class="p">:</span>
+</span><span id="__span-25-53"><a id="__codelineno-25-53" name="__codelineno-25-53" href="#__codelineno-25-53"></a><span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+</span><span id="__span-25-54"><a id="__codelineno-25-54" name="__codelineno-25-54" href="#__codelineno-25-54"></a><span class="w">  </span><span class="nt">log_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">logs</span>
+</span><span id="__span-25-55"><a id="__codelineno-25-55" name="__codelineno-25-55" href="#__codelineno-25-55"></a><span class="w">  </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
+</span></code></pre></div>
+<p>Launch with:</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>--script<span class="w"> </span>gridfm_graphkit<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--interpreter<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span>--root-dir<span class="w"> </span>/path/to/project<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span>--venv<span class="w"> </span>/path/to/venv<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span>--wlm<span class="w"> </span>lsf<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span>--lsf-gpu-config-string<span class="w"> </span><span class="s2">&quot;num=1:mode=exclusive_process:mps=yes:gmodel=NVIDIAA100_SXM4_80GB&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span>--cpu-count<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">  </span>--mem-gb<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">  </span>--optuna-study-name<span class="w"> </span>my_study<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">  </span>--optuna-db-path<span class="w"> </span>sqlite:///my_study.db<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">  </span>--optuna-n-trials<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">  </span>--hpo-yaml<span class="w"> </span>hpo_space.yaml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">  </span>--metrics<span class="w"> </span>val_loss,val_f1
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

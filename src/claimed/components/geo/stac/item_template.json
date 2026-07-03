@@ -45,7 +45,7 @@
                 ],
                 [
                     -180,
-                    -80
+                    -90
                 ]
             ]
         ]
@@ -55,7 +55,7 @@
         "gsd": 10,
         "title": "Terramind Embedding",
         "description": "Terramind embedding from Sentinel-2-L2A imagery.",
-        "licensing": " CC-BY 4.0"
+        "licensing": "CC-BY 4.0"
     },
     "assets": {
         "embeddings": {

@@ -198,18 +198,53 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
         raise ValueError(f"GDAL could not open '{tiff_path}'")
 
     try:
-        srs  = osr.SpatialReference(wkt=ds.GetProjection())
+        wkt = ds.GetProjection()
+        srs = osr.SpatialReference(wkt=wkt)
         epsg = None
-        if srs.IsProjected() or srs.IsGeographic():
+        has_crs = bool(wkt) and (srs.IsProjected() or srs.IsGeographic())
+
+        if has_crs:
+            # Prefer authority code; fall back to None (still georeferenced).
             code = srs.GetAuthorityCode(None)
             if code:
                 epsg = int(code)
 
-        if epsg is not None:
-            # Standard georeferenced TIFF: compute bbox from the geotransform.
-            bbox, geometry = _compute_bbox_and_geometry(
-                ds.GetGeoTransform(), ds.RasterXSize, ds.RasterYSize
-            )
+            # Always reproject to WGS 84 for STAC bbox/geometry.
+            srs_wgs = osr.SpatialReference()
+            srs_wgs.ImportFromEPSG(4326)
+            srs_wgs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+            srs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+            gt = ds.GetGeoTransform()
+            w, h = ds.RasterXSize, ds.RasterYSize
+
+            # Compute corners in native CRS, then transform to WGS 84.
+            native_minx = gt[0]
+            native_maxy = gt[3]
+            native_maxx = native_minx + gt[1] * w
+            native_miny = native_maxy + gt[5] * h
+
+            corners_native = [
+                (native_minx, native_miny),
+                (native_maxx, native_miny),
+                (native_maxx, native_maxy),
+                (native_minx, native_maxy),
+            ]
+
+            to_wgs = osr.CoordinateTransformation(srs, srs_wgs)
+            corners_wgs = []
+            for cx, cy in corners_native:
+                lon, lat, _ = to_wgs.TransformPoint(cx, cy)
+                corners_wgs.append((lon, lat))
+
+            lons = [c[0] for c in corners_wgs]
+            lats = [c[1] for c in corners_wgs]
+            bbox = [min(lons), min(lats), max(lons), max(lats)]
+            ring = corners_wgs + [corners_wgs[0]]
+            geometry = {
+                "type": "Polygon",
+                "coordinates": [[[lon, lat] for lon, lat in ring]],
+            }
         else:
             # Embedding TIFF with no embedded CRS: derive from filename.
             log.debug(
@@ -283,7 +318,8 @@ def run(tiff: str, stac_template: dict, cos_url: str) -> dict:
             - ``geometry``               → bounding-box polygon in WGS 84
             - ``properties.datetime``    → parsed from the filename
             - ``properties.proj:epsg``   → EPSG code of the tile's native CRS
-            - ``assets.embeddings.href`` → relative filename of the tiff
+                                           (omitted when the code cannot be identified)
+            - ``assets.embeddings.href`` → full COS/S3 URL (``cos_url/filename``)
 
         All other template fields are preserved unchanged.
 
@@ -312,10 +348,13 @@ def run(tiff: str, stac_template: dict, cos_url: str) -> dict:
 
     # Properties – keep everything in the template, just update datetime + CRS
     item.setdefault("properties", {})
-    item["properties"]["datetime"]  = _datetime_from_filename(stem)
-    item["properties"]["proj:epsg"] = meta["epsg"]
+    item["properties"]["datetime"] = _datetime_from_filename(stem)
+    if meta["epsg"] is not None:
+        item["properties"]["proj:epsg"] = meta["epsg"]
+    else:
+        item["properties"].pop("proj:epsg", None)
 
-    # Asset href – relative path so the JSON is portable
+    # Asset href – full COS/S3 URL pointing to the TIFF in the bucket
     item.setdefault("assets", {}).setdefault("embeddings", {})
     item["assets"]["embeddings"]["href"] = f"{cos_url}/{os.path.basename(tiff)}"
 
@@ -337,7 +376,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a STAC Item JSON for a TIFF embedding.")
     parser.add_argument("tiff",          help="Path to the GeoTIFF embedding.")
     parser.add_argument("stac_template", help="Path to the STAC Item JSON template.")
-    parser.add_argument("cos_url", help="Url to the COS bucket were the STAC Item will be stored.")
+    parser.add_argument("cos_url", help="URL to the COS bucket where the STAC Item will be stored.")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)

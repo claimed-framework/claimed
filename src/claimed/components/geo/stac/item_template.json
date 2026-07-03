@@ -1,0 +1,70 @@
+{
+    "stac_version": "1.1.0",
+    "stac_extensions": [],
+    "type": "Feature",
+    "id":"<<>>",
+    "collection": null,
+    "links": [
+        {
+            "rel": "self",
+            "href": "./terramind_item.json",
+            "type": "application/json"
+        },
+        {
+            "rel": "emb:source-data",
+            "href": "<<>>",
+            "type": "application/json",
+            "title": "Sentinel-2 image from which this embedding was computed."
+        }
+    ],
+    "bbox": [
+        -1,
+        -0,
+        1,
+        0
+    ],
+    "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    -180,
+                    -90
+                ],
+                [
+                    180,
+                    -90
+                ],
+                [
+                    180,
+                    90
+                ],
+                [
+                    -180,
+                    90
+                ],
+                [
+                    -180,
+                    -80
+                ]
+            ]
+        ]
+    },
+    "properties": {
+        "datetime": "<<>>",
+        "gsd": 10,
+        "title": "Terramind Embedding",
+        "description": "Terramind embedding from Sentinel-2-L2A imagery.",
+        "licensing": " CC-BY 4.0"
+    },
+    "assets": {
+        "embeddings": {
+            "href": "<<>>",
+            "title": "AEF embeddings",
+            "type": "image/tiff",
+            "roles": [
+                "embedding"
+            ]
+        }
+    }
+}

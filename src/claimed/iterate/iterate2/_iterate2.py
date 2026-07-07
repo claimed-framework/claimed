@@ -61,7 +61,7 @@ from typing import List, Optional
 
 import optuna
 import yaml
-from terratorch_iterate.iterate2.plugin.coordinator import load_builtin_plugins, resolve_storage
+from claimed.iterate.iterate2.plugin.coordinator import load_builtin_plugins, resolve_storage
 
 load_builtin_plugins()
 

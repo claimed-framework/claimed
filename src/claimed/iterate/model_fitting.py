@@ -44,7 +44,7 @@ from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
 from torchgeo.datamodules import BaseDataModule
 from torchgeo.trainers import BaseTask
 
-from terratorch_iterate.iterate_types import (
+from claimed.iterate.iterate_types import (
     ParameterBounds,
     ParameterTypeEnum,
     TrainingSpec,
@@ -54,7 +54,7 @@ from terratorch_iterate.iterate_types import (
 )
 
 
-from terratorch_iterate.utils import get_logger
+from claimed.iterate.utils import get_logger
 
 LOGGER = get_logger()
 

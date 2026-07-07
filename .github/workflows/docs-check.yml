@@ -12,7 +12,6 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'src/**'
-      - 'terratorch_iterate/**'
       - '.github/workflows/docs-check.yml'
   workflow_dispatch:
 

@@ -26,8 +26,8 @@ jobs:
       run: |
         # Advisory: pyproject.toml requires-python is >=3.11 and the repo has a
         # large pre-existing pylint backlog (notably R0801 duplicate-code
-        # across c3/{notebook,pythonscript,rscript} and the terratorch_iterate
+        # across c3/{notebook,pythonscript,rscript} and the claimed.iterate
         # modules). Mirrors the flake8 "exit-zero" pattern in
         # python-package-conda.yml so findings surface in logs without
         # blocking every PR.
-        pylint --exit-zero $(git ls-files 'src/**/*.py' 'terratorch_iterate/**/*.py')
+        pylint --exit-zero $(git ls-files 'src/**/*.py')

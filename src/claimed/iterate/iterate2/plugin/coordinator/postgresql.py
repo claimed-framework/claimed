@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 import re
 
-from terratorch_iterate.iterate2.plugin.coordinator import CoordinatorPlugin, register
+from claimed.iterate.iterate2.plugin.coordinator import CoordinatorPlugin, register
 
 logger = logging.getLogger("iterate2.coordinator.postgresql")
 

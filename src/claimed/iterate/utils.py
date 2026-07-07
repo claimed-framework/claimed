@@ -10,8 +10,8 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from ast import literal_eval
 import optuna
-from terratorch_iterate.iterate_types import Task
-from terratorch_iterate import plot_tools
+from claimed.iterate.iterate_types import Task
+from claimed.iterate import plot_tools
 import sys
 from mlflow.entities.experiment import Experiment
 import importlib

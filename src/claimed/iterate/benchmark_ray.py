@@ -14,15 +14,15 @@ from ray.tune.search.basic_variant import BasicVariantGenerator
 from ray.tune.search.optuna import OptunaSearch
 from tabulate import tabulate
 
-from terratorch_iterate.backbone_benchmark import parse_optimization_space
-from terratorch_iterate.iterate_types import (
+from claimed.iterate.backbone_benchmark import parse_optimization_space
+from claimed.iterate.iterate_types import (
     Defaults,
     Task,
     TrainingSpec,
     combine_with_defaults,
     optimization_space_type,
 )
-from terratorch_iterate.model_fitting import fit_model, ray_tune_model, valid_task_types
+from claimed.iterate.model_fitting import fit_model, ray_tune_model, valid_task_types
 
 
 def benchmark_backbone_on_task(

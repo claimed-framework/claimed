@@ -81,6 +81,7 @@ nav:
       - create_operator: c3/create-operator.md
       - create_gridwrapper: c3/create-gridwrapper.md
       - operator_utils: c3/operator-utils.md
+  - Job Coordinator: jobcoordinator.md
   - MLX Backend:
       - Overview: mlx/index.md
       - cos_backend: mlx/cos-backend.md

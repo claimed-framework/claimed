@@ -96,6 +96,8 @@ test = [
 ]
 utility    = ["geobench"]
 nvidia     = ["pynvml"]
+# Used by iterate2's PostgreSQL coordinator plugin and by the claimed job
+# coordinator (`claimed propagate_jobs` / `claimed work_jobs`) for Postgres URLs.
 postgresql = ["psycopg2-binary>=2.9"]
 amd        = ["pyrsmi"]
 

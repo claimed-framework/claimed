@@ -116,6 +116,11 @@ def main():
         _run_module(sys.argv[2:])
         return
 
+    if len(sys.argv) > 1 and sys.argv[1] in ('propagate_jobs', 'work_jobs'):
+        from claimed.jobcoordinator.cli import main as jobcoordinator_main
+        jobcoordinator_main(sys.argv[1], sys.argv[2:])
+        return
+
     dir_path = os.path.dirname(os.path.realpath(__file__))
     return subprocess.call(
         f'{dir_path}/scripts/claimed ' + ' '.join(sys.argv[1:]), shell=True

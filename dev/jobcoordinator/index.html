@@ -12,25 +12,31 @@
         <meta name="author" content="The CLAIMED authors">
       
       
+        <link rel="canonical" href="https://claimed-framework.github.io/claimed/dev/jobcoordinator/">
       
+      
+        <link rel="prev" href="../c3/operator-utils/">
+      
+      
+        <link rel="next" href="../mlx/">
       
       
         
       
       
-      <link rel="icon" href="/claimed/dev/assets/logo.png">
+      <link rel="icon" href="../assets/logo.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>CLAIMED Framework</title>
+        <title>Job Coordinator - CLAIMED Framework</title>
       
     
     
-      <link rel="stylesheet" href="/claimed/dev/assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="/claimed/dev/assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="/claimed/dev/assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("/claimed/dev",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -75,6 +81,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#job-coordinator-database-backed" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -89,9 +100,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="/claimed/dev/." title="CLAIMED Framework" class="md-header__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+    <a href=".." title="CLAIMED Framework" class="md-header__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
       
-  <img src="/claimed/dev/assets/logo.png" alt="logo">
+  <img src="../assets/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -108,7 +119,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              
+              Job Coordinator
             
           </span>
         </div>
@@ -219,7 +230,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/claimed/dev/." class="md-tabs__link">
+      <a href=".." class="md-tabs__link">
         
   
   
@@ -238,7 +249,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/claimed/dev/roadmap/" class="md-tabs__link">
+      <a href="../roadmap/" class="md-tabs__link">
         
   
   
@@ -257,7 +268,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/claimed/dev/getting-started/" class="md-tabs__link">
+      <a href="../getting-started/" class="md-tabs__link">
         
   
   
@@ -276,7 +287,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/claimed/dev/cli/" class="md-tabs__link">
+      <a href="../cli/" class="md-tabs__link">
         
   
   
@@ -297,7 +308,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/claimed/dev/c3/" class="md-tabs__link">
+        <a href="../c3/" class="md-tabs__link">
           
   
   
@@ -313,9 +324,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="/claimed/dev/jobcoordinator/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -336,7 +349,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/claimed/dev/mlx/" class="md-tabs__link">
+        <a href="../mlx/" class="md-tabs__link">
           
   
   
@@ -356,7 +369,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/claimed/dev/components/util/cosutils/" class="md-tabs__link">
+        <a href="../components/util/cosutils/" class="md-tabs__link">
           
   
   
@@ -376,7 +389,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="/claimed/dev/iterate2/" class="md-tabs__link">
+        <a href="../iterate2/" class="md-tabs__link">
           
   
   
@@ -394,7 +407,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="/claimed/dev/contributing/" class="md-tabs__link">
+      <a href="../contributing/" class="md-tabs__link">
         
   
   
@@ -429,9 +442,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="/claimed/dev/." title="CLAIMED Framework" class="md-nav__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
+    <a href=".." title="CLAIMED Framework" class="md-nav__button md-logo" aria-label="CLAIMED Framework" data-md-component="logo">
       
-  <img src="/claimed/dev/assets/logo.png" alt="logo">
+  <img src="../assets/logo.png" alt="logo">
 
     </a>
     CLAIMED Framework
@@ -458,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -485,7 +498,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/roadmap/" class="md-nav__link">
+      <a href="../roadmap/" class="md-nav__link">
         
   
   
@@ -512,7 +525,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/getting-started/" class="md-nav__link">
+      <a href="../getting-started/" class="md-nav__link">
         
   
   
@@ -539,7 +552,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/cli/" class="md-nav__link">
+      <a href="../cli/" class="md-nav__link">
         
   
   
@@ -620,7 +633,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/c3/" class="md-nav__link">
+      <a href="../c3/" class="md-nav__link">
         
   
   
@@ -648,7 +661,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/c3/create-operator/" class="md-nav__link">
+      <a href="../c3/create-operator/" class="md-nav__link">
         
   
   
@@ -676,7 +689,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/c3/create-gridwrapper/" class="md-nav__link">
+      <a href="../c3/create-gridwrapper/" class="md-nav__link">
         
   
   
@@ -704,7 +717,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/c3/operator-utils/" class="md-nav__link">
+      <a href="../c3/operator-utils/" class="md-nav__link">
         
   
   
@@ -736,10 +749,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/claimed/dev/jobcoordinator/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Job Coordinator
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -755,6 +795,120 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#propagate_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        propagate_jobs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#work_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        work_jobs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="work_jobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-workers-in-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running workers in parallel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomic-claiming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atomic claiming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postgresql-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a worker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-the-grid-wrapper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to the grid wrapper
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -820,7 +974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/mlx/" class="md-nav__link">
+      <a href="../mlx/" class="md-nav__link">
         
   
   
@@ -848,7 +1002,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/mlx/cos-backend/" class="md-nav__link">
+      <a href="../mlx/cos-backend/" class="md-nav__link">
         
   
   
@@ -876,7 +1030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/mlx/s3-kv-store/" class="md-nav__link">
+      <a href="../mlx/s3-kv-store/" class="md-nav__link">
         
   
   
@@ -965,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/components/util/cosutils/" class="md-nav__link">
+      <a href="../components/util/cosutils/" class="md-nav__link">
         
   
   
@@ -993,7 +1147,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/components/util/gpu-benchmark/" class="md-nav__link">
+      <a href="../components/util/gpu-benchmark/" class="md-nav__link">
         
   
   
@@ -1082,7 +1236,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/iterate2/" class="md-nav__link">
+      <a href="../iterate2/" class="md-nav__link">
         
   
   
@@ -1110,7 +1264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/mlflow/" class="md-nav__link">
+      <a href="../mlflow/" class="md-nav__link">
         
   
   
@@ -1138,7 +1292,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/new_backbone/" class="md-nav__link">
+      <a href="../new_backbone/" class="md-nav__link">
         
   
   
@@ -1166,7 +1320,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/ray/" class="md-nav__link">
+      <a href="../ray/" class="md-nav__link">
         
   
   
@@ -1194,7 +1348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/plotting/" class="md-nav__link">
+      <a href="../plotting/" class="md-nav__link">
         
   
   
@@ -1222,7 +1376,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/repeating_experiments/" class="md-nav__link">
+      <a href="../repeating_experiments/" class="md-nav__link">
         
   
   
@@ -1250,7 +1404,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   
@@ -1278,7 +1432,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/for_developers/" class="md-nav__link">
+      <a href="../for_developers/" class="md-nav__link">
         
   
   
@@ -1306,7 +1460,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/handover/" class="md-nav__link">
+      <a href="../handover/" class="md-nav__link">
         
   
   
@@ -1341,7 +1495,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/claimed/dev/contributing/" class="md-nav__link">
+      <a href="../contributing/" class="md-nav__link">
         
   
   
@@ -1378,6 +1532,110 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#propagate_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        propagate_jobs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#work_jobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        work_jobs
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="work_jobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-workers-in-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running workers in parallel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomic-claiming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atomic claiming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postgresql-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a worker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-the-grid-wrapper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to the grid wrapper
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1390,8 +1648,170 @@
               
               <article class="md-content__inner md-typeset">
                 
-  <h1>404 - Not found</h1>
+                  
 
+
+  
+    <a href="https://github.com/claimed-framework/claimed/edit/main/docs/jobcoordinator.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="job-coordinator-database-backed">Job Coordinator (database-backed)<a class="headerlink" href="#job-coordinator-database-backed" title="Permanent link">&para;</a></h1>
+<p>The job coordinator turns <strong>any executable</strong> into a distributed worker. It is a
+database-backed sibling of the file-based grid wrapper: instead of
+<code>.LOCKED/.PROCESSED/.FAILED</code> marker files on a shared filesystem, the queue and
+its coordination state live in a database (SQLite or PostgreSQL).</p>
+<p>A <strong>job</strong> is a whole batch/run; a <strong>task</strong> is one unit of work within it
+(typically a file path). Two commands make up the workflow:</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>claimed propagate_jobs</code></td>
+<td>Populate a job with tasks from a glob/directory (status <code>pending</code>).</td>
+</tr>
+<tr>
+<td><code>claimed work_jobs</code></td>
+<td>Claim the job's tasks one-by-one and run a worker script per task.</td>
+</tr>
+</tbody>
+</table>
+<p>Because the database is the single source of truth and claiming is atomic, many
+workers — on one machine or across many nodes — cooperate safely and never
+process the same task twice.</p>
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<p>Each task is one row in the <code>claimed_jobs</code> table, identified by its <strong>job</strong> (the
+batch namespace) plus its <strong>task_name</strong> (the file path emitted by
+<code>propagate_jobs</code>). The job is a mandatory namespace: it lets many independent
+batches share one database, and workers only ever claim tasks from the job they
+were pointed at. Uniqueness is per <code>(job, task_name)</code>, so the same file path may
+appear in more than one job. A task moves through:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pending ── claim ──▶ processing ── worker exit 0 ──▶ succeeded
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                               └── worker exit ≠0 ──▶ failed
+</span></code></pre></div>
+<p>The table also records <code>worker_id</code>, <code>attempts</code>, timestamps, and (on failure) an
+<code>error</code> message.</p>
+<h2 id="propagate_jobs"><code>propagate_jobs</code><a class="headerlink" href="#propagate_jobs" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>claimed<span class="w"> </span>propagate_jobs<span class="w"> </span>--db<span class="w"> </span>&lt;url&gt;<span class="w"> </span>--job<span class="w"> </span>&lt;name&gt;<span class="w"> </span>&lt;pattern&gt;
+</span></code></pre></div>
+<ul>
+<li><code>--db &lt;url&gt;</code> — a SQLite file path (e.g. <code>jobs.db</code>, <code>/tmp/jobs.db</code>) or a full
+  database URL. Bare paths and <code>*.db</code> / <code>*.sqlite</code> become SQLite; <code>sqlite:///…</code>
+  and <code>postgresql://…</code> (also the legacy <code>postgres://…</code>) are used as given.</li>
+<li><code>--job &lt;name&gt;</code> — <strong>mandatory</strong> namespace for this batch. Use a distinct job
+  name per independent run so several runs can share one database.</li>
+<li><code>&lt;pattern&gt;</code> — a glob (with <code>**</code> recursion) or a directory. <strong>Quote it</strong> so the
+  shell does not expand the glob before CLAIMED sees it.</li>
+</ul>
+<p>The command is <strong>idempotent</strong>: re-running only inserts <code>(job, task_name)</code> pairs
+that do not already exist (<code>INSERT … ON CONFLICT DO NOTHING</code>), so you can grow
+the queue incrementally.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>claimed<span class="w"> </span>propagate_jobs<span class="w"> </span>--db<span class="w"> </span>/tmp/jobs.db<span class="w"> </span>--job<span class="w"> </span>run-2026<span class="w"> </span><span class="s1">&#39;data/**/*.tif&#39;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Inserted 42 tasks into job &#39;run-2026&#39; (0 already existed). Total pending: 42</span>
+</span></code></pre></div>
+<h2 id="work_jobs"><code>work_jobs</code><a class="headerlink" href="#work_jobs" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>claimed<span class="w"> </span>work_jobs<span class="w"> </span>--db<span class="w"> </span>&lt;url&gt;<span class="w"> </span>--job<span class="w"> </span>&lt;name&gt;<span class="w"> </span>--worker<span class="w"> </span>&lt;script&gt;<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</span></code></pre></div>
+<p>The worker loop claims the oldest pending task <strong>in <code>--job</code></strong>, marks it
+<code>processing</code>, runs the worker, then marks it <code>succeeded</code> (exit 0) or <code>failed</code>
+(any other exit code or a launch error). It exits when the job's queue is
+empty. The job must match the one used in <code>propagate_jobs</code>.</p>
+<p>The task name is passed to the worker <strong>both</strong> ways:</p>
+<ul>
+<li>as the first positional argument (<code>$1</code>)</li>
+<li>as the <code>CLAIMED_TASK</code> environment variable</li>
+</ul>
+<p><code>CLAIMED_JOB</code> and <code>CLAIMED_WORKER_ID</code> are also exported.</p>
+<p>Options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--worker-id NAME</code></td>
+<td><code>&lt;hostname&gt;-&lt;pid&gt;</code></td>
+<td>Identifier recorded on claimed tasks.</td>
+</tr>
+<tr>
+<td><code>--max-tasks N</code></td>
+<td>drain queue</td>
+<td>Stop after N tasks this run.</td>
+</tr>
+<tr>
+<td><code>--poll-interval S</code></td>
+<td><code>0</code></td>
+<td>When empty, wait S seconds and retry instead of exiting.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="running-workers-in-parallel">Running workers in parallel<a class="headerlink" href="#running-workers-in-parallel" title="Permanent link">&para;</a></h3>
+<p>Just launch <code>work_jobs</code> more than once against the same <code>--db</code> and <code>--job</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">4</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>claimed<span class="w"> </span>work_jobs<span class="w"> </span>--db<span class="w"> </span>postgresql://user:pass@host/claimed<span class="w"> </span>--job<span class="w"> </span>run-2026<span class="w"> </span>--worker<span class="w"> </span>./worker.sh<span class="w"> </span><span class="p">&amp;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">done</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">wait</span>
+</span></code></pre></div>
+<p>Two runs that use <strong>different</strong> <code>--job</code> values against the same database run
+fully independently — neither sees or claims the other's tasks.</p>
+<h2 id="atomic-claiming">Atomic claiming<a class="headerlink" href="#atomic-claiming" title="Permanent link">&para;</a></h2>
+<p>Claiming is always scoped to the worker's <code>--job</code>.</p>
+<ul>
+<li><strong>PostgreSQL</strong> uses <code>SELECT … FOR UPDATE SKIP LOCKED</code> so concurrent workers
+  skip rows another worker is already claiming — no contention, no duplicates.</li>
+<li><strong>SQLite</strong> has no <code>SKIP LOCKED</code>; writers are serialized with <code>BEGIN IMMEDIATE</code>
+  plus a guarded <code>UPDATE … WHERE status='pending'</code> and a short retry loop, with
+  WAL mode and a busy timeout enabled for cross-process concurrency.</li>
+</ul>
+<h2 id="postgresql-support">PostgreSQL support<a class="headerlink" href="#postgresql-support" title="Permanent link">&para;</a></h2>
+<p>PostgreSQL needs the <code>psycopg2</code> driver, available via the project extra:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;claimed[postgresql]&#39;</span>
+</span></code></pre></div>
+<p>Remote hosts should use SSL — pass it in the URL, e.g.
+<code>postgresql://user:pass@host:5432/claimed?sslmode=require</code>.</p>
+<h2 id="writing-a-worker">Writing a worker<a class="headerlink" href="#writing-a-worker" title="Permanent link">&para;</a></h2>
+<p>Any executable works. Read the task name, do the work, and use the exit code to
+report success or failure:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="ch">#!/usr/bin/env bash</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">TASK</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="nv">$CLAIMED_TASK</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>python<span class="w"> </span>process.py<span class="w"> </span>--input<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TASK</span><span class="s2">&quot;</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">&quot;out/</span><span class="k">$(</span>basename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TASK</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+</span></code></pre></div>
+<p>A complete, runnable example lives in
+<a href="https://github.com/claimed-framework/claimed/tree/main/examples/jobcoordinator_example"><code>examples/jobcoordinator_example/</code></a>.</p>
+<h2 id="relationship-to-the-grid-wrapper">Relationship to the grid wrapper<a class="headerlink" href="#relationship-to-the-grid-wrapper" title="Permanent link">&para;</a></h2>
+<p>The <a href="../c3/create-gridwrapper/">grid wrapper</a> coordinates work through marker
+files on a shared filesystem (or object store) and wraps a CLAIMED <em>component</em>.
+The job coordinator coordinates through a database and wraps an <em>arbitrary
+script</em>. Use the grid wrapper when you already have a containerised component and
+a shared filesystem; use the job coordinator when you want a database as the
+source of truth, robust multi-node claiming, or a plain shell/Python worker.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
               </article>
             </div>
           
@@ -1434,10 +1854,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "/claimed/dev", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "/claimed/dev/assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="/claimed/dev/assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

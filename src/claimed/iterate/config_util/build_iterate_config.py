@@ -2,7 +2,7 @@ from pathlib import Path
 import yaml
 import pandas as pd
 import click
-from terratorch_iterate.iterate_types import (
+from claimed.iterate.iterate_types import (
     TaskTypeEnum,
 )
 from copy import deepcopy

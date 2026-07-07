@@ -63,4 +63,4 @@ You can then use ray job to interact with your job. See [the ray quickstart guid
 
 More easily, you can use the ray dashboard and MLFlow to check your job.
 
-## :::terratorch_iterate.benchmark_ray.benchmark_backbone
+## :::claimed.iterate.benchmark_ray.benchmark_backbone

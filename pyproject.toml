@@ -107,16 +107,14 @@ c3_create_operator               = "c3.create_operator:main"
 c3_create_containerless_operator = "c3.create_containerless_operator:main"
 c3_create_gridwrapper            = "c3.create_gridwrapper:main"
 claimed                          = "claimed.claimed:main"
-# terratorch-iterate
-iterate-classic = "terratorch_iterate.main:main"
-iterate         = "terratorch_iterate.iterate2:main"
+# terratorch-iterate (now bundled under claimed.iterate)
+iterate-classic = "claimed.iterate.main:main"
+iterate         = "claimed.iterate.iterate2:main"
 
-# Pick up packages from both layouts:
-#   src/c3*, src/claimed*       — claimed sources
-#   terratorch_iterate*         — iterate sources (top-level)
+# All sources live under src/: c3*, claimed* (claimed.iterate is included by claimed*).
 [tool.setuptools.packages.find]
-where   = ["src", "."]
-include = ["c3*", "claimed*", "terratorch_iterate*"]
+where   = ["src"]
+include = ["c3*", "claimed*"]
 
 [tool.setuptools.package-data]
 "c3.templates" = ["*"]

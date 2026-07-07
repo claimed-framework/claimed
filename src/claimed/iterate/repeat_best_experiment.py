@@ -24,13 +24,13 @@ from terratorch.tasks import PixelwiseRegressionTask, SemanticSegmentationTask
 
 from lightning.pytorch.loggers.mlflow import MLFlowLogger
 import time
-from terratorch_iterate.iterate_types import (
+from claimed.iterate.iterate_types import (
     Defaults,
     Task,
     TrainingSpec,
     combine_with_defaults,
 )
-from terratorch_iterate.model_fitting import (
+from claimed.iterate.model_fitting import (
     get_default_callbacks,
     inject_hparams,
     valid_task_types,

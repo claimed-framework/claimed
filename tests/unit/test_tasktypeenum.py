@@ -1,4 +1,4 @@
-from terratorch_iterate.iterate_types import TaskTypeEnum
+from claimed.iterate.iterate_types import TaskTypeEnum
 import pytest
 from terratorch.tasks.base_task import TerraTorchTask
 from terratorch.tasks.classification_tasks import ClassificationTask

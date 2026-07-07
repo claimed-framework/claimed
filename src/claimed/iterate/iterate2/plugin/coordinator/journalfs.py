@@ -26,7 +26,7 @@ except ImportError:
     from optuna.storages import JournalFileStorage as _JournalFileBackend  # type: ignore
     _USE_BACKEND = False
 
-from terratorch_iterate.iterate2.plugin.coordinator import CoordinatorPlugin, register
+from claimed.iterate.iterate2.plugin.coordinator import CoordinatorPlugin, register
 
 logger = logging.getLogger("iterate2.coordinator.journalfs")
 

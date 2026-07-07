@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 import yaml
-from terratorch_iterate.config_util.build_iterate_config import generate_iterate_config
+from claimed.iterate.config_util.build_iterate_config import generate_iterate_config
 from deepdiff import DeepDiff
 import logging
 

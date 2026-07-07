@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from jsonargparse import ArgumentParser, Namespace
-from terratorch_iterate.iterate_types import Task
+from claimed.iterate.iterate_types import Task
 import uuid
 import pytest
 

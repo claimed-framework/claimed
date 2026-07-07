@@ -8,4 +8,4 @@ You can do this with:
 repeat_best_experiment <parent_run_id> <absolute_path_to_store_results> --config <path_to_config>
 ```
 
-## :::terratorch_iterate.repeat_best_experiment.rerun_best_from_backbone
+## :::claimed.iterate.repeat_best_experiment.rerun_best_from_backbone

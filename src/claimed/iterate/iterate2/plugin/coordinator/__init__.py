@@ -12,7 +12,7 @@ first matching plugin's storage object.
 
 Usage
 -----
->>> from terratorch_iterate.iterate2.plugin.coordinator import resolve_storage
+>>> from claimed.iterate.iterate2.plugin.coordinator import resolve_storage
 >>> storage = resolve_storage("sqlite:///my_study.db")
 """
 
@@ -82,9 +82,9 @@ def load_builtin_plugins() -> None:
     """Import all built-in coordinator plugins so they self-register."""
     import importlib
     _builtins = [
-        "terratorch_iterate.iterate2.plugin.coordinator.sqlite",
-        "terratorch_iterate.iterate2.plugin.coordinator.journalfs",
-        "terratorch_iterate.iterate2.plugin.coordinator.postgresql",
+        "claimed.iterate.iterate2.plugin.coordinator.sqlite",
+        "claimed.iterate.iterate2.plugin.coordinator.journalfs",
+        "claimed.iterate.iterate2.plugin.coordinator.postgresql",
     ]
     for mod in _builtins:
         try:

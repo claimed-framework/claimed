@@ -16,7 +16,7 @@ Two backends are supported through one URL-based abstraction (SQLAlchemy Core):
   ``UPDATE ... WHERE status='pending'`` and a small retry loop.
 
 The URL-normalisation helpers mirror the iterate2 coordinator plugins
-(``terratorch_iterate/iterate2/plugin/coordinator/{sqlite,postgresql}.py``) so the
+(``src/claimed/iterate/iterate2/plugin/coordinator/{sqlite,postgresql}.py``) so the
 accepted ``--db`` syntax is consistent across CLAIMED.
 """
 

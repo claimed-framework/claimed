@@ -18,13 +18,13 @@ from datetime import datetime, timezone
 from osgeo import gdal, osr
 
 # ---------------------------------------------------------------------------
-# Sentinel-2 MGRS tile origin lookup  (EPSG:32613 easting/northing, metres)
+# Sentinel-2 MGRS tile origin lookup  (easting/northing in metres)
 # ---------------------------------------------------------------------------
-# Each entry: MGRS_TILE_ID → (epsg, ul_easting, ul_northing, pixel_size_m)
+# Each entry: MGRS_TILE_ID → (ul_easting, ul_northing, pixel_size_m)
 # Values sourced from the official ESA Sentinel-2 tiling grid.
 # Extend this dict as additional tiles are encountered.
-_S2_TILE_ORIGINS: dict[str, tuple[int, float, float, int]] = {
-    "T13TEF": (32613, 399960.0, 4000020.0, 10),
+_S2_TILE_ORIGINS: dict[str, tuple[float, float, int]] = {
+    "T13TEF": (399960.0, 4000020.0, 10),
 }
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ _WINDOW_RE = re.compile(r'__(\d+)-(\d+)_(\d+)-(\d+)_embedding')
 
 def _parse_spatial_from_filename(filename: str) -> tuple:
     """
-    Derive CRS, bounding box, and GeoJSON geometry from a Sentinel-2
+    Derive bounding box and GeoJSON geometry from a Sentinel-2
     embedding filename when the TIFF has no embedded projection.
 
     The filename is expected to contain:
@@ -62,10 +62,9 @@ def _parse_spatial_from_filename(filename: str) -> tuple:
 
     Returns
     -------
-    tuple[list, dict, int]
-        ``(bbox_wgs84, geometry_wgs84, epsg)`` where *bbox_wgs84* is
-        ``[minx, miny, maxx, maxy]`` in WGS 84 degrees and *epsg* is
-        the integer EPSG code of the tile's UTM zone.
+    tuple[list, dict]
+        ``(bbox_wgs84, geometry_wgs84)`` where *bbox_wgs84* is
+        ``[minx, miny, maxx, maxy]`` in WGS 84 degrees.
 
     Raises
     ------
@@ -86,12 +85,17 @@ def _parse_spatial_from_filename(filename: str) -> tuple:
     if tile_id not in _S2_TILE_ORIGINS:
         raise ValueError(
             f"Tile '{tile_id}' is not in the _S2_TILE_ORIGINS lookup table. "
-            "Add its (epsg, ul_easting, ul_northing, pixel_size_m) entry."
+            "Add its (ul_easting, ul_northing, pixel_size_m) entry."
         )
 
-    epsg, ul_x, ul_y, px = _S2_TILE_ORIGINS[tile_id]
+    ul_x, ul_y, px = _S2_TILE_ORIGINS[tile_id]
     col_start, col_end = int(win_m.group(1)), int(win_m.group(2))
     row_start, row_end = int(win_m.group(3)), int(win_m.group(4))
+
+    # Derive the UTM zone EPSG from the tile name (no hardcoded EPSG needed).
+    zone = int(tile_id[1:3])
+    lat_band = tile_id[3]
+    epsg_utm = 32600 + zone if lat_band >= "N" else 32700 + zone
 
     # UTM corners (y decreases southward from the upper-left origin)
     utm_minx = ul_x + col_start * px
@@ -101,7 +105,7 @@ def _parse_spatial_from_filename(filename: str) -> tuple:
 
     # Reproject the four corners to WGS 84 (STAC bbox must be lon/lat)
     srs_utm = osr.SpatialReference()
-    srs_utm.ImportFromEPSG(epsg)
+    srs_utm.ImportFromEPSG(epsg_utm)
     srs_wgs = osr.SpatialReference()
     srs_wgs.ImportFromEPSG(4326)
     srs_wgs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
@@ -128,7 +132,7 @@ def _parse_spatial_from_filename(filename: str) -> tuple:
         "coordinates": [[[lon, lat] for lon, lat in ring]],
     }
 
-    return bbox_wgs84, geometry_wgs84, epsg
+    return bbox_wgs84, geometry_wgs84
 
 
 def _compute_bbox_and_geometry(
@@ -173,9 +177,9 @@ def _compute_bbox_and_geometry(
 
 def _extract_tiff_metadata(tiff_path: str) -> dict:
     """
-    Extract spatial and band metadata from a GeoTIFF using GDAL.
+    Extract spatial and band metadata from a TIFF using GDAL.
 
-    For standard georeferenced TIFFs the CRS, bbox, and geometry are read
+    For standard georeferenced TIFFs the bbox and geometry are read
     directly from the file.  For Sentinel-2 embedding TIFFs that carry no
     embedded projection, they are derived from the MGRS tile ID and pixel
     window encoded in the filename via :func:`_parse_spatial_from_filename`.
@@ -183,15 +187,13 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
     Returns a dict with:
         bbox     – [minx, miny, maxx, maxy] in WGS 84 (lon/lat)
         geometry – GeoJSON Polygon in WGS 84
-        epsg     – integer EPSG code of the tile's native UTM CRS
         bands    – number of raster bands
         dtype    – GDAL data-type name of band 1
 
     Raises
     ------
     ValueError
-        If GDAL cannot open the file, the CRS cannot be determined from
-        the file or filename, or the tile is not in the lookup table.
+        If GDAL cannot open the file, or the tile is not in the lookup table.
     """
     ds = gdal.Open(tiff_path)
     if ds is None:
@@ -200,15 +202,9 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
     try:
         wkt = ds.GetProjection()
         srs = osr.SpatialReference(wkt=wkt)
-        epsg = None
         has_crs = bool(wkt) and (srs.IsProjected() or srs.IsGeographic())
 
         if has_crs:
-            # Prefer authority code; fall back to None (still georeferenced).
-            code = srs.GetAuthorityCode(None)
-            if code:
-                epsg = int(code)
-
             # Always reproject to WGS 84 for STAC bbox/geometry.
             srs_wgs = osr.SpatialReference()
             srs_wgs.ImportFromEPSG(4326)
@@ -218,7 +214,6 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
             gt = ds.GetGeoTransform()
             w, h = ds.RasterXSize, ds.RasterYSize
 
-            # Compute corners in native CRS, then transform to WGS 84.
             native_minx = gt[0]
             native_maxy = gt[3]
             native_maxx = native_minx + gt[1] * w
@@ -251,7 +246,7 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
                 "No embedded CRS in '%s'; deriving spatial metadata from filename.",
                 tiff_path,
             )
-            bbox, geometry, epsg = _parse_spatial_from_filename(
+            bbox, geometry = _parse_spatial_from_filename(
                 os.path.basename(tiff_path)
             )
 
@@ -263,7 +258,6 @@ def _extract_tiff_metadata(tiff_path: str) -> dict:
     return {
         "bbox":     bbox,
         "geometry": geometry,
-        "epsg":     epsg,
         "bands":    bands,
         "dtype":    dtype,
     }
@@ -302,14 +296,14 @@ def _datetime_from_filename(filename: str) -> str:
 # Public API
 # ---------------------------------------------------------------------------
 
-def run(tiff: str, stac_template: dict, cos_url: str) -> dict:
+def run(tiff: str, stac_template: dict, cos_url: str, collection: str | None = None) -> dict:
     """
-    Build a STAC Item JSON for a GeoTIFF embedding from a template.
+    Build a STAC Item JSON for a TIFF embedding from a template.
 
     Parameters
     ----------
     tiff : str
-        Absolute or relative path to the GeoTIFF embedding file.
+        Absolute or relative path to the TIFF embedding file.
     stac_template : dict
         A STAC Item JSON template (loaded from e.g. ``stac_examples/``).
         The following fields are populated / overwritten from the tiff:
@@ -317,11 +311,18 @@ def run(tiff: str, stac_template: dict, cos_url: str) -> dict:
             - ``bbox``                   → derived from geotransform (or filename)
             - ``geometry``               → bounding-box polygon in WGS 84
             - ``properties.datetime``    → parsed from the filename
-            - ``properties.proj:epsg``   → EPSG code of the tile's native CRS
-                                           (omitted when the code cannot be identified)
             - ``assets.embeddings.href`` → full COS/S3 URL (``cos_url/filename``)
+            - ``links[rel=self].href``   → ``<cos_url>/<stem>.json``
+            - ``collection``             → value of the *collection* argument
+                                           (omitted when *collection* is ``None``)
 
         All other template fields are preserved unchanged.
+    cos_url : str
+        Base URL of the COS/S3 bucket (no trailing slash).
+    collection : str or None
+        Name of the STAC Collection in which this Item is registered.
+        When supplied, the ``collection`` field and the ``collection`` link
+        are populated; when ``None`` the field is omitted.
 
     Returns
     -------
@@ -346,13 +347,29 @@ def run(tiff: str, stac_template: dict, cos_url: str) -> dict:
     item["bbox"]     = meta["bbox"]
     item["geometry"] = meta["geometry"]
 
-    # Properties – keep everything in the template, just update datetime + CRS
+    # self-link: point to the canonical item JSON in the COS bucket
+    self_href = f"{cos_url}/{stem}.json"
+    for link in item.get("links", []):
+        if link.get("rel") == "self":
+            link["href"] = self_href
+            break
+    else:
+        item.setdefault("links", []).insert(0, {
+            "rel": "self",
+            "href": self_href,
+            "type": "application/json",
+        })
+
+    # collection field
+    if collection is not None:
+        item["collection"] = collection
+    else:
+        item.pop("collection", None)
+
+    # Properties – keep everything in the template, just update datetime
     item.setdefault("properties", {})
     item["properties"]["datetime"] = _datetime_from_filename(stem)
-    if meta["epsg"] is not None:
-        item["properties"]["proj:epsg"] = meta["epsg"]
-    else:
-        item["properties"].pop("proj:epsg", None)
+    item["properties"].pop("proj:epsg", None)
 
     # Asset href – full COS/S3 URL pointing to the TIFF in the bucket
     item.setdefault("assets", {}).setdefault("embeddings", {})
@@ -374,9 +391,14 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Create a STAC Item JSON for a TIFF embedding.")
-    parser.add_argument("tiff",          help="Path to the GeoTIFF embedding.")
-    parser.add_argument("stac_template", help="Path to the STAC Item JSON template.")
-    parser.add_argument("cos_url", help="URL to the COS bucket where the STAC Item will be stored.")
+    parser.add_argument("tiff",         help="Path to the GeoTIFF embedding.")
+    parser.add_argument("stac_template",help="Path to the STAC Item JSON template.")
+    parser.add_argument("cos_url",      help="Base URL of the COS bucket (no trailing slash).")
+    parser.add_argument(
+        "--collection",
+        default=None,
+        help="Name of the STAC Collection to register this item in.",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
@@ -384,5 +406,5 @@ if __name__ == "__main__":
     with open(args.stac_template, encoding="utf-8") as fh:
         template = json.load(fh)
 
-    result = run(args.tiff, template, args.cos_url)
+    result = run(tiff=args.tiff, stac_template=template, cos_url=args.cos_url,collection=args.collection)
     print(json.dumps(result, indent=4))

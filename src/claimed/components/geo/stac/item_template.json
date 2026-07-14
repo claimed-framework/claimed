@@ -3,16 +3,16 @@
     "stac_extensions": [],
     "type": "Feature",
     "id":"<<>>",
-    "collection": null,
+    "collection": "<<>>",
     "links": [
         {
             "rel": "self",
-            "href": "./terramind_item.json",
+            "href": "<<>>",
             "type": "application/json"
         },
         {
             "rel": "emb:source-data",
-            "href": "<<>>",
+            "href": "https://stac.dataspace.copernicus.eu/v1/collections/sentinel-2-l2a/items/S2A_MSIL2A_20170102T175732_N0500_R141_T13TEF_20230926T044006",
             "type": "application/json",
             "title": "Sentinel-2 image from which this embedding was computed."
         }
@@ -52,7 +52,7 @@
     },
     "properties": {
         "datetime": "<<>>",
-        "gsd": 10,
+        "gsd": 2240,
         "title": "Terramind Embedding",
         "description": "Terramind embedding from Sentinel-2-L2A imagery.",
         "licensing": "CC-BY 4.0"
@@ -60,7 +60,7 @@
     "assets": {
         "embeddings": {
             "href": "<<>>",
-            "title": "AEF embeddings",
+            "title": "Terramind-Embeddings",
             "type": "image/tiff",
             "roles": [
                 "embedding"

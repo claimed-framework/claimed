@@ -22,7 +22,7 @@ def create_containerless_operator(
     filename, file_extension = os.path.splitext(file_path)
 
     if file_extension != '.py':
-        raise NotImplementedError('Containerless operators currenly only support python scripts')
+        raise NotImplementedError('Containerless operators currently only support python scripts')
     
     all_pip_packages_found = ''
     with open(file_path, 'r') as file:

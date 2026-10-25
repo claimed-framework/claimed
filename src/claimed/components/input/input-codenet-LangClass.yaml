@@ -1,5 +1,5 @@
 name: Pulls Codenet classification data from the ml-exchange.org
-description: Pulls Codenet classification data.zip from the ml-exchange.org in a form ready for text classification in the folowing format:
+description: Pulls Codenet classification data.zip from the ml-exchange.org in a form ready for text classification in the following format:
 
 
 inputs:

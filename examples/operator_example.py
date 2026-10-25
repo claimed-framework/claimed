@@ -30,7 +30,7 @@ output_path = os.getenv('output_path', None)
 def main(num_values, *args, **kwargs):
     # TODO: Add your code.
     random_values = np.random.rand(num_values)
-    # C3 adds setup code to your script which initalize the logging.
+    # C3 adds setup code to your script which initializes the logging.
     # You can just use logging.debug(), logging.info(), logging.warning() in your code.
     logging.info(f'Random values: {random_values}')
 

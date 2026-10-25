@@ -1,5 +1,5 @@
 name: model-blessing
-description: Assesses metrics of an asset (ML model, dashboard, report, ...) and decides on readyness for production deployment. 
+description: Assesses metrics of an asset (ML model, dashboard, report, ...) and decides on readiness for production deployment. 
 
 
 inputs:

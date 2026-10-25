@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -2041,7 +2041,7 @@ This is because ray tune only works with one task at a time and, unfortunately, 
 </span></code></pre></div>
 <h2 id="the-nasty-implementation-bits">The nasty implementation bits<a class="headerlink" href="#the-nasty-implementation-bits" title="Permanent link">&para;</a></h2>
 <h3 id="creating-terratorch-configs">Creating terratorch configs<a class="headerlink" href="#creating-terratorch-configs" title="Permanent link">&para;</a></h3>
-<p>Benchmark does not actually assemble a yaml config file for each <code>train()</code>. Instead, it uses the programatic interface of terratorch. </p>
+<p>Benchmark does not actually assemble a yaml config file for each <code>train()</code>. Instead, it uses the programmatic interface of terratorch. </p>
 <p>See e.g. <code>model_fitting.py:fit_model</code> and <code>model_fitting.py:launch_training</code></p>
 <p>In order to do all the merging, there is a reasonable amount of dictionary merging going on, which could be a source of bugs if not done carefully.</p>
 <p>e.g. <code>benchmark_types.py</code></p>
@@ -2068,7 +2068,7 @@ This is because ray tune only works with one task at a time and, unfortunately, 
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">inject_hparams</span><span class="p">(</span><span class="n">training_spec</span><span class="p">:</span> <span class="n">TrainingSpec</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="c1"># treat batch size specially</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">config_without_batch_size</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">config_without_batch_size</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_size&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">config_without_batch_size</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"batch_size"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">datamodule_with_generated_hparams</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">training_spec</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">datamodule</span><span class="p">)</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">if</span> <span class="n">batch_size</span><span class="p">:</span>
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="n">datamodule_with_generated_hparams</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -2120,7 +2120,7 @@ In particular, for the desired nesting of runs within runs, this quickly became 
 </ul>
 <p>For example, so set the parent run for mlflow on a run started by a ray worker, we do:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span><span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">run</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">&quot;mlflow.parentRunId&quot;</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>        <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="s2">"mlflow.parentRunId"</span><span class="p">,</span> <span class="n">parent_run_id</span><span class="p">)</span>
 </span></code></pre></div>
 <p>However, it gives us the flexibility to log our runs as desired.</p>
 <h3 id="model-checkpointing">Model checkpointing<a class="headerlink" href="#model-checkpointing" title="Permanent link">&para;</a></h3>
@@ -2212,10 +2212,10 @@ There are several reasonable places that could take care of model logging and tr
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

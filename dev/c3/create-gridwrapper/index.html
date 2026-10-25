@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1757,103 +1757,103 @@ using one of several storage backends.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/claimed/c3/create_gridwrapper.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-13">13</a></span>
-<span class="normal"><a href="#__codelineno-0-14">14</a></span>
-<span class="normal"><a href="#__codelineno-0-15">15</a></span>
-<span class="normal"><a href="#__codelineno-0-16">16</a></span>
-<span class="normal"><a href="#__codelineno-0-17">17</a></span>
-<span class="normal"><a href="#__codelineno-0-18">18</a></span>
-<span class="normal"><a href="#__codelineno-0-19">19</a></span>
-<span class="normal"><a href="#__codelineno-0-20">20</a></span>
-<span class="normal"><a href="#__codelineno-0-21">21</a></span>
-<span class="normal"><a href="#__codelineno-0-22">22</a></span>
-<span class="normal"><a href="#__codelineno-0-23">23</a></span>
-<span class="normal"><a href="#__codelineno-0-24">24</a></span>
-<span class="normal"><a href="#__codelineno-0-25">25</a></span>
-<span class="normal"><a href="#__codelineno-0-26">26</a></span>
-<span class="normal"><a href="#__codelineno-0-27">27</a></span>
-<span class="normal"><a href="#__codelineno-0-28">28</a></span>
-<span class="normal"><a href="#__codelineno-0-29">29</a></span>
-<span class="normal"><a href="#__codelineno-0-30">30</a></span>
-<span class="normal"><a href="#__codelineno-0-31">31</a></span>
-<span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span>
-<span class="normal"><a href="#__codelineno-0-34">34</a></span>
-<span class="normal"><a href="#__codelineno-0-35">35</a></span>
-<span class="normal"><a href="#__codelineno-0-36">36</a></span>
-<span class="normal"><a href="#__codelineno-0-37">37</a></span>
-<span class="normal"><a href="#__codelineno-0-38">38</a></span>
-<span class="normal"><a href="#__codelineno-0-39">39</a></span>
-<span class="normal"><a href="#__codelineno-0-40">40</a></span>
-<span class="normal"><a href="#__codelineno-0-41">41</a></span>
-<span class="normal"><a href="#__codelineno-0-42">42</a></span>
-<span class="normal"><a href="#__codelineno-0-43">43</a></span>
-<span class="normal"><a href="#__codelineno-0-44">44</a></span>
-<span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span>
-<span class="normal"><a href="#__codelineno-0-48">48</a></span>
-<span class="normal"><a href="#__codelineno-0-49">49</a></span>
-<span class="normal"><a href="#__codelineno-0-50">50</a></span>
-<span class="normal"><a href="#__codelineno-0-51">51</a></span>
-<span class="normal"><a href="#__codelineno-0-52">52</a></span>
-<span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
-<span class="normal"><a href="#__codelineno-0-55">55</a></span>
-<span class="normal"><a href="#__codelineno-0-56">56</a></span>
-<span class="normal"><a href="#__codelineno-0-57">57</a></span>
-<span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span>
-<span class="normal"><a href="#__codelineno-0-60">60</a></span>
-<span class="normal"><a href="#__codelineno-0-61">61</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">wrap_component</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14"></a>                   <span class="n">component_description</span><span class="p">,</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15"></a>                   <span class="n">component_dependencies</span><span class="p">,</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16"></a>                   <span class="n">component_interface</span><span class="p">,</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17"></a>                   <span class="n">component_inputs</span><span class="p">,</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18"></a>                   <span class="n">component_process</span><span class="p">,</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19"></a>                   <span class="n">backend</span><span class="p">,</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20"></a>                   <span class="p">):</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21"></a>    <span class="c1"># get component name from path</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22"></a>    <span class="n">component_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">component_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23"></a>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25"></a>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">backends</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27"></a>        <span class="s1">&#39;local&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28"></a>        <span class="s1">&#39;cos&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">cos_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="s1">&#39;legacy_cos&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">legacy_cos_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30"></a>        <span class="s1">&#39;s3kv&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">s3kv_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31"></a>        <span class="s1">&#39;grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32"></a>        <span class="s1">&#39;cos_grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">cos_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="s1">&#39;legacy_cos_grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">legacy_cos_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34"></a>        <span class="s1">&#39;s3kv_grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">s3kv_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35"></a>        <span class="s1">&#39;simple_grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">simple_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36"></a>        <span class="s1">&#39;folder_grid_wrapper&#39;</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">folder_grid_wrapper_template</span><span class="p">,</span>
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="p">}</span>
-</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">gw_template</span> <span class="o">=</span> <span class="n">backends</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39"></a>
-</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using backend template: </span><span class="si">{</span><span class="n">gw_template</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41"></a>
-</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42"></a>    <span class="n">grid_wrapper_code</span> <span class="o">=</span> <span class="n">gw_template</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
-</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a>        <span class="n">component_name</span><span class="o">=</span><span class="n">component_name</span><span class="p">,</span>
-</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a>        <span class="n">component_description</span><span class="o">=</span><span class="n">component_description</span><span class="p">,</span>
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a>        <span class="n">component_dependencies</span><span class="o">=</span><span class="n">component_dependencies</span><span class="p">,</span>
-</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>        <span class="n">component_inputs</span><span class="o">=</span><span class="n">component_inputs</span><span class="p">,</span>
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a>        <span class="n">component_interface</span><span class="o">=</span><span class="n">component_interface</span><span class="p">,</span>
-</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>        <span class="n">component_process</span><span class="o">=</span><span class="n">component_process</span><span class="p">,</span>
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="p">)</span>
-</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a>
-</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="c1"># Write edited code to file</span>
-</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a>    <span class="n">grid_wrapper_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;gw_</span><span class="si">{</span><span class="n">component_name</span><span class="si">}</span><span class="s1">.py&#39;</span>
-</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53"></a>    <span class="n">grid_wrapper_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">component_path</span><span class="p">),</span> <span class="n">grid_wrapper_file</span><span class="p">)</span>
-</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54"></a>    <span class="c1"># remove &#39;component_&#39; from gw path</span>
-</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55"></a>    <span class="n">grid_wrapper_file_path</span> <span class="o">=</span> <span class="n">grid_wrapper_file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;component_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">grid_wrapper_file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a>        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">grid_wrapper_code</span><span class="p">)</span>
-</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a>
-</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Saved wrapped component to </span><span class="si">{</span><span class="n">grid_wrapper_file_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a>    <span class="k">return</span> <span class="n">grid_wrapper_file_path</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-13">13</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-14">14</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-15">15</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-16">16</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-17">17</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-18">18</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-19">19</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-20">20</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-21">21</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-22">22</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-23">23</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-24">24</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-25">25</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-26">26</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-27">27</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-28">28</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-29">29</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-30">30</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-31">31</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-32">32</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-33">33</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-34">34</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-35">35</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-36">36</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-37">37</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-38">38</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-39">39</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-40">40</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-41">41</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-42">42</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-51">51</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-52">52</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-53">53</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-54">54</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-55">55</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-56">56</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-58">58</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-60">60</a></span>
+<span class="normal"><a href="#claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-61">61</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-13"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-13" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-13"></a><span class="k">def</span><span class="w"> </span><span class="nf">wrap_component</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-14"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-14" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-14"></a>                   <span class="n">component_description</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-15"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-15" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-15"></a>                   <span class="n">component_dependencies</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-16"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-16" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-16"></a>                   <span class="n">component_interface</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-17"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-17" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-17"></a>                   <span class="n">component_inputs</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-18"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-18" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-18"></a>                   <span class="n">component_process</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-19"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-19" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-19"></a>                   <span class="n">backend</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-20"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-20" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-20"></a>                   <span class="p">):</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-21"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-21" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-21"></a>    <span class="c1"># get component name from path</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-22"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-22" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-22"></a>    <span class="n">component_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">component_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-23"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-23" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-23"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-24"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-24" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-24"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Using backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-25"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-25" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-25"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-26"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-26" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-26"></a>    <span class="n">backends</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-27"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-27" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-27"></a>        <span class="s1">'local'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-28"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-28" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-28"></a>        <span class="s1">'cos'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">cos_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-29"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-29" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-29"></a>        <span class="s1">'legacy_cos'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">legacy_cos_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-30"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-30" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-30"></a>        <span class="s1">'s3kv'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">s3kv_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-31"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-31" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-31"></a>        <span class="s1">'grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-32"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-32" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-32"></a>        <span class="s1">'cos_grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">cos_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-33"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-33" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-33"></a>        <span class="s1">'legacy_cos_grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">legacy_cos_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-34"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-34" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-34"></a>        <span class="s1">'s3kv_grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">s3kv_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-35"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-35" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-35"></a>        <span class="s1">'simple_grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">simple_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-36"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-36" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-36"></a>        <span class="s1">'folder_grid_wrapper'</span><span class="p">:</span> <span class="n">c3</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">folder_grid_wrapper_template</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-37"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-37" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-37"></a>    <span class="p">}</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-38"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-38" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-38"></a>    <span class="n">gw_template</span> <span class="o">=</span> <span class="n">backends</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-39"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-39" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-39"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-40"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-40" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-40"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Using backend template: </span><span class="si">{</span><span class="n">gw_template</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-41"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-41" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-41"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-42"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-42" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-42"></a>    <span class="n">grid_wrapper_code</span> <span class="o">=</span> <span class="n">gw_template</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-43"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-43" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-43"></a>        <span class="n">component_name</span><span class="o">=</span><span class="n">component_name</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-44"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-44" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-44"></a>        <span class="n">component_description</span><span class="o">=</span><span class="n">component_description</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-45"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-45" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-45"></a>        <span class="n">component_dependencies</span><span class="o">=</span><span class="n">component_dependencies</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-46"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-46" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-46"></a>        <span class="n">component_inputs</span><span class="o">=</span><span class="n">component_inputs</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-47"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-47" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-47"></a>        <span class="n">component_interface</span><span class="o">=</span><span class="n">component_interface</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-48"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-48" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-48"></a>        <span class="n">component_process</span><span class="o">=</span><span class="n">component_process</span><span class="p">,</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-49"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-49" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-49"></a>    <span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-50"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-50" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-50"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-51"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-51" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-51"></a>    <span class="c1"># Write edited code to file</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-52"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-52" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-52"></a>    <span class="n">grid_wrapper_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'gw_</span><span class="si">{</span><span class="n">component_name</span><span class="si">}</span><span class="s1">.py'</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-53"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-53" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-53"></a>    <span class="n">grid_wrapper_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">component_path</span><span class="p">),</span> <span class="n">grid_wrapper_file</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-54"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-54" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-54"></a>    <span class="c1"># remove 'component_' from gw path</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-55"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-55" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-55"></a>    <span class="n">grid_wrapper_file_path</span> <span class="o">=</span> <span class="n">grid_wrapper_file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'component_'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-56"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-56" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-56"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">grid_wrapper_file_path</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-57"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-57" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-57"></a>        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">grid_wrapper_code</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-58"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-58" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-58"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-59"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-59" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-59"></a>    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Saved wrapped component to </span><span class="si">{</span><span class="n">grid_wrapper_file_path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-60"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-60" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-60"></a>
+</span><span id="claimed.c3.create_gridwrapper.wrap_component--source--__span-0-61"><a id="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-61" name="claimed.c3.create_gridwrapper.wrap_component--source--__codelineno-0-61"></a>    <span class="k">return</span> <span class="n">grid_wrapper_file_path</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1929,10 +1929,10 @@ using one of several storage backends.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

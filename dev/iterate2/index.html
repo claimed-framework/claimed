@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -2489,7 +2489,7 @@
 <p><strong><code>null</code> omits the flag entirely.</strong> Useful for optional flags like <code>--compile</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">compile</span><span class="p">:</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;max-autotune&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"max-autotune"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"default"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="c1"># null → --compile is completely absent from the command</span>
 </span></code></pre></div>
 <h5 id="flag"><code>flag</code><a class="headerlink" href="#flag" title="Permanent link">&para;</a></h5>
@@ -2680,7 +2680,7 @@ live in an optional <code>wlm:</code> section of the HPO YAML:</p>
 </span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">  </span><span class="nt">gpu-count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 </span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">  </span><span class="nt">cpu-count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
 </span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">  </span><span class="nt">mem-gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="nt">lsf-gpu-config</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;num=1:mode=exclusive_process:mps=no:gmodel=NVIDIAA100_SXM4_80GB&quot;</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">  </span><span class="nt">lsf-gpu-config</span><span class="p">:</span><span class="w"> </span><span class="s">"num=1:mode=exclusive_process:mps=no:gmodel=NVIDIAA100_SXM4_80GB"</span>
 </span></code></pre></div>
 <h3 id="reference-plugins">Reference plugins<a class="headerlink" href="#reference-plugins" title="Permanent link">&para;</a></h3>
 <p>See <code>examples/wlm_plugins/</code> for fully documented reference implementations:</p>
@@ -2769,24 +2769,24 @@ plugin exits.</p>
 </ol>
 <h4 id="job-template">Job template<a class="headerlink" href="#job-template" title="Permanent link">&para;</a></h4>
 <p>Create a YAML file modelled on <code>examples/vela_gridfm_template.yaml</code>.  The only special requirement is the <code>{{HPO_COMMAND}}</code> placeholder somewhere in <code>setupCommands</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nt">jobName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-project-hpo&quot;</span><span class="w">       </span><span class="c1"># iterate2 appends -trial-N</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nt">jobName</span><span class="p">:</span><span class="w"> </span><span class="s">"my-project-hpo"</span><span class="w">       </span><span class="c1"># iterate2 appends -trial-N</span>
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="nt">numGpusPerPod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">                </span><span class="c1"># iterate2 overwrites with gpu_num</span>
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="nt">numCpusPerPod</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="nt">totalMemoryPerPod</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;32Gi&quot;</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="nt">totalMemoryPerPod</span><span class="p">:</span><span class="w"> </span><span class="s">"32Gi"</span>
 </span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
 </span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="nt">volumes</span><span class="p">:</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;data-vol&quot;</span>
-</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">    </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;my-pvc&quot;</span>
-</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">    </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/mnt/data&quot;</span>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">"data-vol"</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="w">    </span><span class="nt">claimName</span><span class="p">:</span><span class="w"> </span><span class="s">"my-pvc"</span>
+</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="w">    </span><span class="nt">mountPath</span><span class="p">:</span><span class="w"> </span><span class="s">"/mnt/data"</span>
 </span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a>
 </span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="nt">setupCommands</span><span class="p">:</span>
-</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;wget</span><span class="nv"> </span><span class="s">-q</span><span class="nv"> </span><span class="s">https://example.com/config.yaml&quot;</span>
-</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;{{HPO_COMMAND}}&quot;</span><span class="w">           </span><span class="c1"># ← iterate2 fills this in</span>
+</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"wget</span><span class="nv"> </span><span class="s">-q</span><span class="nv"> </span><span class="s">https://example.com/config.yaml"</span>
+</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"{{HPO_COMMAND}}"</span><span class="w">           </span><span class="c1"># ← iterate2 fills this in</span>
 </span></code></pre></div>
 <h4 id="example-invocation">Example invocation<a class="headerlink" href="#example-invocation" title="Permanent link">&para;</a></h4>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--script<span class="w">            </span><span class="s2">&quot;gridfm_graphkit train&quot;</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--interpreter<span class="w">       </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--script<span class="w">            </span><span class="s2">"gridfm_graphkit train"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>--interpreter<span class="w">       </span><span class="s2">""</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span>--wlm<span class="w">               </span>vela<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span>--vela-job-template<span class="w"> </span>examples/vela_gridfm_template.yaml<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span>--vela-chart-path<span class="w">   </span>../mlbatch/tools/pytorchjob-generator/chart<span class="w"> </span><span class="se">\</span>
@@ -2832,7 +2832,7 @@ plugin exits.</p>
 </span><span id="__span-25-21"><a id="__codelineno-25-21" name="__codelineno-25-21" href="#__codelineno-25-21"></a><span class="w">  </span><span class="c1"># categorical with null – compile mode (null omits --compile entirely)</span>
 </span><span id="__span-25-22"><a id="__codelineno-25-22" name="__codelineno-25-22" href="#__codelineno-25-22"></a><span class="w">  </span><span class="nt">compile</span><span class="p">:</span>
 </span><span id="__span-25-23"><a id="__codelineno-25-23" name="__codelineno-25-23" href="#__codelineno-25-23"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">categorical</span>
-</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;max-autotune&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
+</span><span id="__span-25-24"><a id="__codelineno-25-24" name="__codelineno-25-24" href="#__codelineno-25-24"></a><span class="w">    </span><span class="nt">choices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"max-autotune"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"default"</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">null</span><span class="p p-Indicator">]</span>
 </span><span id="__span-25-25"><a id="__codelineno-25-25" name="__codelineno-25-25" href="#__codelineno-25-25"></a>
 </span><span id="__span-25-26"><a id="__codelineno-25-26" name="__codelineno-25-26" href="#__codelineno-25-26"></a><span class="w">  </span><span class="c1"># flag – store_true style (--bfloat16 present or absent)</span>
 </span><span id="__span-25-27"><a id="__codelineno-25-27" name="__codelineno-25-27" href="#__codelineno-25-27"></a><span class="w">  </span><span class="nt">bfloat16</span><span class="p">:</span>
@@ -2868,11 +2868,11 @@ plugin exits.</p>
 <p>Launch with:</p>
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>iterate2<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>--script<span class="w"> </span>gridfm_graphkit<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--interpreter<span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span>--interpreter<span class="w"> </span><span class="s2">""</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span>--root-dir<span class="w"> </span>/path/to/project<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span>--venv<span class="w"> </span>/path/to/venv<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span>--wlm<span class="w"> </span>lsf<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span>--lsf-gpu-config-string<span class="w"> </span><span class="s2">&quot;num=1:mode=exclusive_process:mps=yes:gmodel=NVIDIAA100_SXM4_80GB&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span>--lsf-gpu-config-string<span class="w"> </span><span class="s2">"num=1:mode=exclusive_process:mps=yes:gmodel=NVIDIAA100_SXM4_80GB"</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span>--cpu-count<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">  </span>--mem-gb<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">  </span>--optuna-study-name<span class="w"> </span>my_study<span class="w"> </span><span class="se">\</span>
@@ -2936,10 +2936,10 @@ plugin exits.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

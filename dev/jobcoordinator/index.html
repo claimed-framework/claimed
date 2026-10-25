@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/logo.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1715,8 +1715,8 @@ appear in more than one job. A task moves through:</p>
 <p>The command is <strong>idempotent</strong>: re-running only inserts <code>(job, task_name)</code> pairs
 that do not already exist (<code>INSERT … ON CONFLICT DO NOTHING</code>), so you can grow
 the queue incrementally.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>claimed<span class="w"> </span>propagate_jobs<span class="w"> </span>--db<span class="w"> </span>/tmp/jobs.db<span class="w"> </span>--job<span class="w"> </span>run-2026<span class="w"> </span><span class="s1">&#39;data/**/*.tif&#39;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Inserted 42 tasks into job &#39;run-2026&#39; (0 already existed). Total pending: 42</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>claimed<span class="w"> </span>propagate_jobs<span class="w"> </span>--db<span class="w"> </span>/tmp/jobs.db<span class="w"> </span>--job<span class="w"> </span>run-2026<span class="w"> </span><span class="s1">'data/**/*.tif'</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Inserted 42 tasks into job 'run-2026' (0 already existed). Total pending: 42</span>
 </span></code></pre></div>
 <h2 id="work_jobs"><code>work_jobs</code><a class="headerlink" href="#work_jobs" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>claimed<span class="w"> </span>work_jobs<span class="w"> </span>--db<span class="w"> </span>&lt;url&gt;<span class="w"> </span>--job<span class="w"> </span>&lt;name&gt;<span class="w"> </span>--worker<span class="w"> </span>&lt;script&gt;<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
@@ -1778,7 +1778,7 @@ fully independently — neither sees or claims the other's tasks.</p>
 </ul>
 <h2 id="postgresql-support">PostgreSQL support<a class="headerlink" href="#postgresql-support" title="Permanent link">&para;</a></h2>
 <p>PostgreSQL needs the <code>psycopg2</code> driver, available via the project extra:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">&#39;claimed[postgresql]&#39;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'claimed[postgresql]'</span>
 </span></code></pre></div>
 <p>Remote hosts should use SSL — pass it in the URL, e.g.
 <code>postgresql://user:pass@host:5432/claimed?sslmode=require</code>.</p>
@@ -1787,8 +1787,8 @@ fully independently — neither sees or claims the other's tasks.</p>
 report success or failure:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="ch">#!/usr/bin/env bash</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">TASK</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="nv">$CLAIMED_TASK</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>python<span class="w"> </span>process.py<span class="w"> </span>--input<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TASK</span><span class="s2">&quot;</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">&quot;out/</span><span class="k">$(</span>basename<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TASK</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">TASK</span><span class="o">=</span><span class="s2">"</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="nv">$CLAIMED_TASK</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>python<span class="w"> </span>process.py<span class="w"> </span>--input<span class="w"> </span><span class="s2">"</span><span class="nv">$TASK</span><span class="s2">"</span><span class="w"> </span>--output<span class="w"> </span><span class="s2">"out/</span><span class="k">$(</span>basename<span class="w"> </span><span class="s2">"</span><span class="nv">$TASK</span><span class="s2">"</span><span class="k">)</span><span class="s2">"</span>
 </span></code></pre></div>
 <p>A complete, runnable example lives in
 <a href="https://github.com/claimed-framework/claimed/tree/main/examples/jobcoordinator_example"><code>examples/jobcoordinator_example/</code></a>.</p>
@@ -1854,10 +1854,10 @@ source of truth, robust multi-node claiming, or a plain shell/Python worker.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "content.code.copy", "content.code.select", "content.action.edit"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

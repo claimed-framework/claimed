@@ -1,5 +1,5 @@
 name: SparkSQL
-description: Execute arbitrary SQL queries againts CSV and PARQUET files
+description: Execute arbitrary SQL queries against CSV and PARQUET files
 
 inputs:
 - {name: data_file, type: String, description: 'file name for CSV or PARQUET file - must end with .csv or .parquet (default: data.csv)'}

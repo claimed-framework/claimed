@@ -68,7 +68,7 @@ def average_seeds(
 
 
 def extract_1x_data(df_all):
-    """Extract only resutls trained on 100% of the data"""
+    """Extract only results trained on 100% of the data"""
     return df_all[
         (df_all["partition_name"] == "1.00x train")
         | (df_all["partition_name"] == "default")
@@ -119,7 +119,7 @@ def normalize_bootstrap_and_plot(
 
 
 class Normalizer:
-    """Class used to normalize results beween min and max for each dataset."""
+    """Class used to normalize results between min and max for each dataset."""
 
     def __init__(self, range_dict):
         """Initialize a new instance of Normalizer class."""

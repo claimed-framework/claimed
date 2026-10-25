@@ -29,7 +29,7 @@ The `PrithviModelFactory`, despite its name, is actually quite versatile and mak
 
 As such, instead of passing a string with the name of the backbone, you can pass it an instance of the actual backbone.
 
-There are, however, two conditions that must be fulfiled:
+There are, however, two conditions that must be fulfilled:
 
 ### Feature info
 

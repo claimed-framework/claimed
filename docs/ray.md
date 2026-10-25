@@ -9,7 +9,7 @@ Instructions for CCC follow.
     Please make sure your benchmark works for the single node case first,
 
 !!! warning
-    This tool uses bayesian optimization, and will parallelize it over the number of GPUs provided. However, bayesian parallelization does not parallelize super well, so using a large number of GPUs is not reccomended.
+    This tool uses bayesian optimization, and will parallelize it over the number of GPUs provided. However, bayesian parallelization does not parallelize super well, so using a large number of GPUs is not recommended.
 
     With no HPO, this will parallelize over tasks.
 

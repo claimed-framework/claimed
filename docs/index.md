@@ -135,7 +135,7 @@ To do this it relies on a configuration file where the benchmark is defined. Thi
 
 - `description`: Description added to top level mlflow run.
 
-- `defaults`: Defaults that are set for all tasks. Can be overriden under each task.
+- `defaults`: Defaults that are set for all tasks. Can be overridden under each task.
 
 - `tasks`: List of tasks to perform. Tasks specify parameters for the decoder, datamodule to be used and training parameters.
 

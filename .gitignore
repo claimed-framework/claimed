@@ -177,3 +177,13 @@ pyrightconfig.json
 experiment_logs/
 iterate_study.db
 *.db
+
+# macOS zip archive cruft
+__MACOSX/
+._*
+
+# Externally cloned demo data (github.com/adken101/crop-yield-geofm-demo)
+src/claimed/components/geo/Demo/
+
+# Generated STAC Items and Collection (reproducible via create_stac_items.py)
+src/claimed/components/geo/stac/out/

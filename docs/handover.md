@@ -140,7 +140,7 @@ optimization_space:
 
 ### Creating terratorch configs
 
-Benchmark does not actually assemble a yaml config file for each `train()`. Instead, it uses the programatic interface of terratorch. 
+Benchmark does not actually assemble a yaml config file for each `train()`. Instead, it uses the programmatic interface of terratorch. 
 
 See e.g. `model_fitting.py:fit_model` and `model_fitting.py:launch_training`
 

@@ -7,8 +7,8 @@ inputs:
 - {name: password, type: String, description: "password for the Xview webpage to authorize login"}
 - {name: move_to_dir, type: String, description: "move_to_dir the directory where the dataset should be saved"}
 - {name: chromedriver_path, type: String, description: "chromedriver_path the directory where the local copy of chromedriver is saved"}
-- {name: max_download_time, type: String, description: "max_download_time before timeout, must be ajusted acording to the file size and internet speed"}
-- {name: label, type: String, description: "standing for TI=Traning Images, TL=Training Lables, VI=Validation Images"}
+- {name: max_download_time, type: String, description: "max_download_time before timeout, must be adjusted according to the file size and internet speed"}
+- {name: label, type: String, description: "standing for TI=Training Images, TL=Training Labels, VI=Validation Images"}
 
 
 outputs:

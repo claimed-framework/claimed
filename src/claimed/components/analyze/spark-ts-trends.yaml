@@ -1,5 +1,5 @@
 name: spark-ts-trends
-description: Computes trends of time series by fitting a low order polinomial
+description: Computes trends of time series by fitting a low order polynomial
 
 
 inputs:

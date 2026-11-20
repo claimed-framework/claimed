@@ -19,12 +19,12 @@ limitations under the License.
 # Contributing
 
 Welcome to CLAIMED! If you are interested in contributing to the [CLAIMED code repo](README.md)
-then checkout the [Contribution Process](https://github.com/claimed-framework/community/blob/main/contribution_process.md) and 
-the [Code of Conduct](https://github.com/claimed-framework/component-library/blob/master/CODE_OF_CONDUCT.md)). 
+then check out the [Contribution Process](https://github.com/claimed-framework/claimed/blob/main/contribution_process.md) and
+the [Code of Conduct](https://github.com/claimed-framework/component-library/blob/master/CODE_OF_CONDUCT.md).
 
-The [CLAIMED community repo]([https://github.com/elyra-ai/community](https://github.com/claimed-framework/community)) contains information on how the community
+The [CLAIMED community repo](https://github.com/elyra-ai/community) contains information on how the community
 is organized and other information that is pertinent to contributing.
 
 ### Getting Started
 
-It's encouraged that you look under the [Issues]([https://github.com/IBM/claimed/issues](https://github.com/claimed-framework/component-library/issues)) tab for contribution opportunites.
+It's encouraged that you look under the [Issues](https://github.com/claimed-framework/component-library/issues) tab for contribution opportunities.

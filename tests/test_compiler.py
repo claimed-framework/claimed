@@ -45,7 +45,7 @@ def test_convert_notebook(
     inputs = py.get_inputs()
     assert isinstance(inputs, dict), "Inputs is not a dict."
     outputs = py.get_outputs()
-    assert isinstance(outputs, dict), "Ouputs is not a dict."
+    assert isinstance(outputs, dict), "Outputs is not a dict."
     requirements = py.get_requirements()
     assert isinstance(requirements, list), "Requirements is not a list."
 

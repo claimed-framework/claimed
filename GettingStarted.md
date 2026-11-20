@@ -317,7 +317,7 @@ Otherwise, you can use absolute paths in your scripts/variables `/<folder>/...`.
 
 You can use key-value secrets in KubeFlow as well to avoid publishing sensible information in pod configs and logs. 
 You can add the secrets in the Kubernetes project that is running KubeFlow.
-Then, you can add secrets to a specfic step in the pipeline with the following code:
+Then, you can add secrets to a specific step in the pipeline with the following code:
 
 ```python
 from kubernetes.client import V1EnvVar, V1EnvVarSource, V1SecretKeySelector
@@ -413,7 +413,7 @@ Your operator script has to follow certain requirements to be processed by C3. C
 
 - The operator name is the python file: `my_operator_name.py` -> `claimed-my-operator-name`
 - The operator description is the first doc string in the script: `"""Operator description"""`
-- The required pip packages are listed in comments starting with pip install: `# pip install <package1> <package2>` or `# pip install -r ~/requierments.txt`
+- The required pip packages are listed in comments starting with pip install: `# pip install <package1> <package2>` or `# pip install -r ~/requirements.txt`
 - The interface is defined by environment variables `my_parameter = os.getenv('my_parameter')`. 
 - You can cast a specific type by wrapping `os.getenv()` with `int()`, `float()`, `bool()`. The default type is string. Only these four types are currently supported. You can use `None` as a default value but not pass the `NoneType` via the `job.yaml`.
 - Output paths for KubeFlow can be defined with `os.environ['my_output_parameter'] = ...'`. Note that operators cannot return values but always have to save outputs in files.
@@ -543,7 +543,7 @@ Therefore, the code gets wrapped by a coordinator script: The grid wrapper.
 
 ### 5.1 C3 grid computing requirements
 
-You can use the same code for the grid wrapper as for an operator by adding an extra functon which is passed to C3. 
+You can use the same code for the grid wrapper as for an operator by adding an extra function which is passed to C3. 
 The grid wrapper executes this function in each batch and passes specific parameters to the function: 
 The first parameter is the batch id, followed by all variables defined in the operator interface. 
 You need to adapt the variables based on the batch, e.g., by adding the batch id to input and output paths.

@@ -481,7 +481,7 @@ def main():
     parser.add_argument('--keep-generated-files', action='store_true',
                         help='Do not delete temporary generated files.')
     parser.add_argument('--platform', type=str, default='linux/amd64',
-                        help='Select image platform, default is linux/amd64. Alternativly, select linux/arm64".')
+                        help='Select image platform, default is linux/amd64. Alternatively, select linux/arm64".')
     parser.add_argument('--image_version', type=str, default='python3.12',
                         help='Select python or R version (defaults to python3.12).')
     parser.add_argument('--skip-docker-build', action='store_true',

@@ -34,6 +34,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import partial
 
+# pip install gdal==3.10.3.post1 --extra-index-url https://gitlab.com/api/v4/projects/61637378/packages/pypi/simple
 from osgeo import gdal, osr
 
 log = logging.getLogger(__name__)
@@ -208,12 +209,13 @@ def _write_item(base_url, name, output_dir):
 
 
 def _common_value(items, key):
-    """Return the value every Item shares for ``key``, or None if they differ."""
-    seen = {
-        json.dumps(item["properties"][key], sort_keys=True)
-        for item in items
-        if key in item["properties"]
-    }
+    """Return the value every Item shares for ``key``, or None otherwise.
+
+    None is also returned if any Item lacks ``key``.
+    """
+    if any(key not in item["properties"] for item in items):
+        return None
+    seen = {json.dumps(item["properties"][key], sort_keys=True) for item in items}
     if len(seen) != 1:
         return None
     return json.loads(seen.pop())
@@ -355,7 +357,12 @@ def main():
         default=os.environ.get("workers", 8),
         help="Concurrent header reads per page.",
     )
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
+    # CLAIMED passes inputs as name=value; the setup code already put them in
+    # the environment (read as defaults above), so only reject anything else.
+    unknown = [a for a in unknown if not re.fullmatch(r"\w+=.*", a)]
+    if unknown:
+        parser.error(f"unrecognized arguments: {' '.join(unknown)}")
 
     logging.basicConfig(level=logging.INFO)
     written, failed = run(
